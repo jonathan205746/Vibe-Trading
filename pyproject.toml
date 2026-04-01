@@ -1,0 +1,82 @@
+[project]
+name = "vibe-trading-ai"
+version = "0.1.3"
+description = "Natural-language finance research AI agent with backtesting"
+requires-python = ">=3.11"
+license = "MIT"
+readme = "README.md"
+authors = [
+    {name = "HKUDS", email = "hkuds@connect.hku.hk"},
+]
+keywords = ["finance", "trading", "backtesting", "agent", "swarm", "quantitative"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Financial :: Investment",
+]
+dependencies = [
+    "rich>=13.0.0",
+    "pyyaml>=6.0.0",
+    "langchain>=0.1.0",
+    "langchain-core>=0.1.0",
+    "langchain-openai>=0.0.5",
+    "langgraph>=0.2.50,<0.3",
+    "langgraph-checkpoint>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "duckdb>=1.2.0",
+    "scikit-learn>=1.3.0",
+    "joblib>=1.3.0",
+    "smartmoneyconcepts>=0.0.1",
+    "pyharmonics>=1.5.0",
+    "tushare>=1.2.89",
+    "requests>=2.31.0",
+    "yfinance>=0.2.30",
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "pydantic>=2.0.0",
+    "python-multipart>=0.0.6",
+    "sse-starlette>=1.6.0",
+    "fastmcp>=2.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/HKUDS/Vibe-Trading"
+Repository = "https://github.com/HKUDS/Vibe-Trading"
+Issues = "https://github.com/HKUDS/Vibe-Trading/issues"
+
+[project.scripts]
+vibe-trading = "cli:main"
+vibe-trading-mcp = "mcp_server:main"
+
+[tool.setuptools]
+package-dir = {"" = "agent"}
+py-modules = ["cli", "run_agent", "api_server", "mcp_server"]
+
+[tool.setuptools.packages.find]
+where = ["agent"]
+include = ["src*", "backtest*"]
+
+[tool.setuptools.package-data]
+"src" = [
+    "skills/**/*.md",
+    "skills/**/*.yaml",
+    "skills/**/*.json",
+]
+"backtest" = ["*.py"]
+
+[tool.setuptools.data-files]
+"config/swarm" = ["agent/config/swarm/*.yaml"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+src = ["agent"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]

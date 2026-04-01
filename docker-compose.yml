@@ -1,0 +1,17 @@
+services:
+  vibe-trading:
+    build: .
+    ports:
+      - "8899:8899"
+    env_file:
+      - agent/.env
+    volumes:
+      - fin-data:/app/data
+      - fin-runs:/app/agent/runs
+      - fin-sessions:/app/agent/sessions
+    restart: unless-stopped
+
+volumes:
+  fin-data:
+  fin-runs:
+  fin-sessions:
