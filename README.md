@@ -153,12 +153,12 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
 <tr>
 <td width="50%">
 
-https://github.com/user-attachments/assets/3d5a9653-06cd-4903-b487-dc7ce4d8d90e
+https://github.com/user-attachments/assets/4e4dcb80-7358-4b9a-92f0-1e29612e6e86
 
 </td>
 <td width="50%">
 
-https://github.com/user-attachments/assets/3f8c1301-778c-439d-8992-1ad0ac524660
+https://github.com/user-attachments/assets/3754a414-c3ee-464f-b1e8-78e1a74fbd30
 
 </td>
 </tr>
