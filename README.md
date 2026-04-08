@@ -42,6 +42,14 @@
 
 ---
 
+## 📰 News
+
+| Date | Update |
+|------|--------|
+| 2026-04-01 | **v0.1.0** — Initial release: ReAct agent, 64 skills, 29 swarm presets, cross-market backtest, CLI + Web UI + MCP server. |
+
+---
+
 ## 💡 What Is Vibe-Trading?
 
 Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural language requests into executable trading strategies, research insights, and portfolio analysis across global markets.
