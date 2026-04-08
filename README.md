@@ -44,9 +44,8 @@
 
 ## 📰 News
 
-| Date | Update |
-|------|--------|
-| 2026-04-01 | **v0.1.0** — Initial release: ReAct agent, 64 skills, 29 swarm presets, cross-market backtest, CLI + Web UI + MCP server. |
+- **2026-04-09** 🔧 Multi-market backtest engines — per-market rules (A-share T+1, crypto funding/liquidation, US/HK fees) replace the single vectorised engine.
+- **2026-04-01** 🚀 Released **v0.1.0** — Initial release: ReAct agent, 64 skills, 29 swarm presets, cross-market backtest, CLI + Web UI + MCP server.
 
 ---
 

@@ -27,6 +27,9 @@ data/*.duckdb.wal
 data/.duckdb_tmp/
 data/parquet/
 data/backup/
+
+# Internal docs (plans, specs)
+docs/
 data/minutes/
 data/overnight*.log
 data/*.log
@@ -35,5 +38,6 @@ agent/.pytest_tmp/
 agent/tests/e2e_swarm_results.json
 agent/vibe_trading.egg-info/
 agent/vibe_trading_ai.egg-info/
+agent/tests/
 dist/
 build/

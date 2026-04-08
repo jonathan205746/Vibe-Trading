@@ -162,38 +162,65 @@ def main(run_dir: Path) -> None:
 
     # Engine
     engine_type = config.get("engine", "daily")
-    run_backtest_fn = _get_engine(engine_type)
-
-    engine = engine_cls()
+    signal_engine = engine_cls()
 
     # Annualization bars
     effective_source = _detect_primary_source(codes, source)
-    from backtest.engines.daily_portfolio import _calc_bars_per_year
-    bars_per_year = _calc_bars_per_year(interval, effective_source)
+    from backtest.metrics import calc_bars_per_year
+    bars_per_year = calc_bars_per_year(interval, effective_source)
 
     # Auto mode: wrap preloaded data in a dummy loader
     if source == "auto":
         loader = _AutoLoader(data_map)
-        run_backtest_fn(config, loader, engine, run_dir, bars_per_year=bars_per_year)
-    else:
-        run_backtest_fn(config, loader, engine, run_dir, bars_per_year=bars_per_year)
 
-
-def _get_engine(engine_type: str):
-    """Resolve ``run_backtest`` / ``run_options_backtest`` by engine name.
-
-    Args:
-        engine_type: ``daily`` or ``options``.
-
-    Returns:
-        Callable backtest entry.
-    """
     if engine_type == "options":
         from backtest.engines.options_portfolio import run_options_backtest
-        return run_options_backtest
+        run_options_backtest(config, loader, signal_engine, run_dir, bars_per_year=bars_per_year)
     else:
-        from backtest.engines.daily_portfolio import run_backtest
-        return run_backtest
+        market_engine = _create_market_engine(effective_source, config, codes)
+        market_engine.run_backtest(config, loader, signal_engine, run_dir, bars_per_year=bars_per_year)
+
+
+def _create_market_engine(source: str, config: dict, codes: List[str]):
+    """Create the appropriate market engine based on data source.
+
+    Args:
+        source: Data source (okx / tushare / yfinance).
+        config: Backtest configuration.
+        codes: Instrument codes.
+
+    Returns:
+        BaseEngine subclass instance.
+    """
+    if source == "okx":
+        from backtest.engines.crypto import CryptoEngine
+        return CryptoEngine(config)
+    elif source == "tushare":
+        from backtest.engines.china_a import ChinaAEngine
+        return ChinaAEngine(config)
+    elif source == "yfinance":
+        from backtest.engines.global_equity import GlobalEquityEngine
+        market = _detect_submarket(codes)
+        return GlobalEquityEngine(config, market=market)
+    else:
+        # Default: crypto (most permissive rules)
+        from backtest.engines.crypto import CryptoEngine
+        return CryptoEngine(config)
+
+
+def _detect_submarket(codes: List[str]) -> str:
+    """Detect US vs HK from symbol suffixes.
+
+    Args:
+        codes: Instrument codes.
+
+    Returns:
+        "hk" if any code ends with .HK, else "us".
+    """
+    for code in codes:
+        if code.upper().endswith(".HK"):
+            return "hk"
+    return "us"
 
 
 def _detect_primary_source(codes: List[str], source: str) -> str:
