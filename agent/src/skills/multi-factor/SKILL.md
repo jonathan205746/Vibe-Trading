@@ -1,6 +1,7 @@
 ---
 name: multi-factor
 description: Multi-factor cross-sectional stock ranking. Combines factor standardization, equal-weight or IC-weighted scoring, and TopN portfolio construction. Suitable for multi-instrument portfolio strategies.
+category: strategy
 ---
 # Multi-Factor Cross-Sectional Stock Ranking
 

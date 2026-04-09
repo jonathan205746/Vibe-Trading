@@ -1,6 +1,7 @@
 ---
 name: elliott-wave
 description: Elliott Wave Theory signal engine. Detects swing points through Zigzag, matches 5-wave impulse and 3-wave corrective structures, validates them with Fibonacci wave relationships, and generates trend-top / correction-complete signals. Pure in-house pandas implementation.
+category: strategy
 ---
 # Elliott Wave Theory
 

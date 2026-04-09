@@ -1,6 +1,7 @@
 ---
 name: corporate-events
 description: 公司事件驱动分析：并购套利价差计算、大股东增减持信号、股权激励解读、定增配股影响评估、A股ST/退市预警
+category: flow
 ---
 
 # 公司事件驱动分析

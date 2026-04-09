@@ -1,6 +1,7 @@
 ---
 name: backtest-diagnose
 description: Diagnose failed or underperforming backtests, locate the root cause, and fix the issue
+category: tool
 ---
 
 # Backtest Diagnosis

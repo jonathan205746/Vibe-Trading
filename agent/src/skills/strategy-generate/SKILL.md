@@ -1,6 +1,7 @@
 ---
 name: strategy-generate
 description: Create, modify, and optimize quantitative trading strategies, then backtest and evaluate them.
+category: strategy
 ---
 
 ## Workflow

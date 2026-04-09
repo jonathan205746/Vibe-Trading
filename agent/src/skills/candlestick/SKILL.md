@@ -1,6 +1,7 @@
 ---
 name: candlestick
 description: Candlestick pattern recognition engine, pure pandas vectorized implementation of 15 classic candlestick patterns (5 single-candle + 5 double-candle + 4 triple-candle + 1 trend confirmation), generating a composite signal from bullish/bearish pattern scores.
+category: strategy
 ---
 # Candlestick Pattern Recognition
 

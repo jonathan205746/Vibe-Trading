@@ -1,6 +1,7 @@
 ---
 name: global-macro
 description: Global macro analysis framework (central bank policy transmission / FX forecasting / geopolitical risk / capital flows), used to build macro factor signals that drive cross-asset allocation.
+category: analysis
 ---
 # Global Macro Analysis
 

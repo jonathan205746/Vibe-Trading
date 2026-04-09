@@ -1,6 +1,7 @@
 ---
 name: valuation-model
 description: Valuation methodology — absolute valuation with DCF / DDM / SOTP, relative valuation with PE-Band / PB-ROE / EV-EBITDA, sensitivity analysis, and valuation-trap detection.
+category: analysis
 ---
 
 # Valuation Methodology

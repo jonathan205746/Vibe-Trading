@@ -1,6 +1,7 @@
 ---
 name: yfinance
 description: yfinance global market data interface — retrieve OHLCV, financials, insider transactions, and institutional holdings for US stocks, HK stocks, ETFs, and indices via Yahoo Finance. Free, no API key required.
+category: data-source
 ---
 # yfinance
 

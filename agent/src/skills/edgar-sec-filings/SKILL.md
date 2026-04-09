@@ -1,6 +1,7 @@
 ---
 name: edgar-sec-filings
 description: SEC EDGAR filing analysis — 10-K, 10-Q, 8-K, proxy statements, insider Form 4. Extract key financials, risk factors, management discussion, and generate investment signals from US public company filings.
+category: flow
 ---
 # SEC EDGAR Filing Analysis
 

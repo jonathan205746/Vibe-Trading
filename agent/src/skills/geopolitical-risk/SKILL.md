@@ -1,6 +1,7 @@
 ---
 name: geopolitical-risk
 description: "Geopolitical risk analysis: quantify crisis signals, identify precursors, and build event-driven strategies for war, sanctions, and supply disruption scenarios."
+category: tool
 ---
 
 # Geopolitical Risk Analysis

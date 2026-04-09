@@ -1,6 +1,7 @@
 ---
 name: defi-yield
 description: DeFi yield analysis and optimization — lending rates, LP yields, staking returns, yield farming strategies, risk-adjusted yield comparison, and protocol-level sustainability assessment.
+category: crypto
 ---
 # DeFi Yield Analysis & Optimization
 

@@ -9,10 +9,26 @@ Usage: ``python -m backtest.runner <run_dir>``
 
 import importlib.util
 import json
+import logging
 import re
 import sys
 from pathlib import Path
 from typing import Dict, List
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+from backtest.loaders.registry import (
+    LOADER_REGISTRY,
+    get_loader_cls_with_fallback,
+    resolve_loader,
+)
+from backtest.loaders.base import NoAvailableSourceError
+
+logger = logging.getLogger(__name__)
 
 
 def _load_module_from_file(file_path: Path, module_name: str):
@@ -32,33 +48,80 @@ def _load_module_from_file(file_path: Path, module_name: str):
     return module
 
 
-# --- Market detection ---
+# --- Market detection (returns market type, NOT source name) ---
 
-_PATTERNS = [
-    (re.compile(r"^\d{6}\.(SZ|SH|BJ)$", re.I), "tushare"),
-    (re.compile(r"^[A-Z]+\.US$", re.I), "yfinance"),
-    (re.compile(r"^\d{3,5}\.HK$", re.I), "yfinance"),
-    (re.compile(r"^[A-Z]+-USDT$", re.I), "okx"),
+_MARKET_PATTERNS = [
+    (re.compile(r"^\d{6}\.(SZ|SH|BJ)$", re.I), "a_share"),
+    (re.compile(r"^(51|15|56)\d{4}\.(SZ|SH)$", re.I), "a_share"),
+    (re.compile(r"^[A-Z]+\.US$", re.I), "us_equity"),
+    (re.compile(r"^\d{3,5}\.HK$", re.I), "hk_equity"),
+    (re.compile(r"^[A-Z]+-USDT$", re.I), "crypto"),
+    (re.compile(r"^[A-Z]+/USDT$", re.I), "crypto"),
+    (re.compile(r"^[A-Z]{1,2}\d{3,4}\.(ZCE|DCE|SHFE|INE|CFFEX|GFEX)$", re.I), "futures"),
+    (re.compile(r"^[A-Z]{3}/[A-Z]{3}$"), "forex"),
+    (re.compile(r"^[A-Z]{6}\.FX$"), "forex"),
 ]
 
+# Back-compat: market type -> legacy source name (for engine selection & metrics)
+_MARKET_TO_SOURCE = {
+    "a_share": "tushare",
+    "us_equity": "yfinance",
+    "hk_equity": "yfinance",
+    "crypto": "okx",
+    "futures": "tushare",
+    "fund": "tushare",
+    "macro": "akshare",
+    "forex": "akshare",
+}
 
-def _detect_source(code: str) -> str:
-    """Infer data source from symbol format.
+
+def _detect_market(code: str) -> str:
+    """Infer market type from symbol format.
 
     Args:
         code: Ticker / symbol string.
 
     Returns:
-        Source name (tushare/okx/yfinance); unknown defaults to ``tushare``.
+        Market type (a_share/us_equity/hk_equity/crypto/futures/forex);
+        unknown defaults to ``a_share``.
     """
-    for pattern, source in _PATTERNS:
+    for pattern, market in _MARKET_PATTERNS:
         if pattern.match(code):
-            return source
-    return "tushare"
+            return market
+    return "a_share"
+
+
+def _detect_source(code: str) -> str:
+    """Infer legacy source name from symbol (back-compat for metrics/engine).
+
+    Args:
+        code: Ticker / symbol string.
+
+    Returns:
+        Source name (tushare/okx/yfinance/akshare).
+    """
+    market = _detect_market(code)
+    return _MARKET_TO_SOURCE.get(market, "tushare")
+
+
+def _group_codes_by_market(codes: List[str]) -> Dict[str, List[str]]:
+    """Group symbols by detected market type.
+
+    Args:
+        codes: List of symbol strings.
+
+    Returns:
+        Mapping market_type -> list of codes.
+    """
+    groups: Dict[str, List[str]] = {}
+    for code in codes:
+        market = _detect_market(code)
+        groups.setdefault(market, []).append(code)
+    return groups
 
 
 def _group_codes_by_source(codes: List[str]) -> Dict[str, List[str]]:
-    """Group symbols by inferred source.
+    """Group symbols by inferred source (back-compat).
 
     Args:
         codes: List of symbol strings.
@@ -74,23 +137,21 @@ def _group_codes_by_source(codes: List[str]) -> Dict[str, List[str]]:
 
 
 def _get_loader(source: str):
-    """Return the DataLoader class for a source name.
+    """Return a DataLoader class for a source name, with fallback.
 
     Args:
-        source: Source name.
+        source: Source name (tushare/okx/yfinance/akshare/ccxt).
 
     Returns:
         DataLoader class.
     """
-    if source == "okx":
-        from backtest.loaders.okx import DataLoader
-    elif source == "yfinance":
-        from backtest.loaders.yfinance_loader import DataLoader
-    elif source == "tushare":
-        from backtest.loaders.tushare import DataLoader
-    else:
-        from backtest.loaders.tushare import DataLoader
-    return DataLoader
+    try:
+        return get_loader_cls_with_fallback(source)
+    except NoAvailableSourceError:
+        # Ultimate fallback for unknown sources
+        if "tushare" in LOADER_REGISTRY:
+            return LOADER_REGISTRY["tushare"]
+        raise
 
 
 def _normalize_codes(codes: List[str], source: str) -> List[str]:
@@ -103,7 +164,7 @@ def _normalize_codes(codes: List[str], source: str) -> List[str]:
     Returns:
         Normalized codes.
     """
-    if source == "okx":
+    if source in ("okx", "ccxt"):
         return [c.replace("/", "-").upper() for c in codes]
     return codes
 
@@ -185,17 +246,23 @@ def _create_market_engine(source: str, config: dict, codes: List[str]):
     """Create the appropriate market engine based on data source.
 
     Args:
-        source: Data source (okx / tushare / yfinance).
+        source: Data source (okx/ccxt/tushare/akshare/yfinance).
         config: Backtest configuration.
         codes: Instrument codes.
 
     Returns:
         BaseEngine subclass instance.
     """
-    if source == "okx":
+    if source in ("okx", "ccxt"):
         from backtest.engines.crypto import CryptoEngine
         return CryptoEngine(config)
-    elif source == "tushare":
+    elif source in ("tushare", "akshare"):
+        # Determine if codes look like A-shares or global equities
+        markets = {_detect_market(c) for c in codes}
+        if markets & {"us_equity", "hk_equity"}:
+            from backtest.engines.global_equity import GlobalEquityEngine
+            market = _detect_submarket(codes)
+            return GlobalEquityEngine(config, market=market)
         from backtest.engines.china_a import ChinaAEngine
         return ChinaAEngine(config)
     elif source == "yfinance":
@@ -203,7 +270,6 @@ def _create_market_engine(source: str, config: dict, codes: List[str]):
         market = _detect_submarket(codes)
         return GlobalEquityEngine(config, market=market)
     else:
-        # Default: crypto (most permissive rules)
         from backtest.engines.crypto import CryptoEngine
         return CryptoEngine(config)
 
@@ -243,7 +309,7 @@ def _detect_primary_source(codes: List[str], source: str) -> str:
 
 
 def _fetch_auto(codes: List[str], config: dict, interval: str = "1D") -> dict:
-    """Auto mode: fetch per source and merge into one data map.
+    """Auto mode: route each market group through fallback chain.
 
     Args:
         codes: All symbols.
@@ -253,18 +319,25 @@ def _fetch_auto(codes: List[str], config: dict, interval: str = "1D") -> dict:
     Returns:
         Merged ``code -> DataFrame`` map.
     """
-    groups = _group_codes_by_source(codes)
+    market_groups = _group_codes_by_market(codes)
     merged = {}
     start_date = config.get("start_date", "")
     end_date = config.get("end_date", "")
 
-    for src, src_codes in groups.items():
-        src_codes = _normalize_codes(src_codes, src)
-        LoaderCls = _get_loader(src)
-        loader = LoaderCls()
-        # Only tushare supports extra_fields
-        fields = config.get("extra_fields") if src == "tushare" else None
-        result = loader.fetch(src_codes, start_date, end_date, fields=fields, interval=interval)
+    for market, market_codes in market_groups.items():
+        try:
+            loader = resolve_loader(market)
+        except NoAvailableSourceError as exc:
+            # Fallback: try legacy source mapping
+            legacy_src = _MARKET_TO_SOURCE.get(market, "tushare")
+            logger.warning("Fallback chain failed for %s: %s — trying %s", market, exc, legacy_src)
+            LoaderCls = _get_loader(legacy_src)
+            loader = LoaderCls()
+
+        src_name = getattr(loader, "name", "unknown")
+        normalized_codes = _normalize_codes(market_codes, src_name)
+        fields = config.get("extra_fields") if src_name == "tushare" else None
+        result = loader.fetch(normalized_codes, start_date, end_date, fields=fields, interval=interval)
         merged.update(result)
 
     return merged

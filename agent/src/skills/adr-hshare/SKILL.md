@@ -1,6 +1,7 @@
 ---
 name: adr-hshare
 description: ADR/H-share/A-share cross-listing premium analysis — track pricing gaps between US-listed ADRs, HK-listed H-shares, and A-shares for arbitrage signals, dual-listing valuation, and delisting risk assessment.
+category: flow
 ---
 # ADR / H-Share / A-Share Cross-Listing Analysis
 

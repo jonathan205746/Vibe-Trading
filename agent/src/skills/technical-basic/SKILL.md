@@ -1,6 +1,7 @@
 ---
 name: technical-basic
 description: Core technical indicator collection (trend EMA/ADX + mean-reversion BB/RSI + volume-price OBV/volume ratio), generates a composite signal via three-dimensional voting. Pure pandas implementation for any OHLCV data.
+category: strategy
 ---
 # Core Technical Indicator Collection
 

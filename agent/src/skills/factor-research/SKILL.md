@@ -1,6 +1,7 @@
 ---
 name: factor-research
 description: Factor research framework with IC/IR analysis, quantile backtesting, and factor combination. Suitable for cross-sectional factor evaluation across multiple instruments.
+category: analysis
 ---
 
 # Factor Research Framework

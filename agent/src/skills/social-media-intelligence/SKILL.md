@@ -1,6 +1,7 @@
 ---
 name: social-media-intelligence
 description: "Social media intelligence: financial signal extraction from Twitter/X, Telegram, Discord, and Reddit for sentiment-driven trading strategies."
+category: tool
 ---
 
 # Social Media Intelligence

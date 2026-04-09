@@ -1,6 +1,7 @@
 ---
 name: stablecoin-flow
 description: Stablecoin supply and flow analysis — USDT/USDC mint-burn signals, exchange stablecoin reserves, on-chain stablecoin velocity, and capital rotation indicators for crypto market timing.
+category: crypto
 ---
 # Stablecoin Flow Analysis
 

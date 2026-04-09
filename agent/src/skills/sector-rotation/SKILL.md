@@ -1,6 +1,7 @@
 ---
 name: sector-rotation
 description: 行业轮动分析——申万行业景气度评分、行业动量排名、产业链传导、估值/盈利/资金流多维比较框架
+category: asset-class
 ---
 
 # 行业轮动分析

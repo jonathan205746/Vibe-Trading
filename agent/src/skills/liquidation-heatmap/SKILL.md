@@ -1,6 +1,7 @@
 ---
 name: liquidation-heatmap
 description: Liquidation level analysis and heatmap interpretation — identify leveraged position concentration, liquidation cascades, stop-hunt zones, and use liquidation data as support/resistance signals.
+category: crypto
 ---
 # Liquidation Heatmap & Level Analysis
 

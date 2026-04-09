@@ -1,6 +1,7 @@
 ---
 name: commodity-analysis
 description: Commodity analysis (oil supply-demand balance / gold pricing / copper as an economic predictor / inventory cycles / futures premium-discount structure / seasonality), generating directional commodity signals.
+category: analysis
 ---
 # Commodity Analysis
 

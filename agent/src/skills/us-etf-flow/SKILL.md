@@ -1,6 +1,7 @@
 ---
 name: us-etf-flow
 description: US ETF fund flow analysis, sector rotation breadth, and style factor flows — track institutional capital movement via ETF creation/redemption, sector breadth signals, and thematic momentum.
+category: flow
 ---
 # US ETF Flow & Sector Breadth Analysis
 

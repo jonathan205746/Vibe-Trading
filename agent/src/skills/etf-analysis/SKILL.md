@@ -1,6 +1,7 @@
 ---
 name: etf-analysis
 description: "ETF分析：产品筛选、费率对比、跟踪误差、流动性评估、策略应用与中国市场ETF量化配置框架。"
+category: asset-class
 ---
 
 # ETF 分析 Skill

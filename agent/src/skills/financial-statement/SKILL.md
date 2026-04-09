@@ -1,6 +1,7 @@
 ---
 name: financial-statement
 description: 财报三表深度解读——三表勾稽关系、盈利质量(应计vs现金流)分析、杜邦分解、10+财务造假红旗指标
+category: flow
 ---
 
 # 财报三表解读

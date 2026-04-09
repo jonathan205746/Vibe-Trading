@@ -1,6 +1,7 @@
 ---
 name: performance-attribution
 description: Performance attribution analysis — Brinson sector/stock-selection attribution, factor alpha/beta decomposition, market-timing evaluation, and benchmark comparison framework.
+category: analysis
 ---
 
 # Performance Attribution Analysis

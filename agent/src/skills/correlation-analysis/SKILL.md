@@ -1,6 +1,7 @@
 ---
 name: correlation-analysis
 description: Correlation and cointegration analysis — co-movement discovery, deep return-correlation analysis, sector clustering, realized correlation, Engle-Granger / Johansen cointegration, half-life, Kalman dynamic hedge ratio, cross-market linkage analysis, and pair-trading signal generation
+category: analysis
 ---
 
 # Correlation and Cointegration Analysis

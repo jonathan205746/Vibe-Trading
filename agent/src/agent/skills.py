@@ -20,6 +20,7 @@ class Skill:
     Attributes:
         name: Skill name.
         description: Skill description.
+        category: Skill category for grouped display.
         body: SKILL.md body text.
         dir_path: Skill directory path (used for on-demand loading of supporting files).
         metadata: Parsed frontmatter metadata.
@@ -27,6 +28,7 @@ class Skill:
 
     name: str
     description: str = ""
+    category: str = "other"
     body: str = ""
     dir_path: Optional[Path] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
@@ -108,6 +110,7 @@ def _load_skill_dir(dir_path: Path) -> Optional[Skill]:
     return Skill(
         name=name,
         description=meta.get("description", ""),
+        category=meta.get("category", "other"),
         body=body,
         dir_path=dir_path,
         metadata=meta,
@@ -141,17 +144,33 @@ class SkillsLoader:
                 if skill:
                     self.skills.append(skill)
 
+    # Display order for categories (unlisted categories appear at the end).
+    _CATEGORY_ORDER = [
+        "data-source", "strategy", "analysis", "asset-class",
+        "crypto", "flow", "tool", "other",
+    ]
+
     def get_descriptions(self) -> str:
-        """Return a one-line summary of every skill for the system prompt (low token cost).
+        """Return skills grouped by category for the system prompt.
 
         Returns:
-            One line per skill with name + description.
+            Grouped skill list with category headers.
         """
         if not self.skills:
             return "(no skills)"
-        lines = []
+
+        groups: Dict[str, List[Skill]] = {}
         for skill in self.skills:
-            lines.append(f"  - {skill.name}: {skill.description}")
+            groups.setdefault(skill.category, []).append(skill)
+
+        ordered_cats = [c for c in self._CATEGORY_ORDER if c in groups]
+        ordered_cats += [c for c in sorted(groups) if c not in ordered_cats]
+
+        lines: List[str] = []
+        for cat in ordered_cats:
+            lines.append(f"\n### {cat}")
+            for skill in groups[cat]:
+                lines.append(f"  - {skill.name}: {skill.description}")
         return "\n".join(lines)
 
     def get_content(self, name: str) -> str:

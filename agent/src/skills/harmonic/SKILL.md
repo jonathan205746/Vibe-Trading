@@ -1,6 +1,7 @@
 ---
 name: harmonic
 description: Harmonic Patterns signal engine. Identifies XABCD five-point structures such as Gartley/Bat/Butterfly/Crab based on Fibonacci geometry, and generates trading signals in the PRZ (Potential Reversal Zone).
+category: strategy
 ---
 # Harmonic Patterns
 

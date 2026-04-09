@@ -1,6 +1,7 @@
 ---
 name: pine-script
 description: Convert Python backtest strategies to TradingView Pine Script v6, or generate Pine Script from natural language descriptions.
+category: tool
 ---
 
 ## Overview

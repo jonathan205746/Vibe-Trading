@@ -15,10 +15,10 @@
   <a href="https://pypi.org/project/vibe-trading-ai/"><img src="https://img.shields.io/pypi/v/vibe-trading-ai?style=flat&logo=pypi&logoColor=white" alt="PyPI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=flat" alt="License"></a>
   <br>
-  <img src="https://img.shields.io/badge/Skills-65-orange" alt="Skills">
+  <img src="https://img.shields.io/badge/Skills-68-orange" alt="Skills">
   <img src="https://img.shields.io/badge/Swarm_Presets-29-7C3AED" alt="Swarm">
-  <img src="https://img.shields.io/badge/Tools-20-0F766E" alt="Tools">
-  <img src="https://img.shields.io/badge/Markets-3-2563EB" alt="Markets">
+  <img src="https://img.shields.io/badge/Tools-21-0F766E" alt="Tools">
+  <img src="https://img.shields.io/badge/Data_Sources-5-2563EB" alt="Data Sources">
   <br>
   <a href="https://github.com/HKUDS/.github/blob/main/profile/README.md"><img src="https://img.shields.io/badge/Feishu-Group-E9DBFC?style=flat-square&logo=feishu&logoColor=white" alt="Feishu"></a>
   <a href="https://github.com/HKUDS/.github/blob/main/profile/README.md"><img src="https://img.shields.io/badge/WeChat-Group-C5EAB4?style=flat-square&logo=wechat&logoColor=white" alt="WeChat"></a>
@@ -44,7 +44,8 @@
 
 ## 📰 News
 
-- **2026-04-09** 🔧 Multi-market backtest engines with per-market rules; **Pine Script v6 export** — convert strategies to TradingView in one command (`/pine`, API, frontend viewer).
+- **2026-04-09** 🔧 **Data source expansion**: 5 data sources with auto-fallback (tushare, yfinance, OKX, AKShare, CCXT) — zero-config backtesting across A-shares, US/HK equities, crypto, futures, and forex. Added `web_search` tool (DuckDuckGo), skill categorization (7 categories), and `data-routing` meta-skill for intelligent source selection.
+- **2026-04-08** 🔧 Multi-market backtest engines with per-market rules; **Pine Script v6 export** — convert strategies to TradingView in one command (`/pine`, API, frontend viewer).
 - **2026-04-01** 🚀 Released **v0.1.0** — Initial release: ReAct agent, 64 skills, 29 swarm presets, cross-market backtest, CLI + Web UI + MCP server.
 
 ---
@@ -55,7 +56,7 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
 
 ### Key Capabilities:
 • **Strategy Generation** — Automatically writes trading code from your ideas<br>
-• **Smart Data Access** — Pulls market data from multiple sources seamlessly<br>
+• **Smart Data Access** — 5 data sources with automatic fallback; zero-config for all markets<br>
 • **Performance Testing** — Tests your strategies against historical market data<br>
 • **TradingView Export** — One-click convert strategies to Pine Script v6 for TradingView<br>
 • **Expert Teams** — Deploys specialized AI agents for complex research tasks<br>
@@ -70,7 +71,7 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
     <td align="center" width="25%" valign="top">
       <img src="assets/scene-research.png" height="150" alt="Research"/><br>
       <h3>🔍 DeepResearch for Trading</h3>
-      <img src="https://img.shields.io/badge/65_Skills-FF6B6B?style=for-the-badge&logo=bookstack&logoColor=white" alt="Skills" /><br><br>
+      <img src="https://img.shields.io/badge/68_Skills-FF6B6B?style=for-the-badge&logo=bookstack&logoColor=white" alt="Skills" /><br><br>
       <div align="left" style="font-size: 4px;">
         • Multi-domain analysis coverage across markets<br>
         • Auto strategy and signal generation<br>
@@ -92,10 +93,10 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
     <td align="center" width="25%" valign="top">
       <img src="assets/scene-backtest.png" height="150" alt="Backtest"/><br>
       <h3>📊 Cross-Market Backtest</h3>
-      <img src="https://img.shields.io/badge/3_Markets-FFD93D?style=for-the-badge&logo=bitcoin&logoColor=black" alt="Backtest" /><br><br>
+      <img src="https://img.shields.io/badge/5_Data_Sources-FFD93D?style=for-the-badge&logo=bitcoin&logoColor=black" alt="Backtest" /><br><br>
       <div align="left">
-        • A-shares, HK/US equities & crypto<br>
-        • 7 flexible intervals from 1 min to 1 day<br>
+        • A-shares, HK/US equities, crypto, futures & forex<br>
+        • Auto-fallback: always finds a working source<br>
         • Daily & options portfolio engines<br>
         • 15+ performance metrics & 4 optimizers
       </div>
@@ -114,22 +115,21 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
   </tr>
 </table>
 
-## 64 Skills across 8 Core Finance Domains
+## 68 Skills across 7 Categories
 
-- 📊 65 specialized finance skills across 8 core domains
+- 📊 68 specialized finance skills organized into 7 categories
 - 🌐 Complete coverage from traditional markets to crypto & DeFi
-- 🔬 Comprehensive capabilities spanning technical analysis to quantitative research
+- 🔬 Comprehensive capabilities spanning data sourcing to quantitative research
 
-| Area | Examples |
-|------|----------|
-| Technical Analysis | `technical-basic`, `candlestick`, `ichimoku`, `harmonic`, `elliott-wave`, `smc` |
-| Quant Research | `strategy-generate`, `pine-script`, `multi-factor`, `pair-trading`, `factor-research`, `ml-strategy` |
-| Fundamentals | `valuation-model`, `financial-statement`, `earnings-forecast`, `credit-analysis` |
-| HK/US Equities | `edgar-sec-filings`, `earnings-revision`, `us-etf-flow`, `hk-connect-flow`, `adr-hshare` |
-| Crypto Desk | `perp-funding-basis`, `liquidation-heatmap`, `stablecoin-flow`, `token-unlock-treasury`, `defi-yield` |
-| Macro | `macro-analysis`, `global-macro`, `asset-allocation`, `commodity-analysis`, `sector-rotation` |
-| Derivatives | `options-strategy`, `options-advanced`, `options-payoff`, `crypto-derivatives`, `hedging-strategy` |
-| Alt Data | `social-media-intelligence`, `sentiment-analysis`, `behavioral-finance`, `report-generate` |
+| Category | Skills | Examples |
+|----------|--------|----------|
+| Data Source | 6 | `data-routing`, `tushare`, `yfinance`, `okx-market`, `akshare`, `ccxt` |
+| Strategy | 16 | `strategy-generate`, `technical-basic`, `candlestick`, `ichimoku`, `elliott-wave`, `smc`, `multi-factor`, `ml-strategy` |
+| Analysis | 15 | `factor-research`, `macro-analysis`, `global-macro`, `valuation-model`, `earnings-forecast`, `credit-analysis` |
+| Asset Class | 9 | `options-strategy`, `options-advanced`, `convertible-bond`, `etf-analysis`, `asset-allocation`, `sector-rotation` |
+| Crypto | 7 | `perp-funding-basis`, `liquidation-heatmap`, `stablecoin-flow`, `defi-yield`, `onchain-analysis` |
+| Flow | 7 | `hk-connect-flow`, `us-etf-flow`, `edgar-sec-filings`, `financial-statement`, `adr-hshare` |
+| Tool | 8 | `backtest-diagnose`, `report-generate`, `pine-script`, `doc-reader`, `web-reader` |
 
 ## 29 Agent Swarm Team Presets
 
@@ -215,7 +215,7 @@ vibe-trading-mcp               # start MCP server (stdio)
 - **Python 3.11+** for Path B
 - **Docker** for Path A
 
-> **Tip:** yfinance (HK/US equities) and OKX (crypto) are free and require no API key. You only need a Tushare token for A-share data.
+> **Tip:** All markets work without any API keys thanks to automatic fallback. yfinance (HK/US), OKX (crypto), and AKShare (A-shares, US, HK, futures, forex) are all free. Tushare token is optional — AKShare covers A-shares as a free fallback.
 
 ### Path A: Docker (zero setup)
 
@@ -291,10 +291,11 @@ Edit `agent/.env`:
 | `OPENAI_BASE_URL` | Usually | API gateway URL (default: `https://openrouter.ai/api/v1`) |
 | `LANGCHAIN_PROVIDER` | Yes | LLM provider selector (e.g. `openrouter`) |
 | `LANGCHAIN_MODEL_NAME` | Yes | Model name (e.g. `deepseek/deepseek-v3.2`) |
-| `TUSHARE_TOKEN` | A-shares only | Tushare Pro token for A-share data |
+| `TUSHARE_TOKEN` | No | Tushare Pro token for A-share data (falls back to AKShare if missing) |
+| `CCXT_EXCHANGE` | No | CCXT exchange name, default `binance` |
 | `TIMEOUT_SECONDS` | No | Agent timeout, default 2400s |
 
-**Free data (no key needed):** HK/US equities via yfinance, crypto via OKX public API.
+**Free data (no key needed):** A-shares via AKShare, HK/US equities via yfinance, crypto via OKX, 100+ crypto exchanges via CCXT. The system automatically selects the best available source for each market.
 
 ---
 
@@ -312,7 +313,7 @@ vibe-trading serve         # API server
 | Command | Description |
 |---------|-------------|
 | `/help` | Show all commands |
-| `/skills` | List all 65 finance skills |
+| `/skills` | List all 68 finance skills |
 | `/swarm` | List 29 swarm team presets |
 | `/swarm run <preset> [vars_json]` | Run a swarm team with live streaming |
 | `/swarm list` | Swarm run history |
@@ -446,7 +447,7 @@ Browse on ClawHub: [clawhub.ai/skills/vibe-trading](https://clawhub.ai/skills/vi
 <details>
 <summary><b>OpenSpace — self-evolving skills</b></summary>
 
-All 65 finance skills are published on [open-space.cloud](https://open-space.cloud) and evolve autonomously through OpenSpace's self-evolution engine.
+All 68 finance skills are published on [open-space.cloud](https://open-space.cloud) and evolve autonomously through OpenSpace's self-evolution engine.
 
 To use with OpenSpace, add both MCP servers to your agent config:
 
@@ -468,7 +469,7 @@ To use with OpenSpace, add both MCP servers to your agent config:
 }
 ```
 
-OpenSpace will auto-discover all 64 skills, enabling auto-fix, auto-improve, and community sharing. Search for Vibe-Trading skills via `search_skills("finance backtest")` in any OpenSpace-connected agent.
+OpenSpace will auto-discover all 68 skills, enabling auto-fix, auto-improve, and community sharing. Search for Vibe-Trading skills via `search_skills("finance backtest")` in any OpenSpace-connected agent.
 
 </details>
 
@@ -489,30 +490,33 @@ Vibe-Trading/
 │   ├── src/
 │   │   ├── agent/                  # ReAct agent core
 │   │   │   ├── loop.py             #   main reasoning loop
-│   │   │   ├── skills.py           #   skill loader (64 SKILL.md files)
+│   │   │   ├── skills.py           #   skill loader (68 SKILL.md files, 7 categories)
 │   │   │   ├── tools.py            #   tool orchestration
 │   │   │   ├── context.py          #   system prompt builder
 │   │   │   ├── memory.py           #   run memory / artifact store
 │   │   │   └── trace.py            #   execution trace writer
 │   │   │
-│   │   ├── tools/                  # 20 agent tools
+│   │   ├── tools/                  # 21 agent tools
 │   │   │   ├── backtest_tool.py    #   run backtests
 │   │   │   ├── factor_analysis_tool.py
 │   │   │   ├── options_pricing_tool.py
 │   │   │   ├── pattern_tool.py     #   chart pattern detection
 │   │   │   ├── doc_reader_tool.py  #   PDF reader (OCR fallback)
 │   │   │   ├── web_reader_tool.py  #   web page reader (Jina)
+│   │   │   ├── web_search_tool.py  #   DuckDuckGo web search
 │   │   │   ├── swarm_tool.py       #   launch swarm teams
 │   │   │   └── ...                 #   file I/O, bash, tasks, etc.
 │   │   │
-│   │   ├── skills/                 # 64 finance skill definitions (SKILL.md each)
+│   │   ├── skills/                 # 68 finance skills in 7 categories (SKILL.md each)
 │   │   ├── swarm/                  # Swarm DAG execution engine
 │   │   ├── session/                # Multi-turn chat session management
 │   │   └── providers/              # LLM provider abstraction
 │   │
 │   ├── backtest/                   # Backtest engines
 │   │   ├── engines/                #   daily_portfolio + options_portfolio
-│   │   ├── loaders/                #   tushare, okx, yfinance
+│   │   ├── loaders/                #   5 sources: tushare, okx, yfinance, akshare, ccxt
+│   │   │   ├── base.py             #   DataLoader Protocol
+│   │   │   └── registry.py         #   Registry + auto-fallback chains
 │   │   └── optimizers/             #   MVO, equal vol, max div, risk parity
 │   │
 │   └── config/swarm/               # 29 swarm preset YAML definitions

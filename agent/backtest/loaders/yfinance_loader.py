@@ -8,6 +8,8 @@ from typing import Dict, List, Optional, Union
 import pandas as pd
 import yfinance as yf
 
+from backtest.loaders.registry import register
+
 _OHLCV_COLUMNS = ["open", "high", "low", "close", "volume"]
 _COLUMN_RENAMES = {
     "Open": "open",
@@ -186,8 +188,17 @@ def _normalize_frame(frame: pd.DataFrame, requested_interval: str) -> pd.DataFra
     return normalized
 
 
+@register
 class DataLoader:
     """Fetch HK/US equity bars from Yahoo Finance via yfinance."""
+
+    name = "yfinance"
+    markets = {"us_equity", "hk_equity"}
+    requires_auth = False
+
+    def is_available(self) -> bool:
+        """Always available (free public data, no auth)."""
+        return True
 
     def __init__(self) -> None:
         """Initialize the loader.

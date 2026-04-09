@@ -1,6 +1,7 @@
 ---
 name: quant-statistics
 description: "Quantitative statistical methods: ADF unit-root / cointegration tests, GARCH volatility modeling, regression diagnostics (heteroskedasticity / autocorrelation), Bootstrap, and hypothesis testing."
+category: analysis
 ---
 
 # Quantitative Statistical Methods

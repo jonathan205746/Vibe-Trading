@@ -1,6 +1,7 @@
 ---
 name: credit-analysis
 description: "固收与信用分析：信用债评级、利差分析、违约风险评估、城投债研究、可转债定价与策略。"
+category: analysis
 ---
 
 # Credit Analysis Skill — 固收与信用分析

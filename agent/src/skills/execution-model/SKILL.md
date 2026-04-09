@@ -1,6 +1,7 @@
 ---
 name: execution-model
 description: Trade execution modeling (backtest only) — slippage formulas (linear / square-root impact), VWAP/TWAP execution logic, market-impact cost estimation, and execution-assumption configuration.
+category: strategy
 ---
 
 # Trade Execution Modeling

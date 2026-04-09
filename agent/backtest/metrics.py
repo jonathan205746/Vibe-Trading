@@ -14,15 +14,15 @@ from backtest.models import TradeRecord
 
 # ─── Annualisation factor mapping ───
 
-_TRADING_DAYS = {"tushare": 252, "yfinance": 252, "okx": 365}
+_TRADING_DAYS = {"tushare": 252, "yfinance": 252, "okx": 365, "akshare": 252, "ccxt": 365}
 _BARS_PER_DAY = {
-    "1m":  {"tushare": 240, "okx": 1440, "yfinance": 390},
-    "5m":  {"tushare": 48,  "okx": 288,  "yfinance": 78},
-    "15m": {"tushare": 16,  "okx": 96,   "yfinance": 26},
-    "30m": {"tushare": 8,   "okx": 48,   "yfinance": 13},
-    "1H":  {"tushare": 4,   "okx": 24,   "yfinance": 7},
-    "4H":  {"tushare": 1,   "okx": 6,    "yfinance": 2},
-    "1D":  {"tushare": 1,   "okx": 1,    "yfinance": 1},
+    "1m":  {"tushare": 240, "okx": 1440, "yfinance": 390, "akshare": 240, "ccxt": 1440},
+    "5m":  {"tushare": 48,  "okx": 288,  "yfinance": 78,  "akshare": 48,  "ccxt": 288},
+    "15m": {"tushare": 16,  "okx": 96,   "yfinance": 26,  "akshare": 16,  "ccxt": 96},
+    "30m": {"tushare": 8,   "okx": 48,   "yfinance": 13,  "akshare": 8,   "ccxt": 48},
+    "1H":  {"tushare": 4,   "okx": 24,   "yfinance": 7,   "akshare": 4,   "ccxt": 24},
+    "4H":  {"tushare": 1,   "okx": 6,    "yfinance": 2,   "akshare": 1,   "ccxt": 6},
+    "1D":  {"tushare": 1,   "okx": 1,    "yfinance": 1,   "akshare": 1,   "ccxt": 1},
 }
 
 

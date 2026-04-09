@@ -1,6 +1,7 @@
 ---
 name: macro-analysis
 description: Macroeconomic cycle positioning and central-bank policy interpretation, including GDP/CPI/PMI/rates/FX analysis, with output in the form of major-asset allocation tilts.
+category: analysis
 ---
 
 # Macroeconomic Analysis

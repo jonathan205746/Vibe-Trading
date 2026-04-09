@@ -1,6 +1,7 @@
 ---
 name: ml-strategy
 description: Machine-learning predictive strategy based on sklearn walk-forward training, feature engineering, and signal generation. Suitable for any OHLCV data.
+category: strategy
 ---
 # Machine-Learning Predictive Strategy
 

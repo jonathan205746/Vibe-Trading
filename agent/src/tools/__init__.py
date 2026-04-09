@@ -21,6 +21,7 @@ def build_registry() -> ToolRegistry:
     from src.tools.task_tools import TaskCreateTool, TaskUpdateTool, TaskListTool, TaskGetTool
     from src.tools.background_tools import BackgroundRunTool, CheckBackgroundTool
     from src.tools.web_reader_tool import WebReaderTool
+    from src.tools.web_search_tool import WebSearchTool
     from src.tools.doc_reader_tool import DocReaderTool
     from src.tools.factor_analysis_tool import FactorAnalysisTool
     from src.tools.options_pricing_tool import OptionsPricingTool
@@ -31,7 +32,7 @@ def build_registry() -> ToolRegistry:
                  PatternTool(), CompactTool(), SubagentTool(),
                  TaskCreateTool(), TaskUpdateTool(), TaskListTool(), TaskGetTool(),
                  BackgroundRunTool(), CheckBackgroundTool(),
-                 WebReaderTool(), DocReaderTool(),
+                 WebReaderTool(), WebSearchTool(), DocReaderTool(),
                  FactorAnalysisTool(), OptionsPricingTool(), SwarmTool()]:
         registry.register(tool)
     return registry

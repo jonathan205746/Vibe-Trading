@@ -1,6 +1,7 @@
 ---
 name: token-unlock-treasury
 description: Token unlock schedule analysis and project treasury tracking — vesting cliffs, linear unlocks, team/investor/ecosystem token releases, treasury diversification, and sell pressure forecasting.
+category: crypto
 ---
 # Token Unlock & Treasury Analysis
 

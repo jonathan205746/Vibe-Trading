@@ -1,6 +1,7 @@
 ---
 name: fundamental-filter
 description: Fundamental factor screening — filter stocks by PE/PB/ROE and other financial metrics for value or growth selection. Supports A-shares (via tushare extra_fields) and HK/US stocks (via yfinance Ticker info).
+category: flow
 ---
 # Fundamental Factor Screening
 

@@ -1,6 +1,7 @@
 ---
 name: risk-analysis
 description: Risk measurement and stress testing — VaR/CVaR/max drawdown calculation, Monte Carlo simulation, extreme-value tail-risk analysis, and historical scenario stress testing.
+category: analysis
 ---
 
 # Risk Measurement and Stress Testing

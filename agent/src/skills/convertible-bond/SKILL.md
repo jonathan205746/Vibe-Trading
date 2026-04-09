@@ -1,6 +1,7 @@
 ---
 name: convertible-bond
 description: A股可转债分析——转股/纯债/期权三维估值、下修/强赎/回售博弈、双低策略与转债轮动选债框架
+category: asset-class
 ---
 
 # A股可转债分析

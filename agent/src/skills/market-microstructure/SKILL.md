@@ -1,6 +1,7 @@
 ---
 name: market-microstructure
 description: "Market microstructure: bid-ask spread analysis, order-flow toxicity metrics (VPIN / Kyle lambda), liquidity measures (Amihud / Roll), price-impact models, limit-order-book analysis, and China A-share call auction / block trade mechanics."
+category: analysis
 ---
 
 # Market Microstructure

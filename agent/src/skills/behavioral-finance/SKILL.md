@@ -1,6 +1,7 @@
 ---
 name: behavioral-finance
 description: "Behavioral finance applications: theories of overreaction and underreaction, behavioral explanations for momentum and reversal, investor sentiment cycles, cognitive-bias checklists, and debiasing quantitative strategies."
+category: analysis
 ---
 
 # Behavioral Finance Applications

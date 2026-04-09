@@ -1,6 +1,7 @@
 ---
 name: earnings-forecast
 description: 盈利预测与一致预期分析（自上而下/自下而上预测法/SUE/PEAD/分析师预期修正），捕捉业绩超预期交易机会。
+category: analysis
 ---
 # 盈利预测与一致预期
 

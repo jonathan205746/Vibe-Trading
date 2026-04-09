@@ -1,6 +1,7 @@
 ---
 name: seasonal
 description: Seasonal/calendar-effect strategy. Generates trading signals from time-based patterns such as month-of-year effects and day-of-week effects. Suitable for any OHLCV data.
+category: strategy
 ---
 # Seasonal / Calendar Effect Strategy
 

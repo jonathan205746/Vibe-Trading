@@ -9,9 +9,20 @@ from typing import Dict, List, Optional
 
 import pandas as pd
 
+from backtest.loaders.registry import register
 
+
+@register
 class DataLoader:
     """Tushare-backed OHLCV loader."""
+
+    name = "tushare"
+    markets = {"a_share", "futures", "fund"}
+    requires_auth = True
+
+    def is_available(self) -> bool:
+        """Available when TUSHARE_TOKEN is set."""
+        return bool(os.getenv("TUSHARE_TOKEN", ""))
 
     def __init__(self) -> None:
         """Initialize Tushare pro API."""

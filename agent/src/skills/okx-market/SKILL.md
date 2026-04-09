@@ -1,6 +1,7 @@
 ---
 name: okx-market
 description: OKX cryptocurrency market data interface. Uses the OKX V5 REST API to retrieve spot, derivatives, index, and other crypto market data, including real-time prices, candlesticks, funding rates, open interest, and more. No authentication required, free to use.
+category: data-source
 ---
 # OKX Market
 

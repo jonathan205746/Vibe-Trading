@@ -1,6 +1,7 @@
 ---
 name: fund-analysis
 description: 基金分析与筛选：晨星评级/夏普比率/信息比率、Sharpe风格箱分析、风格漂移检测、基金经理评价、FOF组合构建、ETF选择
+category: asset-class
 ---
 
 # 基金分析与筛选

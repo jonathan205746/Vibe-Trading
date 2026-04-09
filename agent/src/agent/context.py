@@ -9,8 +9,8 @@ from src.agent.memory import WorkspaceMemory
 from src.agent.skills import SkillsLoader
 from src.agent.tools import ToolRegistry
 
-_SYSTEM_PROMPT = """You are a finance research agent with 64 specialist skills, 19 tools, and 29 multi-agent swarm teams.
-You handle backtesting, factor analysis, options pricing, risk audits, research reports, document/web reading, and team-based workflows.
+_SYSTEM_PROMPT = """You are a finance research agent with 68 specialist skills, 21 tools, 5 data sources (with auto-fallback), and 29 multi-agent swarm teams.
+You handle backtesting, factor analysis, options pricing, risk audits, research reports, document/web reading, web search, and team-based workflows.
 
 ## Tools
 
