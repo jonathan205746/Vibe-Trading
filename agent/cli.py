@@ -358,7 +358,7 @@ def cmd_run(prompt: str, max_iter: int, *, json_mode: bool = False, no_rich: boo
         return _result_exit_code(result)
     _print_result(result, time.perf_counter() - start, no_rich=no_rich)
     if result.get("run_id"):
-        tip = f"--show {result['run_id']}  |  --continue {result['run_id']} \"...\"  |  --code {result['run_id']}"
+        tip = f"--show {result['run_id']}  |  --continue {result['run_id']} \"...\"  |  --code {result['run_id']}  |  --pine {result['run_id']}"
         if no_rich:
             print(tip)
         else:
@@ -466,6 +466,7 @@ def _print_help() -> None:
         ("/list", "List recent runs"),
         ("/show <run_id>", "Show run details"),
         ("/code <run_id>", "Show generated code"),
+        ("/pine <run_id>", "Show Pine Script for TradingView"),
         ("/trace <run_id>", "Replay run trace"),
         ("/continue <run_id> <prompt>", "Continue an existing run"),
         ("/swarm", "List swarm team presets"),
@@ -525,6 +526,11 @@ def _handle_slash_command(input_str: str, *, max_iter: int) -> None:
             cmd_code(arg)
         else:
             console.print("[red]Usage: /code <run_id>[/red]")
+    elif cmd == "/pine":
+        if arg:
+            cmd_pine(arg)
+        else:
+            console.print("[red]Usage: /pine <run_id>[/red]")
     elif cmd == "/trace":
         if arg:
             cmd_trace(arg)
@@ -980,6 +986,19 @@ def cmd_code(run_id: str) -> None:
             console.print()
 
 
+def cmd_pine(run_id: str) -> None:
+    """Show Pine Script for a run."""
+    pine_path = RUNS_DIR / run_id / "artifacts" / "strategy.pine"
+    if not pine_path.exists():
+        console.print(f"[red]{run_id}/artifacts/strategy.pine not found[/red]")
+        console.print("[dim]Ask the agent: \"export this strategy to Pine Script\"[/dim]")
+        return
+    code = pine_path.read_text(encoding="utf-8")
+    console.print(Syntax(code, "javascript", theme="monokai", line_numbers=True), width=120)
+    console.print()
+    console.print("[dim]Copy and paste into TradingView Pine Editor → Add to Chart[/dim]")
+
+
 def cmd_skills() -> None:
     """List available skills."""
     from src.agent.skills import SkillsLoader
@@ -1316,6 +1335,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--list", action="store_true", help="List runs")
     parser.add_argument("--show", metavar="RUN_ID", help="Show run details")
     parser.add_argument("--code", metavar="RUN_ID", help="Show generated code")
+    parser.add_argument("--pine", metavar="RUN_ID", help="Show Pine Script for TradingView")
     parser.add_argument("--trace", metavar="RUN_ID", help="Replay a run trace")
     parser.add_argument("--skills", action="store_true", help="List skills")
     parser.add_argument("--max-iter", type=int, default=50, help="Maximum agent iterations")
@@ -1474,6 +1494,8 @@ def main(argv: list[str] | None = None) -> int:
         return _coerce_exit_code(cmd_show(args.show))
     if args.code:
         return _coerce_exit_code(cmd_code(args.code))
+    if args.pine:
+        return _coerce_exit_code(cmd_pine(args.pine))
     if args.trace:
         return _coerce_exit_code(cmd_trace(args.trace))
     if args.skills:

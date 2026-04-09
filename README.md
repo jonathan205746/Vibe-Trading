@@ -15,7 +15,7 @@
   <a href="https://pypi.org/project/vibe-trading-ai/"><img src="https://img.shields.io/pypi/v/vibe-trading-ai?style=flat&logo=pypi&logoColor=white" alt="PyPI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=flat" alt="License"></a>
   <br>
-  <img src="https://img.shields.io/badge/Skills-64-orange" alt="Skills">
+  <img src="https://img.shields.io/badge/Skills-65-orange" alt="Skills">
   <img src="https://img.shields.io/badge/Swarm_Presets-29-7C3AED" alt="Swarm">
   <img src="https://img.shields.io/badge/Tools-20-0F766E" alt="Tools">
   <img src="https://img.shields.io/badge/Markets-3-2563EB" alt="Markets">
@@ -44,7 +44,7 @@
 
 ## 📰 News
 
-- **2026-04-09** 🔧 Multi-market backtest engines — per-market rules (A-share T+1, crypto funding/liquidation, US/HK fees) replace the single vectorised engine.
+- **2026-04-09** 🔧 Multi-market backtest engines with per-market rules; **Pine Script v6 export** — convert strategies to TradingView in one command (`/pine`, API, frontend viewer).
 - **2026-04-01** 🚀 Released **v0.1.0** — Initial release: ReAct agent, 64 skills, 29 swarm presets, cross-market backtest, CLI + Web UI + MCP server.
 
 ---
@@ -57,6 +57,7 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
 • **Strategy Generation** — Automatically writes trading code from your ideas<br>
 • **Smart Data Access** — Pulls market data from multiple sources seamlessly<br>
 • **Performance Testing** — Tests your strategies against historical market data<br>
+• **TradingView Export** — One-click convert strategies to Pine Script v6 for TradingView<br>
 • **Expert Teams** — Deploys specialized AI agents for complex research tasks<br>
 • **Live Updates** — Watch the entire analysis process in real-time
 
@@ -69,7 +70,7 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
     <td align="center" width="25%" valign="top">
       <img src="assets/scene-research.png" height="150" alt="Research"/><br>
       <h3>🔍 DeepResearch for Trading</h3>
-      <img src="https://img.shields.io/badge/64_Skills-FF6B6B?style=for-the-badge&logo=bookstack&logoColor=white" alt="Skills" /><br><br>
+      <img src="https://img.shields.io/badge/65_Skills-FF6B6B?style=for-the-badge&logo=bookstack&logoColor=white" alt="Skills" /><br><br>
       <div align="left" style="font-size: 4px;">
         • Multi-domain analysis coverage across markets<br>
         • Auto strategy and signal generation<br>
@@ -115,14 +116,14 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
 
 ## 64 Skills across 8 Core Finance Domains
 
-- 📊 64 specialized finance skills across 8 core domains
+- 📊 65 specialized finance skills across 8 core domains
 - 🌐 Complete coverage from traditional markets to crypto & DeFi
 - 🔬 Comprehensive capabilities spanning technical analysis to quantitative research
 
 | Area | Examples |
 |------|----------|
 | Technical Analysis | `technical-basic`, `candlestick`, `ichimoku`, `harmonic`, `elliott-wave`, `smc` |
-| Quant Research | `strategy-generate`, `multi-factor`, `pair-trading`, `factor-research`, `ml-strategy` |
+| Quant Research | `strategy-generate`, `pine-script`, `multi-factor`, `pair-trading`, `factor-research`, `ml-strategy` |
 | Fundamentals | `valuation-model`, `financial-statement`, `earnings-forecast`, `credit-analysis` |
 | HK/US Equities | `edgar-sec-filings`, `earnings-revision`, `us-etf-flow`, `hk-connect-flow`, `adr-hshare` |
 | Crypto Desk | `perp-funding-basis`, `liquidation-heatmap`, `stablecoin-flow`, `token-unlock-treasury`, `defi-yield` |
@@ -311,7 +312,7 @@ vibe-trading serve         # API server
 | Command | Description |
 |---------|-------------|
 | `/help` | Show all commands |
-| `/skills` | List all 64 finance skills |
+| `/skills` | List all 65 finance skills |
 | `/swarm` | List 29 swarm team presets |
 | `/swarm run <preset> [vars_json]` | Run a swarm team with live streaming |
 | `/swarm list` | Swarm run history |
@@ -320,6 +321,7 @@ vibe-trading serve         # API server
 | `/list` | Recent runs |
 | `/show <run_id>` | Run details + metrics |
 | `/code <run_id>` | Generated strategy code |
+| `/pine <run_id>` | Pine Script for TradingView |
 | `/trace <run_id>` | Full execution replay |
 | `/continue <run_id> <prompt>` | Continue a run with new instructions |
 | `/sessions` | List chat sessions |
@@ -347,6 +349,7 @@ vibe-trading --swarm-run investment_committee '{"topic":"BTC outlook"}'
 vibe-trading --list
 vibe-trading --show <run_id>
 vibe-trading --code <run_id>
+vibe-trading --pine <run_id>           # Pine Script for TradingView
 vibe-trading --trace <run_id>
 vibe-trading --continue <run_id> "refine the strategy"
 vibe-trading --upload report.pdf
@@ -366,6 +369,7 @@ vibe-trading serve --port 8899
 |--------|----------|-------------|
 | `GET` | `/runs` | List runs |
 | `GET` | `/runs/{run_id}` | Run details |
+| `GET` | `/runs/{run_id}/pine` | Pine Script export |
 | `POST` | `/sessions` | Create session |
 | `POST` | `/sessions/{id}/messages` | Send message |
 | `GET` | `/sessions/{id}/events` | SSE event stream |
@@ -442,7 +446,7 @@ Browse on ClawHub: [clawhub.ai/skills/vibe-trading](https://clawhub.ai/skills/vi
 <details>
 <summary><b>OpenSpace — self-evolving skills</b></summary>
 
-All 64 finance skills are published on [open-space.cloud](https://open-space.cloud) and evolve autonomously through OpenSpace's self-evolution engine.
+All 65 finance skills are published on [open-space.cloud](https://open-space.cloud) and evolve autonomously through OpenSpace's self-evolution engine.
 
 To use with OpenSpace, add both MCP servers to your agent config:
 

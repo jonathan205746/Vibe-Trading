@@ -43,6 +43,7 @@ export const api = {
   listRuns: () => request<RunListItem[]>("/runs"),
   getRun: (id: string) => request<RunData>(`/runs/${id}`),
   getRunCode: (id: string) => request<Record<string, string>>(`/runs/${id}/code`),
+  getRunPine: (id: string) => request<PineScriptResult>(`/runs/${id}/pine`),
   listSessions: () => request<SessionItem[]>("/sessions"),
   createSession: (title?: string) => request<SessionItem>("/sessions", { method: "POST", body: JSON.stringify({ title: title || "" }) }),
   deleteSession: (sid: string) => request<{ status: string }>(`/sessions/${sid}`, { method: "DELETE" }),
@@ -169,6 +170,11 @@ export interface ArtifactInfo {
   type: string;
   size: number;
   exists: boolean;
+}
+
+export interface PineScriptResult {
+  exists: boolean;
+  content: string | null;
 }
 
 export interface SessionItem {

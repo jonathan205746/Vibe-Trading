@@ -1,11 +1,12 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { BarChart3 } from "lucide-react";
+import { BarChart3, Code2, Loader2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { api } from "@/lib/api";
 import { AgentAvatar } from "./AgentAvatar";
 import { MetricsCard } from "./MetricsCard";
 import { MiniEquityChart } from "@/components/charts/MiniEquityChart";
+import { PineScriptViewer } from "./PineScriptViewer";
 import type { AgentMessage } from "@/types/agent";
 
 interface Props {
@@ -15,6 +16,11 @@ interface Props {
 export const RunCompleteCard = memo(function RunCompleteCard({ msg }: Props) {
   const { t } = useI18n();
   const [curve, setCurve] = useState(msg.equityCurve);
+  const [pineCode, setPineCode] = useState<string | null>(null);
+  const [pineLoading, setPineLoading] = useState(false);
+  const [showPine, setShowPine] = useState(false);
+  const [pineChecked, setPineChecked] = useState(false);
+  const [pineExists, setPineExists] = useState(false);
 
   useEffect(() => {
     if (!curve && msg.runId) {
@@ -23,6 +29,37 @@ export const RunCompleteCard = memo(function RunCompleteCard({ msg }: Props) {
       }).catch(() => {});
     }
   }, [msg.runId, curve]);
+
+  // Check if Pine Script exists for this run
+  useEffect(() => {
+    if (msg.runId && !pineChecked) {
+      api.getRunPine(msg.runId).then(r => {
+        setPineChecked(true);
+        if (r.exists && r.content) {
+          setPineExists(true);
+          setPineCode(r.content);
+        }
+      }).catch(() => { setPineChecked(true); });
+    }
+  }, [msg.runId, pineChecked]);
+
+  const handlePineClick = useCallback(async () => {
+    if (pineCode) {
+      setShowPine(true);
+      return;
+    }
+    if (!msg.runId) return;
+    setPineLoading(true);
+    try {
+      const r = await api.getRunPine(msg.runId);
+      if (r.exists && r.content) {
+        setPineCode(r.content);
+        setPineExists(true);
+        setShowPine(true);
+      }
+    } catch { /* ignore */ }
+    finally { setPineLoading(false); }
+  }, [pineCode, msg.runId]);
 
   return (
     <div className="flex gap-3">
@@ -34,13 +71,28 @@ export const RunCompleteCard = memo(function RunCompleteCard({ msg }: Props) {
         {curve && curve.length > 1 && (
           <MiniEquityChart data={curve} height={80} />
         )}
-        <Link
-          to={`/runs/${msg.runId}`}
-          className="text-sm text-primary hover:underline inline-flex items-center gap-1.5 font-medium"
-        >
-          <BarChart3 className="h-3.5 w-3.5" />
-          {t.fullReport}
-        </Link>
+        <div className="flex items-center gap-3 flex-wrap">
+          <Link
+            to={`/runs/${msg.runId}`}
+            className="text-sm text-primary hover:underline inline-flex items-center gap-1.5 font-medium"
+          >
+            <BarChart3 className="h-3.5 w-3.5" />
+            {t.fullReport}
+          </Link>
+          {pineExists && (
+            <button
+              onClick={handlePineClick}
+              disabled={pineLoading}
+              className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1.5 font-medium disabled:opacity-50"
+            >
+              {pineLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Code2 className="h-3.5 w-3.5" />}
+              Pine Script
+            </button>
+          )}
+        </div>
+        {showPine && pineCode && (
+          <PineScriptViewer code={pineCode} onClose={() => setShowPine(false)} />
+        )}
       </div>
     </div>
   );

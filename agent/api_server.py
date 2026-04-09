@@ -395,6 +395,25 @@ async def get_run_code(run_id: str):
     return result
 
 
+@app.get("/runs/{run_id}/pine")
+async def get_run_pine(run_id: str):
+    """Return Pine Script file for a run.
+
+    Args:
+        run_id: Run identifier.
+
+    Returns:
+        Object with pine script content and exists flag.
+    """
+    pine_path = RUNS_DIR / run_id / "artifacts" / "strategy.pine"
+    if not pine_path.exists():
+        return {"exists": False, "content": None}
+    return {
+        "exists": True,
+        "content": pine_path.read_text(encoding="utf-8"),
+    }
+
+
 @app.get("/runs/{run_id}", response_model=RunResponse)
 async def get_run_result(run_id: str):
     """Fetch full details for a historical run by ``run_id``."""
