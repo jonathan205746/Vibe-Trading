@@ -44,6 +44,7 @@
 
 ## 📰 News
 
+- **2026-04-10** 🔧 **ML strategy robustness**: Hardened `ml-strategy` skill template — added input validation gate, division-by-zero guards (RSI, Bollinger Bands), inf/NaN sanitization, sliding window option, output contract enforcement, and a complete copy-paste-ready `SignalEngine` example. All fixes are skill-only, zero changes to the backtest engine.
 - **2026-04-09** 🔧 **Data source expansion**: 5 data sources with auto-fallback (tushare, yfinance, OKX, AKShare, CCXT) — zero-config backtesting across A-shares, US/HK equities, crypto, futures, and forex. Added `web_search` tool (DuckDuckGo), skill categorization (7 categories), and `data-routing` meta-skill for intelligent source selection.
 - **2026-04-08** 🔧 Multi-market backtest engines with per-market rules; **Pine Script v6 export** — convert strategies to TradingView in one command (`/pine`, API, frontend viewer).
 - **2026-04-01** 🚀 Released **v0.1.0** — Initial release: ReAct agent, 64 skills, 29 swarm presets, cross-market backtest, CLI + Web UI + MCP server.
