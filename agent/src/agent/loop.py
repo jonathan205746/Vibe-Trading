@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import time as _time
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
@@ -23,7 +24,7 @@ from src.providers.chat import ChatLLM
 from src.tools.background_tools import get_background_manager
 
 RUNS_DIR = Path(__file__).resolve().parents[2] / "runs"
-TOKEN_THRESHOLD = 50_000
+TOKEN_THRESHOLD = int(os.getenv("TOKEN_THRESHOLD", "40000"))
 KEEP_RECENT = 3
 TOOL_RESULT_LIMIT = 10_000
 

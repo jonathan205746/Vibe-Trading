@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -26,8 +27,8 @@ from src.tools import build_filtered_registry
 
 logger = logging.getLogger(__name__)
 
-_DEFAULT_MAX_ITERATIONS = 50
-_DEFAULT_TIMEOUT_SECONDS = 300
+_DEFAULT_MAX_ITERATIONS = int(os.getenv("SWARM_WORKER_MAX_ITER", "50"))
+_DEFAULT_TIMEOUT_SECONDS = int(os.getenv("SWARM_WORKER_TIMEOUT", "300"))
 _MAX_TOKEN_ESTIMATE = 60_000
 
 

@@ -57,18 +57,43 @@ def _ensure_dotenv() -> None:
 
 
 def _sync_provider_env() -> None:
-    """Map provider-specific env vars to OPENAI_* for ChatOpenAI."""
+    """Map provider-specific env vars to OPENAI_* for ChatOpenAI.
+
+    Each entry: provider_name -> (api_key_env, base_url_env).
+    All base URLs must be set explicitly in .env — no hardcoded defaults.
+    api_key_env=None means no key required (e.g. Ollama local).
+    """
     _ensure_dotenv()
     provider = os.getenv("LANGCHAIN_PROVIDER", "openai").lower()
-    provider_env = {
-        "openai": ("OPENAI_API_KEY", "OPENAI_API_BASE"),
-        "openrouter": ("OPENAI_API_KEY", "OPENAI_API_BASE"),
-        "deepseek": ("DEEPSEEK_API_KEY", "DEEPSEEK_BASE_URL"),
-        "qwen": ("QWEN_API_KEY", "QWEN_BASE_URL"),
+
+    # (api_key_env, base_url_env)
+    _PROVIDER_MAP: dict[str, tuple[str | None, str]] = {
+        "openai":     ("OPENAI_API_KEY",     "OPENAI_BASE_URL"),
+        "openrouter": ("OPENROUTER_API_KEY",  "OPENROUTER_BASE_URL"),
+        "deepseek":   ("DEEPSEEK_API_KEY",    "DEEPSEEK_BASE_URL"),
+        "gemini":     ("GEMINI_API_KEY",      "GEMINI_BASE_URL"),
+        "groq":       ("GROQ_API_KEY",        "GROQ_BASE_URL"),
+        "dashscope":  ("DASHSCOPE_API_KEY",   "DASHSCOPE_BASE_URL"),
+        "qwen":       ("DASHSCOPE_API_KEY",   "DASHSCOPE_BASE_URL"),
+        "zhipu":      ("ZHIPU_API_KEY",       "ZHIPU_BASE_URL"),
+        "moonshot":   ("MOONSHOT_API_KEY",    "MOONSHOT_BASE_URL"),
+        "minimax":    ("MINIMAX_API_KEY",     "MINIMAX_BASE_URL"),
+        "mimo":       ("MIMO_API_KEY",        "MIMO_BASE_URL"),
+        "ollama":     (None,                  "OLLAMA_BASE_URL"),
     }
-    key_env, base_env = provider_env.get(provider, provider_env["openai"])
-    api_key = os.getenv(key_env) or os.getenv("OPENAI_API_KEY", "")
-    base_url = os.getenv(base_env, "") or os.getenv("OPENAI_API_BASE", "") or os.getenv("OPENAI_BASE_URL", "")
+
+    spec = _PROVIDER_MAP.get(provider, _PROVIDER_MAP["openai"])
+    key_env, base_env = spec
+
+    # Resolve API key: provider-specific env → OPENAI_API_KEY fallback
+    if key_env is not None:
+        api_key = os.getenv(key_env, "") or os.getenv("OPENAI_API_KEY", "")
+    else:
+        api_key = os.getenv("OPENAI_API_KEY", "") or "ollama"
+
+    # Resolve base URL: provider-specific env → OPENAI_BASE_URL fallback
+    base_url = os.getenv(base_env, "") or os.getenv("OPENAI_BASE_URL", "") or os.getenv("OPENAI_API_BASE", "")
+
     if api_key:
         os.environ["OPENAI_API_KEY"] = api_key
     if base_url:
@@ -96,8 +121,8 @@ def build_llm(*, model_name: Optional[str] = None, callbacks: Any = None) -> Any
     if not name:
         raise RuntimeError("LANGCHAIN_MODEL_NAME is not set")
     temperature = float(os.getenv("LANGCHAIN_TEMPERATURE", "0.0"))
-    timeout = int(os.getenv("TIMEOUT_SECONDS", "600"))
-    max_retries = int(os.getenv("MAX_RETRIES", "3"))
+    timeout = int(os.getenv("TIMEOUT_SECONDS", "120"))
+    max_retries = int(os.getenv("MAX_RETRIES", "2"))
     return ChatOpenAI(
         model=name,
         temperature=temperature,

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import time
 from pathlib import Path
@@ -18,7 +19,7 @@ from src.agent.tools import BaseTool
 logger = logging.getLogger(__name__)
 
 _POLL_INTERVAL_SECONDS = 5
-_MAX_WAIT_SECONDS = 1800  # 30 minutes
+_MAX_WAIT_SECONDS = int(os.getenv("SWARM_TIMEOUT", "1800"))
 
 # Preset matching: (preset_name, keyword_patterns, weight_boost). Patterns match user intent (EN + ZH).
 _PRESET_KEYWORDS: list[tuple[str, list[str], float]] = [
@@ -615,7 +616,7 @@ class SwarmTool(BaseTool):
         swarm_base_dir = Path(__file__).resolve().parents[2] / ".swarm" / "runs"
         swarm_base_dir.mkdir(parents=True, exist_ok=True)
         store = SwarmStore(base_dir=swarm_base_dir)
-        runtime = SwarmRuntime(store=store)
+        runtime = SwarmRuntime(store=store, max_workers=int(os.getenv("SWARM_MAX_WORKERS", "4")))
 
         try:
             run = runtime.start_run(preset, variables)

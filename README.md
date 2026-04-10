@@ -44,10 +44,10 @@
 
 ## 📰 News
 
-- **2026-04-10** 🔧 **ML strategy robustness**: Hardened `ml-strategy` skill template — added input validation gate, division-by-zero guards (RSI, Bollinger Bands), inf/NaN sanitization, sliding window option, output contract enforcement, and a complete copy-paste-ready `SignalEngine` example. All fixes are skill-only, zero changes to the backtest engine.
-- **2026-04-09** 🔧 **Data source expansion**: 5 data sources with auto-fallback (tushare, yfinance, OKX, AKShare, CCXT) — zero-config backtesting across A-shares, US/HK equities, crypto, futures, and forex. Added `web_search` tool (DuckDuckGo), skill categorization (7 categories), and `data-routing` meta-skill for intelligent source selection.
-- **2026-04-08** 🔧 Multi-market backtest engines with per-market rules; **Pine Script v6 export** — convert strategies to TradingView in one command (`/pine`, API, frontend viewer).
-- **2026-04-01** 🚀 Released **v0.1.0** — Initial release: ReAct agent, 64 skills, 29 swarm presets, cross-market backtest, CLI + Web UI + MCP server.
+- **2026-04-10** 🔧 **Performance & multi-provider**: LLM timeout 2400s→120s, all tuning params configurable via `.env`. Added 11 LLM providers (DeepSeek, Groq, Gemini, Ollama, etc.). Hardened `ml-strategy` skill template with input validation and inf/NaN sanitization.
+- **2026-04-09** 🔧 **Data source expansion**: 5 sources with auto-fallback, `web_search` tool, skill categorization (7 categories).
+- **2026-04-08** 🔧 **Multi-market backtest** with per-market rules; **Pine Script v6 export** for TradingView.
+- **2026-04-01** 🚀 **v0.1.0** — Initial release: ReAct agent, 64 skills, 29 swarm presets, cross-market backtest, CLI + Web UI + MCP server.
 
 ---
 
@@ -212,9 +212,11 @@ vibe-trading-mcp               # start MCP server (stdio)
 
 ### Prerequisites
 
-- An **OpenAI-compatible API key** (OpenRouter, DeepSeek, etc.) — the only hard requirement
+- An **LLM API key** from any supported provider — or run locally with **Ollama** (no key needed)
 - **Python 3.11+** for Path B
 - **Docker** for Path A
+
+> **Supported LLM providers:** OpenRouter, OpenAI, DeepSeek, Gemini, Groq, DashScope/Qwen, Zhipu, Moonshot/Kimi, MiniMax, Xiaomi MIMO, Ollama (local). See `.env.example` for config.
 
 > **Tip:** All markets work without any API keys thanks to automatic fallback. yfinance (HK/US), OKX (crypto), and AKShare (A-shares, US, HK, futures, forex) are all free. Tushare token is optional — AKShare covers A-shares as a free fallback.
 
@@ -284,17 +286,18 @@ The skill + MCP config is downloaded into your agent's skills directory. See [Cl
 
 ## 🧠 Environment Variables
 
-Edit `agent/.env`:
+Copy `agent/.env.example` to `agent/.env` and uncomment the provider block you want. Each provider needs 3-4 variables:
 
 | Variable | Required | Description |
 |----------|:--------:|-------------|
-| `OPENAI_API_KEY` | Yes | OpenAI-compatible API key (OpenRouter, DeepSeek, etc.) |
-| `OPENAI_BASE_URL` | Usually | API gateway URL (default: `https://openrouter.ai/api/v1`) |
-| `LANGCHAIN_PROVIDER` | Yes | LLM provider selector (e.g. `openrouter`) |
+| `LANGCHAIN_PROVIDER` | Yes | Provider name (`openrouter`, `deepseek`, `groq`, `ollama`, etc.) |
+| `<PROVIDER>_API_KEY` | Yes* | API key (`OPENROUTER_API_KEY`, `DEEPSEEK_API_KEY`, etc.) |
+| `<PROVIDER>_BASE_URL` | Yes | API endpoint URL |
 | `LANGCHAIN_MODEL_NAME` | Yes | Model name (e.g. `deepseek/deepseek-v3.2`) |
-| `TUSHARE_TOKEN` | No | Tushare Pro token for A-share data (falls back to AKShare if missing) |
-| `CCXT_EXCHANGE` | No | CCXT exchange name, default `binance` |
-| `TIMEOUT_SECONDS` | No | Agent timeout, default 2400s |
+| `TUSHARE_TOKEN` | No | Tushare Pro token for A-share data (falls back to AKShare) |
+| `TIMEOUT_SECONDS` | No | LLM call timeout, default 120s |
+
+<sub>* Ollama does not require an API key.</sub>
 
 **Free data (no key needed):** A-shares via AKShare, HK/US equities via yfinance, crypto via OKX, 100+ crypto exchanges via CCXT. The system automatically selects the best available source for each market.
 
