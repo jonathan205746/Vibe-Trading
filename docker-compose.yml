@@ -6,12 +6,10 @@ services:
     env_file:
       - agent/.env
     volumes:
-      - fin-data:/app/data
-      - fin-runs:/app/agent/runs
-      - fin-sessions:/app/agent/sessions
+      - vibe-runs:/app/agent/runs
+      - vibe-sessions:/app/agent/sessions
     restart: unless-stopped
 
 volumes:
-  fin-data:
-  fin-runs:
-  fin-sessions:
+  vibe-runs:
+  vibe-sessions:

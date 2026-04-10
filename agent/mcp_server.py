@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Vibe-Trading MCP Server — expose 16 finance research tools to any MCP client.
+"""Vibe-Trading MCP Server — expose 17 finance research tools to any MCP client.
 
 Works with OpenClaw, Claude Desktop, Cursor, and any MCP-compatible client.
-Zero API key required for HK/US/crypto markets (yfinance + OKX are free).
+Zero API key required for HK/US/crypto markets (yfinance, OKX, AKShare are free).
 
 Usage:
     python mcp_server.py                    # stdio transport (default)
@@ -75,7 +75,7 @@ def _get_registry():
 def list_skills() -> str:
     """List all available finance skills with names and descriptions.
 
-    Returns a JSON array of {name, description} for all 56 skills.
+    Returns a JSON array of {name, description} for all 68 skills.
     Use load_skill(name) to get the full documentation for any skill.
     """
     loader = _get_skills_loader()
@@ -117,7 +117,9 @@ def backtest(run_dir: str) -> str:
     - "yfinance": HK/US equities (free, no API key needed)
     - "okx": cryptocurrency (free, no API key needed)
     - "tushare": China A-shares (requires TUSHARE_TOKEN env var)
-    - "auto": auto-detect based on symbol format
+    - "akshare": A-shares, US, HK, futures, forex (free, no API key)
+    - "ccxt": crypto from 100+ exchanges (free, no API key)
+    - "auto": auto-detect based on symbol format (with fallback)
 
     Returns metrics (Sharpe, return, drawdown, etc.) and artifact paths.
 
@@ -247,6 +249,27 @@ def read_document(file_path: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Web search tool
+# ---------------------------------------------------------------------------
+
+@mcp.tool
+def web_search(query: str, max_results: int = 5) -> str:
+    """Search the web via DuckDuckGo and return top results.
+
+    Returns titles, URLs, and snippets. Use read_url() to fetch full content
+    from any result URL. Free, no API key required.
+
+    Args:
+        query: Search query string.
+        max_results: Maximum results to return (default 5, max 10).
+    """
+    registry = _get_registry()
+    return registry.execute("web_search", {
+        "query": query, "max_results": min(max_results, 10),
+    })
+
+
+# ---------------------------------------------------------------------------
 # File I/O tools (sandboxed to workspace)
 # ---------------------------------------------------------------------------
 
@@ -354,6 +377,7 @@ _SOURCE_PATTERNS = [
     (re.compile(r"^[A-Z]+\.US$", re.I), "yfinance"),
     (re.compile(r"^\d{3,5}\.HK$", re.I), "yfinance"),
     (re.compile(r"^[A-Z]+-USDT$", re.I), "okx"),
+    (re.compile(r"^[A-Z]+/USDT$", re.I), "ccxt"),
 ]
 
 
@@ -365,13 +389,9 @@ def _detect_source(code: str) -> str:
 
 
 def _get_loader(source: str):
-    if source == "okx":
-        from backtest.loaders.okx import DataLoader
-    elif source == "yfinance":
-        from backtest.loaders.yfinance_loader import DataLoader
-    else:
-        from backtest.loaders.tushare import DataLoader
-    return DataLoader
+    """Get loader class via registry with fallback support."""
+    from backtest.loaders.registry import get_loader_cls_with_fallback
+    return get_loader_cls_with_fallback(source)
 
 
 @mcp.tool
@@ -388,13 +408,15 @@ def get_market_data(
     - "yfinance": HK/US equities (free, e.g. AAPL.US, 700.HK)
     - "okx": cryptocurrency (free, e.g. BTC-USDT, ETH-USDT)
     - "tushare": China A-shares (requires TUSHARE_TOKEN, e.g. 000001.SZ)
-    - "auto": auto-detect based on symbol format (supports mixed markets)
+    - "akshare": A-shares, US, HK, futures, forex (free, e.g. 000001.SZ, AAPL.US)
+    - "ccxt": crypto from 100+ exchanges (free, e.g. BTC/USDT)
+    - "auto": auto-detect based on symbol format (with fallback)
 
     Args:
         codes: List of symbols (e.g. ["AAPL.US", "BTC-USDT", "000001.SZ"]).
         start_date: Start date (YYYY-MM-DD).
         end_date: End date (YYYY-MM-DD).
-        source: Data source ("auto", "yfinance", "okx", "tushare").
+        source: Data source ("auto", "yfinance", "okx", "tushare", "akshare", "ccxt").
         interval: Bar size (1m/5m/15m/30m/1H/4H/1D, default "1D").
     """
     results = {}

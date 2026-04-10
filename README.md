@@ -45,7 +45,7 @@
 
 ## 📰 News
 
-- **2026-04-10** 🔧 **Performance & multi-provider**: LLM timeout 2400s→120s, all tuning params configurable via `.env`. Added 11 LLM providers (DeepSeek, Groq, Gemini, Ollama, etc.). Hardened `ml-strategy` skill template with input validation and inf/NaN sanitization.
+- **2026-04-10** 📦 **v0.1.4**: Fix Docker build ([#8](https://github.com/HKUDS/Vibe-Trading/issues/8)), add `web_search` MCP tool (17 total), `akshare`/`ccxt` in deps & MCP. 11 LLM providers (DeepSeek, Groq, Gemini, Ollama, etc.), all tuning params via `.env`. Hardened `ml-strategy` skill. Published to PyPI and ClawHub.
 - **2026-04-09** 📊 **Backtest Wave 2 — multi-asset engines**: added ChinaFutures (CFFEX/SHFE/DCE/ZCE, 50+ contracts), GlobalFutures (CME/ICE/Eurex, 30+ contracts), Forex (24 pairs, spread + swap), Options v2 (American exercise, IV smile). Statistical validation: Monte Carlo permutation test, Bootstrap Sharpe CI, Walk-Forward analysis.
 - **2026-04-08** 🔧 **Multi-market backtest** with per-market rules; **Pine Script v6 export** for TradingView. **Data source expansion**: 5 sources with auto-fallback, `web_search` tool, skill categorization (7 categories).
 - **2026-04-01** 🚀 **v0.1.0** — Initial release: ReAct agent, 64 skills, 29 swarm presets, cross-market backtest, CLI + Web UI + MCP server.
@@ -227,7 +227,7 @@ vibe-trading-mcp               # start MCP server (stdio)
 git clone https://github.com/HKUDS/Vibe-Trading.git
 cd Vibe-Trading
 cp agent/.env.example agent/.env
-# Edit agent/.env — set OPENAI_API_KEY (required)
+# Edit agent/.env — uncomment your LLM provider and set API key
 docker compose up --build
 ```
 
@@ -245,7 +245,7 @@ source .venv/bin/activate          # Linux / macOS
 # .venv\Scripts\Activate.ps1       # Windows PowerShell
 
 pip install -e .
-cp agent/.env.example agent/.env   # Edit — set OPENAI_API_KEY
+cp agent/.env.example agent/.env   # Edit — set your LLM provider API key
 vibe-trading                       # Launch interactive TUI
 ```
 
@@ -390,7 +390,7 @@ Interactive docs: `http://localhost:8899/docs`
 
 ## 🔌 MCP Plugin
 
-Vibe-Trading exposes 16 MCP tools for any MCP-compatible client. Runs as a stdio subprocess — no server setup needed. **15 of 16 tools work with zero API keys** (HK/US/crypto). Only `run_swarm` needs an LLM key.
+Vibe-Trading exposes 17 MCP tools for any MCP-compatible client. Runs as a stdio subprocess — no server setup needed. **16 of 17 tools work with zero API keys** (HK/US/crypto). Only `run_swarm` needs an LLM key.
 
 <details>
 <summary><b>Claude Desktop</b></summary>
@@ -432,7 +432,7 @@ vibe-trading-mcp --transport sse  # SSE for web clients
 
 </details>
 
-**MCP tools exposed (16):** `list_skills`, `load_skill`, `backtest`, `factor_analysis`, `analyze_options`, `pattern_recognition`, `get_market_data`, `read_url`, `read_document`, `read_file`, `write_file`, `list_swarm_presets`, `run_swarm`, `get_swarm_status`, `get_run_result`, `list_runs`.
+**MCP tools exposed (17):** `list_skills`, `load_skill`, `backtest`, `factor_analysis`, `analyze_options`, `pattern_recognition`, `get_market_data`, `web_search`, `read_url`, `read_document`, `read_file`, `write_file`, `list_swarm_presets`, `run_swarm`, `get_swarm_status`, `get_run_result`, `list_runs`.
 
 <details>
 <summary><b>Install from ClawHub (one command)</b></summary>
@@ -490,7 +490,7 @@ Vibe-Trading/
 ├── agent/                          # Backend (Python)
 │   ├── cli.py                      # CLI entrypoint — interactive TUI + subcommands
 │   ├── api_server.py               # FastAPI server — runs, sessions, upload, swarm, SSE
-│   ├── mcp_server.py               # MCP server — 16 tools for OpenClaw / Claude Desktop
+│   ├── mcp_server.py               # MCP server — 17 tools for OpenClaw / Claude Desktop
 │   │
 │   ├── src/
 │   │   ├── agent/                  # ReAct agent core
@@ -518,7 +518,7 @@ Vibe-Trading/
 │   │   └── providers/              # LLM provider abstraction
 │   │
 │   ├── backtest/                   # Backtest engines
-│   │   ├── engines/                #   daily_portfolio + options_portfolio
+│   │   ├── engines/                #   7 engines: china_a, global_equity, crypto, china_futures, global_futures, forex + options_portfolio
 │   │   ├── loaders/                #   5 sources: tushare, okx, yfinance, akshare, ccxt
 │   │   │   ├── base.py             #   DataLoader Protocol
 │   │   │   └── registry.py         #   Registry + auto-fallback chains
@@ -579,9 +579,7 @@ Areas we'd love help with:
 
 | Area | Difficulty | Description |
 |------|:----------:|-------------|
-| Intraday backtest engine | Hard | Sub-daily (1m/5m/1H) bar execution with proper session handling |
 | Options vol surface & Greeks viz | Hard | 3D implied-vol surface, delta/gamma/vega charts in frontend |
-| Monte Carlo & stress testing | Hard | Scenario simulation, regime-switching, tail-risk analysis |
 | Portfolio optimizer constraints | Medium | Leverage limits, sector caps, turnover penalties |
 | Correlation heatmap dashboard | Medium | Cross-asset correlation matrix with time-window slider |
 | New data source loader | Medium | Implement `DataLoader` Protocol for a new exchange/vendor |

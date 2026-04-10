@@ -1,28 +1,50 @@
+# Version control & CI
+.git/
+.github/
+
+# IDE & editor
+.claude/
+.vscode/
+.editorconfig
+
+# Python artifacts
 .venv/
 agent/.venv/
 __pycache__/
 *.pyc
 .pytest_cache/
 .ruff_cache/
-node_modules/
-frontend/dist/
-frontend/tsconfig.tsbuildinfo
-.env
-agent/.env
+agent/vibe_trading.egg-info/
+agent/vibe_trading_ai.egg-info/
+agent/__pycache__/
+
+# Runtime data (generated at runtime, not in repo)
+data/
 agent/runs/
 agent/sessions/
 agent/.swarm/runs/
 agent/.ui_runtime/
 agent/.tasks/
-agent/vibe_trading.egg-info/
-.git/
-.github/
-.claude/
-.vscode/
-data/*.duckdb
-data/*.duckdb.wal
-data/.duckdb_tmp/
-data/parquet/
-data/backup/
-data/minutes/
-data/*.log
+
+# Env files (mounted via docker-compose env_file)
+.env
+agent/.env
+
+# Frontend build (built inside Docker, don't copy local)
+frontend/dist/
+frontend/node_modules/
+frontend/tsconfig.tsbuildinfo
+
+# Tests & docs (not needed in production image)
+agent/tests/
+docs/
+assets/
+build/
+dist/
+
+# Project docs
+CLAUDE.md
+CONTRIBUTING.md
+*.md
+!README.md
+!LICENSE

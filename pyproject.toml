@@ -1,6 +1,6 @@
 [project]
 name = "vibe-trading-ai"
-version = "0.1.3"
+version = "0.1.4"
 description = "Natural-language finance research AI agent with backtesting"
 requires-python = ">=3.11"
 license = "MIT"
@@ -36,6 +36,8 @@ dependencies = [
     "tushare>=1.2.89",
     "requests>=2.31.0",
     "yfinance>=0.2.30",
+    "akshare>=1.12.0",
+    "ccxt>=4.0.0",
     "fastapi>=0.104.0",
     "uvicorn[standard]>=0.24.0",
     "pydantic>=2.0.0",
@@ -55,7 +57,7 @@ vibe-trading-mcp = "mcp_server:main"
 
 [tool.setuptools]
 package-dir = {"" = "agent"}
-py-modules = ["cli", "run_agent", "api_server", "mcp_server"]
+py-modules = ["cli", "api_server", "mcp_server"]
 
 [tool.setuptools.packages.find]
 where = ["agent"]
