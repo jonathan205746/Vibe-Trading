@@ -35,9 +35,8 @@ data/overnight*.log
 data/*.log
 data/test_write.txt
 agent/.pytest_tmp/
-agent/tests/e2e_swarm_results.json
 agent/vibe_trading.egg-info/
 agent/vibe_trading_ai.egg-info/
-agent/tests/
+agent/tests/e2e_backtest/
 dist/
 build/
