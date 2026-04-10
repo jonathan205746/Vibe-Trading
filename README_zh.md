@@ -77,7 +77,7 @@ Vibe-Trading 是一个由 AI 驱动的多代理金融工作台，将自然语言
   <tr>
     <td align="center" width="25%" valign="top">
       <img src="assets/scene-research.png" height="150" alt="Research"/><br>
-      <h3>🔍 DeepResearch for Trading</h3>
+      <h3>🔍 面向交易的深度研究</h3>
       <img src="https://img.shields.io/badge/68_Skills-FF6B6B?style=for-the-badge&logo=bookstack&logoColor=white" alt="Skills" /><br><br>
       <div align="left" style="font-size: 4px;">
         • 覆盖多市场的多领域分析<br>
@@ -88,7 +88,7 @@ Vibe-Trading 是一个由 AI 驱动的多代理金融工作台，将自然语言
     </td>
     <td align="center" width="25%" valign="top">
       <img src="assets/scene-swarm.png" height="150" alt="Swarm"/><br>
-      <h3>🐝 Swarm Intelligence</h3>
+      <h3>🐝 群体智能</h3>
       <img src="https://img.shields.io/badge/29_Trading_Teams-4ECDC4?style=for-the-badge&logo=hive&logoColor=white" alt="Swarm" /><br><br>
       <div align="left">
         • 29 个开箱即用的交易团队预设<br>
@@ -99,7 +99,7 @@ Vibe-Trading 是一个由 AI 驱动的多代理金融工作台，将自然语言
     </td>
     <td align="center" width="25%" valign="top">
       <img src="assets/scene-backtest.png" height="150" alt="Backtest"/><br>
-      <h3>📊 Cross-Market Backtest</h3>
+      <h3>📊 跨市场回测</h3>
       <img src="https://img.shields.io/badge/5_Data_Sources-FFD93D?style=for-the-badge&logo=bitcoin&logoColor=black" alt="Backtest" /><br><br>
       <div align="left">
         • A 股、港美股、加密、期货与外汇<br>
@@ -110,7 +110,7 @@ Vibe-Trading 是一个由 AI 驱动的多代理金融工作台，将自然语言
     </td>
     <td align="center" width="25%" valign="top">
       <img src="assets/scene-quant.png" height="150" alt="Quant"/><br>
-      <h3>🧮 Quant Analysis Toolkit</h3>
+      <h3>🧮 量化分析工具箱</h3>
       <img src="https://img.shields.io/badge/Quant_Tools-C77DFF?style=for-the-badge&logo=wolfram&logoColor=white" alt="Quant" /><br><br>
       <div align="left">
         • 因子 IC/IR 分析与分位回测<br>
