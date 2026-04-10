@@ -34,6 +34,7 @@
   <a href="#-api-server">API</a> &nbsp;&middot;&nbsp;
   <a href="#-mcp-plugin">MCP</a> &nbsp;&middot;&nbsp;
   <a href="#-project-structure">Structure</a> &nbsp;&middot;&nbsp;
+  <a href="#-roadmap">Roadmap</a> &nbsp;&middot;&nbsp;
   <a href="#-contributing">Contributing</a>
 </p>
 
@@ -569,22 +570,33 @@ Vibe-Trading is part of the **[HKUDS](https://github.com/HKUDS)** agent ecosyste
 
 ---
 
+## 🗺 Roadmap
+
+> We ship in phases. Items move to [Issues](https://github.com/HKUDS/Vibe-Trading/issues) when work begins.
+
+| Phase | Feature | Status |
+|-------|---------|--------|
+| **Analysis & Viz** | Options volatility surface & Greeks 3D visualization | Planned |
+| | Cross-asset correlation heatmap with rolling window & clustering | Planned |
+| | Benchmark comparison in CLI backtest output | Planned |
+| | Calmar Ratio & Omega Ratio in backtest metrics | Planned |
+| **Skills & Presets** | Dividend Analysis skill | Planned |
+| | ESG / Sustainable Investing swarm preset | Planned |
+| | Emerging Markets Research Desk swarm preset | Planned |
+| **Portfolio & Optimization** | Advanced portfolio optimizer: leverage, sector caps, turnover constraints | Planned |
+| **Future** | Beginner tutorial: "5-minute natural language backtest" | Planned |
+| | Live data streaming via WebSocket | Exploring |
+| | Strategy marketplace (share & discover) | Exploring |
+
+---
+
 ## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-**Good first issues** are tagged with [`good first issue`](https://github.com/HKUDS/Vibe-Trading/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) — great for getting started.
+**Good first issues** are tagged with [`good first issue`](https://github.com/HKUDS/Vibe-Trading/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) — pick one and get started.
 
-Areas we'd love help with:
-
-| Area | Difficulty | Description |
-|------|:----------:|-------------|
-| Options vol surface & Greeks viz | Hard | 3D implied-vol surface, delta/gamma/vega charts in frontend |
-| Portfolio optimizer constraints | Medium | Leverage limits, sector caps, turnover penalties |
-| Correlation heatmap dashboard | Medium | Cross-asset correlation matrix with time-window slider |
-| New data source loader | Medium | Implement `DataLoader` Protocol for a new exchange/vendor |
-| New finance skill | Easy | Add a `SKILL.md` — e.g., pairs trading, mean reversion, VWAP |
-| New swarm preset | Easy | YAML config for a new multi-agent workflow |
+Want to contribute something bigger? Check the [Roadmap](#-roadmap) above and open an issue to discuss before starting.
 
 ---
 
