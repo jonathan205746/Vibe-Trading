@@ -33,7 +33,8 @@
   <a href="#-cli-reference">CLI</a> &nbsp;&middot;&nbsp;
   <a href="#-api-server">API</a> &nbsp;&middot;&nbsp;
   <a href="#-mcp-plugin">MCP</a> &nbsp;&middot;&nbsp;
-  <a href="#-project-structure">Structure</a>
+  <a href="#-project-structure">Structure</a> &nbsp;&middot;&nbsp;
+  <a href="#-contributing">Contributing</a>
 </p>
 
 <p align="center">
@@ -565,6 +566,27 @@ Vibe-Trading is part of the **[HKUDS](https://github.com/HKUDS)** agent ecosyste
     </td>
   </tr>
 </table>
+
+---
+
+## Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+**Good first issues** are tagged with [`good first issue`](https://github.com/HKUDS/Vibe-Trading/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) — great for getting started.
+
+Areas we'd love help with:
+
+| Area | Difficulty | Description |
+|------|:----------:|-------------|
+| Intraday backtest engine | Hard | Sub-daily (1m/5m/1H) bar execution with proper session handling |
+| Options vol surface & Greeks viz | Hard | 3D implied-vol surface, delta/gamma/vega charts in frontend |
+| Monte Carlo & stress testing | Hard | Scenario simulation, regime-switching, tail-risk analysis |
+| Portfolio optimizer constraints | Medium | Leverage limits, sector caps, turnover penalties |
+| Correlation heatmap dashboard | Medium | Cross-asset correlation matrix with time-window slider |
+| New data source loader | Medium | Implement `DataLoader` Protocol for a new exchange/vendor |
+| New finance skill | Easy | Add a `SKILL.md` — e.g., pairs trading, mean reversion, VWAP |
+| New swarm preset | Easy | YAML config for a new multi-agent workflow |
 
 ---
 
