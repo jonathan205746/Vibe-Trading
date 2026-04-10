@@ -135,7 +135,8 @@ class TestFundingFee:
         # Long pays: 1.0 × 60000 × 0.0001 × 1(long) = $6
         assert engine.capital == pytest.approx(initial_capital - 6.0)
 
-    def test_no_funding_at_non_settlement_hour(self) -> None:
+    def test_non_settlement_hour_applies_daily_fallback(self) -> None:
+        """Non-settlement hour still applies funding once per day (daily bar support)."""
         engine = _make_engine(funding_rate=0.0001)
         engine.positions["BTC-USDT"] = Position(
             "BTC-USDT", 1, 60000.0, pd.Timestamp("2025-01-01"), 1.0, leverage=10.0,
@@ -144,7 +145,8 @@ class TestFundingFee:
         bar = _make_bar(close=60000.0)
         ts = pd.Timestamp("2025-01-01 05:00:00")  # not settlement hour
         engine._apply_funding_fee("BTC-USDT", bar, ts)
-        assert engine.capital == initial_capital
+        # Daily fallback: applies once even at non-settlement hour
+        assert engine.capital == pytest.approx(initial_capital - 6.0)
 
     def test_short_receives_funding(self) -> None:
         engine = _make_engine(funding_rate=0.0001)
@@ -178,6 +180,57 @@ class TestFundingFee:
         ts = pd.Timestamp("2025-01-01 08:00:00")
         engine._apply_funding_fee("BTC-USDT", bar, ts)
         assert engine.capital == initial_capital
+
+    def test_daily_bars_apply_each_day(self) -> None:
+        """Regression: daily bars (all hour=0) must apply funding every day, not just day 1."""
+        engine = _make_engine(funding_rate=0.0001)
+        engine.positions["BTC-USDT"] = Position(
+            "BTC-USDT", 1, 60000.0, pd.Timestamp("2025-01-01"), 1.0, leverage=10.0,
+        )
+        bar = _make_bar(close=60000.0)
+        initial = engine.capital
+
+        # Day 1
+        engine._apply_funding_fee("BTC-USDT", bar, pd.Timestamp("2025-01-01"))
+        after_day1 = engine.capital
+        assert after_day1 < initial  # fee deducted
+
+        # Day 2 (same hour=0, different date)
+        engine._apply_funding_fee("BTC-USDT", bar, pd.Timestamp("2025-01-02"))
+        after_day2 = engine.capital
+        assert after_day2 < after_day1  # fee deducted again
+
+        # Day 3
+        engine._apply_funding_fee("BTC-USDT", bar, pd.Timestamp("2025-01-03"))
+        after_day3 = engine.capital
+        assert after_day3 < after_day2  # fee deducted again
+
+        # Each day: 1 × 60000 × 0.0001 = $6
+        assert initial - after_day3 == pytest.approx(18.0)
+
+    def test_multi_symbol_funding(self) -> None:
+        """Each symbol gets independent funding settlement."""
+        engine = _make_engine(funding_rate=0.0001)
+        engine.positions["BTC-USDT"] = Position(
+            "BTC-USDT", 1, 60000.0, pd.Timestamp("2025-01-01"), 1.0, leverage=10.0,
+        )
+        engine.positions["ETH-USDT"] = Position(
+            "ETH-USDT", 1, 3000.0, pd.Timestamp("2025-01-01"), 10.0, leverage=10.0,
+        )
+        initial = engine.capital
+        bar_btc = _make_bar(close=60000.0)
+        bar_eth = _make_bar(close=3000.0)
+        ts = pd.Timestamp("2025-01-01 08:00:00")
+
+        engine._apply_funding_fee("BTC-USDT", bar_btc, ts)
+        after_btc = engine.capital
+        engine._apply_funding_fee("ETH-USDT", bar_eth, ts)
+        after_both = engine.capital
+
+        # BTC: 1 × 60000 × 0.0001 = $6
+        # ETH: 10 × 3000 × 0.0001 = $3
+        assert initial - after_btc == pytest.approx(6.0)
+        assert initial - after_both == pytest.approx(9.0)
 
     def test_funding_hours_correct(self) -> None:
         assert _FUNDING_HOURS == {0, 8, 16}

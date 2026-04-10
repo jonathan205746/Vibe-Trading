@@ -127,6 +127,52 @@ export interface EquityPoint {
   drawdown: string | number;
 }
 
+export interface ValidationData {
+  monte_carlo?: {
+    actual_sharpe: number;
+    actual_max_dd: number;
+    p_value_sharpe: number;
+    p_value_max_dd: number;
+    simulated_sharpe_mean: number;
+    simulated_sharpe_std: number;
+    simulated_sharpe_p5: number;
+    simulated_sharpe_p95: number;
+    n_simulations: number;
+    n_trades: number;
+    error?: string;
+  };
+  bootstrap?: {
+    observed_sharpe: number;
+    ci_lower: number;
+    ci_upper: number;
+    median_sharpe: number;
+    prob_positive: number;
+    confidence: number;
+    n_bootstrap: number;
+    error?: string;
+  };
+  walk_forward?: {
+    n_windows: number;
+    windows: Array<{
+      window: number;
+      start: string;
+      end: string;
+      return: number;
+      sharpe: number;
+      max_dd: number;
+      trades: number;
+      win_rate: number;
+    }>;
+    profitable_windows: number;
+    consistency_rate: number;
+    return_mean: number;
+    return_std: number;
+    sharpe_mean: number;
+    sharpe_std: number;
+    error?: string;
+  };
+}
+
 export interface RunData {
   status: string;
   run_id: string;
@@ -138,6 +184,7 @@ export interface RunData {
 
   metrics?: BacktestMetrics;
   artifacts?: ArtifactInfo[];
+  validation?: ValidationData;
 
   price_series?: Record<string, PriceBar[]>;
   indicator_series?: Record<string, Record<string, IndicatorPoint[]>>;

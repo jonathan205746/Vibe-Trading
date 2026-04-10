@@ -119,6 +119,7 @@ class BaseEngine(ABC):
         self.trades: List[TradeRecord] = []
         self.equity_snapshots: List[EquitySnapshot] = []
         self._bar_idx: int = 0
+        self._active_symbol: str = ""  # set by _rebalance/_close_position for subclass use
 
     # ── Market rule interface (subclass must implement) ──
 
@@ -178,6 +179,28 @@ class BaseEngine(ABC):
 
         Default: no-op. Override in subclass as needed.
         """
+
+    # ── PnL / margin calculation hooks ──
+    # Override in FuturesBaseEngine to inject contract multiplier.
+
+    def _calc_pnl(
+        self, symbol: str, direction: int, size: float,
+        entry_price: float, exit_price: float,
+    ) -> float:
+        """Realised PnL for a closed position."""
+        return direction * size * (exit_price - entry_price)
+
+    def _calc_margin(
+        self, symbol: str, size: float, price: float, leverage: float,
+    ) -> float:
+        """Margin (collateral) required for a position."""
+        return size * price / leverage
+
+    def _calc_raw_size(
+        self, symbol: str, target_notional: float, price: float,
+    ) -> float:
+        """Convert target notional exposure to number of units/contracts."""
+        return target_notional / price
 
     # ── Main entry ──
 
@@ -248,7 +271,18 @@ class BaseEngine(ABC):
         m["by_symbol"] = by_symbol_stats(self.trades)
         m["by_exit_reason"] = by_exit_reason_stats(self.trades)
 
-        # 7. Artifacts
+        # 7. Validation (optional — triggered by config["validation"])
+        if config.get("validation"):
+            from backtest.validation import run_validation
+            v_results = run_validation(
+                config, equity_series, self.trades, self.initial_capital, bars_per_year,
+            )
+            m["validation"] = v_results
+            # Write validation.json artifact
+            v_path = run_dir / "artifacts" / "validation.json"
+            v_path.write_text(json.dumps(v_results, indent=2, ensure_ascii=False), encoding="utf-8")
+
+        # 8. Artifacts
         self._write_artifacts(
             run_dir, data_map, dates, equity_series, bench_equity, bench_ret,
             target_pos, m, valid_codes,
@@ -288,7 +322,7 @@ class BaseEngine(ABC):
             total_unrealized = 0.0
             for p in self.positions.values():
                 cp = self._safe_price(close_df, ts, p.symbol, p.entry_price)
-                total_unrealized += p.direction * p.size * (cp - p.entry_price)
+                total_unrealized += self._calc_pnl(p.symbol, p.direction, p.size, p.entry_price, cp)
             self.equity_snapshots.append(EquitySnapshot(
                 timestamp=ts,
                 capital=self.capital,
@@ -309,8 +343,8 @@ class BaseEngine(ABC):
         equity = self.capital
         for sym, pos in self.positions.items():
             cp = self._safe_price(close_df, ts, sym, pos.entry_price)
-            margin = pos.size * pos.entry_price / pos.leverage
-            unrealized = pos.direction * pos.size * (cp - pos.entry_price)
+            margin = self._calc_margin(sym, pos.size, pos.entry_price, pos.leverage)
+            unrealized = self._calc_pnl(sym, pos.direction, pos.size, pos.entry_price, cp)
             equity += margin + unrealized
         return equity
 
@@ -323,6 +357,7 @@ class BaseEngine(ABC):
         equity: float,
     ) -> None:
         """Adjust position for *symbol* toward *target_weight*."""
+        self._active_symbol = symbol
         target_dir = 1 if target_weight > 1e-9 else (-1 if target_weight < -1e-9 else 0)
         current_pos = self.positions.get(symbol)
 
@@ -357,12 +392,12 @@ class BaseEngine(ABC):
             slipped = self.apply_slippage(open_price, target_dir)
             leverage = self.default_leverage
             target_notional = abs(target_weight) * equity * leverage
-            raw_size = target_notional / slipped
+            raw_size = self._calc_raw_size(symbol, target_notional, slipped)
             size = self.round_size(raw_size, slipped)
             if size <= 0:
                 return
 
-            margin = size * slipped / leverage
+            margin = self._calc_margin(symbol, size, slipped, leverage)
             comm = self.calc_commission(size, slipped, target_dir, is_open=True)
 
             # Capital check — reduce if insufficient
@@ -370,10 +405,12 @@ class BaseEngine(ABC):
                 available = self.capital - comm
                 if available <= 0:
                     return
-                size = self.round_size(available * leverage / slipped, slipped)
+                size = self.round_size(
+                    self._calc_raw_size(symbol, available * leverage, slipped), slipped,
+                )
                 if size <= 0:
                     return
-                margin = size * slipped / leverage
+                margin = self._calc_margin(symbol, size, slipped, leverage)
                 comm = self.calc_commission(size, slipped, target_dir, is_open=True)
 
             self.capital -= (margin + comm)
@@ -396,12 +433,13 @@ class BaseEngine(ABC):
         reason: str,
     ) -> None:
         """Close position, record trade, return capital."""
+        self._active_symbol = symbol
         pos = self.positions.pop(symbol, None)
         if pos is None:
             return
 
-        pnl = pos.direction * pos.size * (exit_price - pos.entry_price)
-        margin = pos.size * pos.entry_price / pos.leverage
+        pnl = self._calc_pnl(symbol, pos.direction, pos.size, pos.entry_price, exit_price)
+        margin = self._calc_margin(symbol, pos.size, pos.entry_price, pos.leverage)
         pnl_pct = pnl / margin * 100 if margin > 1e-9 else 0.0
         exit_comm = self.calc_commission(pos.size, exit_price, pos.direction, is_open=False)
 

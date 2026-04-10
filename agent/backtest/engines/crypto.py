@@ -48,7 +48,8 @@ class CryptoEngine(BaseEngine):
         self.taker_rate: float = config.get("taker_rate", 0.0005)
         self.slippage_rate: float = config.get("slippage", 0.0005)
         self.funding_rate: float = config.get("funding_rate", 0.0001)
-        self._last_funding_hour: int = -1
+        self._funding_applied: set = set()   # (symbol, date, hour) — per-slot dedup
+        self._funding_daily_done: set = set()  # (symbol, date) — daily fallback dedup
 
     def can_execute(self, symbol: str, direction: int, bar: pd.Series) -> bool:
         """Crypto: 24/7, long/short/close all allowed."""
@@ -80,16 +81,29 @@ class CryptoEngine(BaseEngine):
         """Deduct/credit funding fee at settlement hours.
 
         Positive rate: longs pay shorts. Negative rate: shorts pay longs.
+
+        For intraday bars: applies at each 8h settlement (0/8/16 UTC).
+        For daily bars: applies once per calendar day regardless of hour.
+        Dedup is per-(symbol, date, hour) so multi-symbol portfolios work.
         """
-        if not hasattr(timestamp, "hour"):
+        if not hasattr(timestamp, "date"):
             return
-        hour = timestamp.hour
-        if hour not in _FUNDING_HOURS:
-            return
-        # Avoid double-settlement on same hour
-        if hour == self._last_funding_hour:
-            return
-        self._last_funding_hour = hour
+
+        current_date = timestamp.date()
+        hour = timestamp.hour if hasattr(timestamp, "hour") else 0
+
+        if hour in _FUNDING_HOURS:
+            key = (symbol, current_date, hour)
+            if key in self._funding_applied:
+                return
+            self._funding_applied.add(key)
+        else:
+            # Non-settlement hour (e.g. daily bar at 12:00 UTC)
+            # Apply once per day as approximation
+            day_key = (symbol, current_date)
+            if day_key in self._funding_daily_done:
+                return
+            self._funding_daily_done.add(day_key)
 
         pos = self.positions.get(symbol)
         if pos is None:
@@ -97,7 +111,7 @@ class CryptoEngine(BaseEngine):
 
         mark_price = float(bar.get("close", pos.entry_price))
         notional = pos.size * mark_price
-        fee = notional * self.funding_rate * pos.direction  # long pays when rate > 0
+        fee = notional * self.funding_rate * pos.direction
         self.capital -= fee
 
     # ── Liquidation (exchange-enforced) ──

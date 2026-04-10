@@ -46,8 +46,8 @@
 ## 📰 News
 
 - **2026-04-10** 🔧 **Performance & multi-provider**: LLM timeout 2400s→120s, all tuning params configurable via `.env`. Added 11 LLM providers (DeepSeek, Groq, Gemini, Ollama, etc.). Hardened `ml-strategy` skill template with input validation and inf/NaN sanitization.
-- **2026-04-09** 🔧 **Data source expansion**: 5 sources with auto-fallback, `web_search` tool, skill categorization (7 categories).
-- **2026-04-08** 🔧 **Multi-market backtest** with per-market rules; **Pine Script v6 export** for TradingView.
+- **2026-04-09** 📊 **Backtest Wave 2 — multi-asset engines**: added ChinaFutures (CFFEX/SHFE/DCE/ZCE, 50+ contracts), GlobalFutures (CME/ICE/Eurex, 30+ contracts), Forex (24 pairs, spread + swap), Options v2 (American exercise, IV smile). Statistical validation: Monte Carlo permutation test, Bootstrap Sharpe CI, Walk-Forward analysis.
+- **2026-04-08** 🔧 **Multi-market backtest** with per-market rules; **Pine Script v6 export** for TradingView. **Data source expansion**: 5 sources with auto-fallback, `web_search` tool, skill categorization (7 categories).
 - **2026-04-01** 🚀 **v0.1.0** — Initial release: ReAct agent, 64 skills, 29 swarm presets, cross-market backtest, CLI + Web UI + MCP server.
 
 ---
@@ -98,8 +98,8 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
       <img src="https://img.shields.io/badge/5_Data_Sources-FFD93D?style=for-the-badge&logo=bitcoin&logoColor=black" alt="Backtest" /><br><br>
       <div align="left">
         • A-shares, HK/US equities, crypto, futures & forex<br>
-        • Auto-fallback: always finds a working source<br>
-        • Daily & options portfolio engines<br>
+        • 7 market engines: A-share, US/HK equity, crypto, China futures, global futures, forex<br>
+        • Statistical validation: Monte Carlo, Bootstrap CI, Walk-Forward<br>
         • 15+ performance metrics & 4 optimizers
       </div>
     </td>

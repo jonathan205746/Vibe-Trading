@@ -75,6 +75,7 @@ const messages = {
   metricBenchmarkReturn: "Benchmark",
   metricExcessReturn: "Excess Return",
   metricIR: "IR",
+  validation: "Validation",
   overlayMA: "Moving Avg",
   overlayChannel: "Channel",
   overlayIndicators: "Indicators",

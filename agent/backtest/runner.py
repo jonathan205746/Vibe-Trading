@@ -57,7 +57,15 @@ _MARKET_PATTERNS = [
     (re.compile(r"^\d{3,5}\.HK$", re.I), "hk_equity"),
     (re.compile(r"^[A-Z]+-USDT$", re.I), "crypto"),
     (re.compile(r"^[A-Z]+/USDT$", re.I), "crypto"),
-    (re.compile(r"^[A-Z]{1,2}\d{3,4}\.(ZCE|DCE|SHFE|INE|CFFEX|GFEX)$", re.I), "futures"),
+    # China futures: product+delivery.exchange (e.g. IF2406.CFFEX, rb2410.SHFE)
+    (re.compile(r"^[A-Za-z]{1,2}\d{3,4}\.(ZCE|DCE|SHFE|INE|CFFEX|GFEX)$", re.I), "futures"),
+    # Global futures: product+month-code (e.g. ESZ4, CLF25, GCM2025)
+    (re.compile(r"^[A-Z]{2,4}[FGHJKMNQUVXZ]\d{1,2}$", re.I), "futures"),
+    # Global futures: product+YYMM (e.g. CL2412, ES2503)
+    (re.compile(r"^[A-Z]{2,4}\d{4}$", re.I), "futures"),
+    # Global futures: bare product code with exchange (e.g. ES.CME)
+    (re.compile(r"^[A-Z]{2,4}\.(CME|CBOT|NYMEX|COMEX|ICE|EUREX)$", re.I), "futures"),
+    # Forex pairs: XXX/YYY or XXXXXX.FX
     (re.compile(r"^[A-Z]{3}/[A-Z]{3}$"), "forex"),
     (re.compile(r"^[A-Z]{6}\.FX$"), "forex"),
 ]
@@ -243,7 +251,11 @@ def main(run_dir: Path) -> None:
 
 
 def _create_market_engine(source: str, config: dict, codes: List[str]):
-    """Create the appropriate market engine based on data source.
+    """Create the appropriate market engine based on data source and market type.
+
+    Routing priority:
+      1. Detect market type from symbol patterns (futures, forex, etc.)
+      2. Fall back to source-based routing (okx->crypto, tushare->china_a, etc.)
 
     Args:
         source: Data source (okx/ccxt/tushare/akshare/yfinance).
@@ -253,12 +265,28 @@ def _create_market_engine(source: str, config: dict, codes: List[str]):
     Returns:
         BaseEngine subclass instance.
     """
+    # Detect dominant market type from codes
+    markets = {_detect_market(c) for c in codes} if codes else set()
+
+    # Futures routing (Wave 2)
+    if "futures" in markets:
+        # Distinguish China vs global futures by exchange suffix
+        if any(_is_china_futures(c) for c in codes):
+            from backtest.engines.china_futures import ChinaFuturesEngine
+            return ChinaFuturesEngine(config)
+        from backtest.engines.global_futures import GlobalFuturesEngine
+        return GlobalFuturesEngine(config)
+
+    # Forex routing (Wave 2)
+    if "forex" in markets:
+        from backtest.engines.forex import ForexEngine
+        return ForexEngine(config)
+
+    # Original routing (Wave 1)
     if source in ("okx", "ccxt"):
         from backtest.engines.crypto import CryptoEngine
         return CryptoEngine(config)
     elif source in ("tushare", "akshare"):
-        # Determine if codes look like A-shares or global equities
-        markets = {_detect_market(c) for c in codes}
         if markets & {"us_equity", "hk_equity"}:
             from backtest.engines.global_equity import GlobalEquityEngine
             market = _detect_submarket(codes)
@@ -272,6 +300,39 @@ def _create_market_engine(source: str, config: dict, codes: List[str]):
     else:
         from backtest.engines.crypto import CryptoEngine
         return CryptoEngine(config)
+
+
+def _is_china_futures(code: str) -> bool:
+    """Check if a futures code belongs to a Chinese exchange.
+
+    Args:
+        code: Symbol string (e.g. 'IF2406.CFFEX', 'rb2410.SHFE').
+
+    Returns:
+        True if it matches a Chinese futures exchange suffix.
+    """
+    china_exchanges = {"CFFEX", "SHFE", "DCE", "ZCE", "INE", "GFEX"}
+    parts = code.upper().split(".")
+    if len(parts) == 2 and parts[1] in china_exchanges:
+        return True
+    # Heuristic: Chinese futures product codes
+    m = re.match(r"([A-Za-z]+)\d+", parts[0])
+    if m:
+        product = m.group(1)
+        # Known Chinese futures products (partial list)
+        cn_products = {
+            "IF", "IC", "IH", "IM", "T", "TF", "TS", "TL",
+            "au", "ag", "cu", "al", "zn", "pb", "ni", "sn", "ss",
+            "rb", "hc", "i", "j", "jm",
+            "sc", "fu", "lu", "bu", "nr",
+            "c", "cs", "m", "y", "a", "p", "jd", "lh",
+            "CF", "SR", "TA", "MA", "AP", "RM", "OI",
+            "pp", "l", "v", "eg", "eb", "PF", "SA", "FG", "UR",
+            "si", "lc",
+        }
+        if product in cn_products:
+            return True
+    return False
 
 
 def _detect_submarket(codes: List[str]) -> str:

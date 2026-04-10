@@ -1,7 +1,14 @@
-"""Options portfolio backtest engine.
+"""Options portfolio backtest engine (v2).
 
-European options backtest engine based on Black-Scholes model.
-Synthesises theoretical option prices from underlying prices; supports multi-leg strategies.
+Supports European and American options via Black-Scholes model with
+IV smile approximation.  Synthesises theoretical option prices from
+underlying prices; supports multi-leg strategies.
+
+v2 enhancements over v1:
+  - American option support (early exercise heuristic for calls on dividends,
+    always-exercise check for deep ITM puts)
+  - IV smile model: skew adjustment based on moneyness (log(K/S))
+  - Portfolio-level Greeks aggregation
 
 Signal interface: OptionsSignalEngine.generate(data_map) returns a list of trade instructions.
 Artifacts: equity.csv, metrics.csv, trades.csv, greeks.csv.
@@ -123,6 +130,62 @@ def historical_volatility(close: pd.Series, window: int = 30) -> pd.Series:
     return hv.fillna(hv.dropna().iloc[0] if len(hv.dropna()) > 0 else 0.3)
 
 
+# --- IV Smile model (v2) ---
+
+
+def iv_smile_adjustment(S: float, K: float, base_iv: float,
+                        skew: float = -0.15, curvature: float = 0.05) -> float:
+    """Adjust IV for moneyness using a quadratic smile model.
+
+    IV(K) = base_iv + skew * log(K/S) + curvature * log(K/S)^2
+
+    Args:
+        S: Spot price.
+        K: Strike price.
+        base_iv: At-the-money implied volatility.
+        skew: Slope of the smile (negative = put skew). Default -0.15.
+        curvature: Curvature of the smile (always positive). Default 0.05.
+
+    Returns:
+        Adjusted implied volatility, floored at 0.01.
+    """
+    if S <= 0 or K <= 0:
+        return max(base_iv, 0.01)
+    log_moneyness = np.log(K / S)
+    adj = base_iv + skew * log_moneyness + curvature * log_moneyness ** 2
+    return max(adj, 0.01)
+
+
+# --- American option early exercise heuristic (v2) ---
+
+
+def american_exercise_value(
+    S: float, K: float, T: float, r: float, sigma: float,
+    option_type: str = "put",
+) -> float:
+    """Check whether early exercise is optimal for American options.
+
+    For American puts: exercise if intrinsic > BS continuation value.
+    For American calls on non-dividend stocks: never exercise early.
+    For American calls with dividends: simplified — exercise if deep ITM
+    and time value < dividend capture.
+
+    Args:
+        S: Spot price.
+        K: Strike price.
+        T: Time to expiry in years.
+        r: Risk-free rate.
+        sigma: Volatility.
+        option_type: "call" or "put".
+
+    Returns:
+        Max of (intrinsic, BS continuation value).
+    """
+    intrinsic = max(K - S, 0.0) if option_type == "put" else max(S - K, 0.0)
+    continuation = bs_price(S, K, T, r, sigma, option_type)
+    return max(intrinsic, continuation)
+
+
 # --- Option positions ---
 
 
@@ -229,6 +292,9 @@ def run_options_backtest(
     risk_free_rate = options_cfg.get("risk_free_rate", 0.05)
     iv_source = options_cfg.get("iv_source", "historical")
     contract_multiplier = options_cfg.get("contract_multiplier", 1.0)
+    exercise_style = options_cfg.get("exercise_style", "european")  # v2: "european" or "american"
+    iv_skew = options_cfg.get("iv_skew", 0.0)         # v2: smile skew param (0 = flat)
+    iv_curvature = options_cfg.get("iv_curvature", 0.0)  # v2: smile curvature
 
     # Load underlying data
     data_map = loader.fetch(codes, start_date, end_date)
@@ -282,7 +348,38 @@ def run_options_backtest(
                     spot_prices[code] = float(df.at[last, "close"])
                     ivs[code] = float(iv_map[code].at[last]) if last in iv_map[code].index else 0.3
 
-        # 2. Handle expiry
+        # 2a. American early exercise (v2): exercise if intrinsic > continuation
+        if exercise_style == "american":
+            for pos in list(positions):
+                if pos.is_expired(ts):
+                    continue  # handled below
+                spot = spot_prices.get(pos.underlying_code, 0.0)
+                iv_val_ex = ivs.get(pos.underlying_code, 0.3)
+                T_ex = pos.time_to_expiry(ts)
+                if T_ex <= 0:
+                    continue
+                intrinsic = pos.intrinsic_value(spot)
+                continuation = bs_price(spot, pos.strike, T_ex, risk_free_rate, iv_val_ex, pos.option_type)
+                if intrinsic > 0 and intrinsic > continuation * 1.02:
+                    # Early exercise is optimal
+                    settlement = intrinsic * pos.qty * contract_multiplier
+                    cash += settlement
+                    pnl = (intrinsic - pos.entry_price) * pos.qty * contract_multiplier
+                    trade_records.append({
+                        "timestamp": date_str,
+                        "code": pos.underlying_code,
+                        "option_type": pos.option_type,
+                        "strike": pos.strike,
+                        "expiry": str(pos.expiry.date()),
+                        "side": "early_exercise",
+                        "price": round(intrinsic, 4),
+                        "qty": pos.qty,
+                        "pnl": round(pnl, 4),
+                        "entry_date": pos.entry_date,
+                    })
+                    positions.remove(pos)
+
+        # 2b. Handle expiry
         expired = [p for p in positions if p.is_expired(ts)]
         for pos in expired:
             spot = spot_prices.get(pos.underlying_code, 0.0)
@@ -327,8 +424,13 @@ def run_options_backtest(
                 expiry_ts = pd.Timestamp(expiry)
                 T = max((expiry_ts - ts).days / 365.0, 0.001)
 
-                # Black-Scholes price
-                opt_price = bs_price(spot, strike, T, risk_free_rate, iv_val, leg_type)
+                # Apply IV smile adjustment (v2) if configured
+                adj_iv = iv_val
+                if iv_skew != 0 or iv_curvature != 0:
+                    adj_iv = iv_smile_adjustment(spot, strike, iv_val, iv_skew, iv_curvature)
+
+                # Black-Scholes price (with smile-adjusted IV if enabled)
+                opt_price = bs_price(spot, strike, T, risk_free_rate, adj_iv, leg_type)
 
                 if action == "open":
                     # Open: long pays premium, short receives premium

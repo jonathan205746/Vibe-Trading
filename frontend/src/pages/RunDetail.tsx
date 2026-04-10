@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { CheckCircle2, XCircle, BarChart3, List, Code2, ArrowLeft, Download } from "lucide-react";
+import { CheckCircle2, XCircle, BarChart3, List, Code2, ArrowLeft, Download, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 import { api, type RunData, type BacktestMetrics } from "@/lib/api";
@@ -9,12 +9,13 @@ import rehypeHighlight from "rehype-highlight";
 import { CandlestickChart } from "@/components/charts/CandlestickChart";
 import { EquityChart } from "@/components/charts/EquityChart";
 import { MetricsCard } from "@/components/chat/MetricsCard";
+import { ValidationPanel } from "@/components/charts/ValidationPanel";
 import { Skeleton, SkeletonMetrics, SkeletonChart } from "@/components/common/Skeleton";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 
 const rehypePlugins = [rehypeHighlight];
 
-type Tab = "chart" | "trades" | "code";
+type Tab = "chart" | "trades" | "code" | "validation";
 
 function downloadCsv(filename: string, csvContent: string) {
   const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
@@ -57,9 +58,11 @@ export function RunDetail() {
   const [tab, setTab] = useState<Tab>("chart");
   const [loading, setLoading] = useState(true);
 
-  const TABS: { id: Tab; label: string; icon: typeof BarChart3 }[] = [
+  const hasValidation = !!run?.validation;
+  const TABS: { id: Tab; label: string; icon: typeof BarChart3; hidden?: boolean }[] = [
     { id: "chart", label: t.chart, icon: BarChart3 },
     { id: "trades", label: t.trades, icon: List },
+    { id: "validation", label: t.validation, icon: ShieldCheck, hidden: !hasValidation },
     { id: "code", label: t.code, icon: Code2 },
   ];
 
@@ -104,7 +107,7 @@ export function RunDetail() {
         {run.metrics && <MetricsCard metrics={run.metrics as Record<string, number>} />}
 
         <div className="flex items-center gap-1">
-          {TABS.map(({ id, label, icon: Icon }) => (
+          {TABS.filter(t => !t.hidden).map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => setTab(id)}
@@ -144,6 +147,7 @@ export function RunDetail() {
         <ErrorBoundary>
           {tab === "chart" && <ChartTab run={run} />}
           {tab === "trades" && <TradesTab run={run} />}
+          {tab === "validation" && run.validation && <ValidationPanel data={run.validation} />}
           {tab === "code" && <CodeTab code={code} />}
         </ErrorBoundary>
       </div>

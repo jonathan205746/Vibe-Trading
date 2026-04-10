@@ -118,12 +118,14 @@ Self-check after writing `signal_engine.py`:
   "extra_fields": null,
   "optimizer": null,
   "optimizer_params": {},
-  "engine": "daily"
+  "engine": "daily",
+  "validation": null
 }
 ```
 
-- `source`: `"auto"` (recommended, auto-select by code format) / `"tushare"` / `"yfinance"` / `"okx"`
+- `source`: `"auto"` (recommended, auto-select by code format) / `"tushare"` / `"yfinance"` / `"okx"` / `"akshare"` / `"ccxt"`
   - `"auto"` supports mixed instruments. For example, `["000001.SZ", "BTC-USDT"]` will be automatically routed to `tushare` and `okx`
+  - Futures codes (e.g. `"IF2406.CFFEX"`, `"ESZ4"`) and forex pairs (e.g. `"EUR/USD"`) are also auto-routed
 - `interval`: candlestick interval, default `"1D"`. Supported values: `"1m"` / `"5m"` / `"15m"` / `"30m"` / `"1H"` / `"4H"` / `"1D"`
   - The annualization factor for minute backtests is inferred automatically from `source` (252 trading days for China A-shares, 365 calendar days for crypto)
   - Minute backtests can be very data-heavy. Recommended limits are no more than 30 days for `1m`, or 1 year for `1H`
@@ -133,6 +135,19 @@ Self-check after writing `signal_engine.py`:
 - `engine`: backtest engine, default `"daily"`. For options strategies, set `"options"` (requires `OptionsSignalEngine`)
 - `initial_cash`: default 1,000,000
 - `commission`: default 0.1%
+- `validation`: optional statistical validation after backtest completes. Omit to skip. Example:
+  ```json
+  "validation": {
+    "monte_carlo": {"n_simulations": 1000},
+    "bootstrap": {"n_bootstrap": 1000, "confidence": 0.95},
+    "walk_forward": {"n_windows": 5}
+  }
+  ```
+  - `monte_carlo`: permutation test — shuffles trade order to compute p-value (is Sharpe significantly better than random?)
+  - `bootstrap`: resamples daily returns to compute Sharpe 95% confidence interval
+  - `walk_forward`: splits equity curve into N windows, checks performance consistency
+  - Each key is optional — include only the validations you want
+  - Can also run standalone on past results: `python -m backtest.validation <run_dir>`
 
 ## Review Criteria
 

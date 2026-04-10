@@ -111,6 +111,7 @@ class RunResponse(BaseModel):
     artifacts_equity_csv: Optional[List[Dict[str, Any]]] = Field(None, description="Full equity rows")
     artifacts_metrics_csv: Optional[List[Dict[str, Any]]] = Field(None, description="Full metrics rows")
     artifacts_trades_csv: Optional[List[Dict[str, Any]]] = Field(None, description="Full trade rows")
+    validation: Optional[Dict[str, Any]] = Field(None, description="Statistical validation results")
 
     run_directory: str = Field(..., description="Run directory path")
     run_stage: Optional[str] = Field(None, description="UI-facing run stage")
@@ -341,6 +342,13 @@ def _build_response_from_run_dir(run_dir: Path, elapsed: float, *, include_analy
     trades_path = run_dir / "artifacts" / "trades.csv"
     if trades_path.exists():
         response.artifacts_trades_csv = _load_csv_to_dict(trades_path)
+
+    validation_path = run_dir / "artifacts" / "validation.json"
+    if validation_path.exists():
+        try:
+            response.validation = json.loads(validation_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            pass
 
     if response.artifacts_equity_csv:
         filtered_equity = []
