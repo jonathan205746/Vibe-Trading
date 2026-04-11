@@ -39,7 +39,8 @@
   <a href="#-mcp-plugin">MCP</a> &nbsp;&middot;&nbsp;
   <a href="#-project-structure">Structure</a> &nbsp;&middot;&nbsp;
   <a href="#-roadmap">Roadmap</a> &nbsp;&middot;&nbsp;
-  <a href="#-contributing">Contributing</a>
+  <a href="#-contributing">Contributing</a> &nbsp;&middot;&nbsp;
+  <a href="#contributors">Contributors</a>
 </p>
 
 <p align="center">
@@ -601,6 +602,16 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 **Good first issues** are tagged with [`good first issue`](https://github.com/HKUDS/Vibe-Trading/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) — pick one and get started.
 
 Want to contribute something bigger? Check the [Roadmap](#-roadmap) above and open an issue to discuss before starting.
+
+---
+
+## Contributors
+
+Thanks to everyone who has contributed to Vibe-Trading!
+
+<a href="https://github.com/HKUDS/Vibe-Trading/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=HKUDS/Vibe-Trading" />
+</a>
 
 ---
 
