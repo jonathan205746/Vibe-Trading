@@ -25,6 +25,7 @@ except ImportError:
     pass
 
 from backtest.loaders.registry import (
+    FALLBACK_CHAINS,
     LOADER_REGISTRY,
     get_loader_cls_with_fallback,
     resolve_loader,
@@ -302,6 +303,25 @@ def main(run_dir: Path) -> None:
             fields=config.get("extra_fields") or None,
             interval=interval,
         )
+        # Runtime fallback: try next sources in chain when primary returns empty
+        if not data_map and codes:
+            market = _detect_market(codes[0])
+            for fb_name in FALLBACK_CHAINS.get(market, []):
+                if fb_name == source or fb_name not in LOADER_REGISTRY:
+                    continue
+                fb_loader = LOADER_REGISTRY[fb_name]()
+                if not fb_loader.is_available():
+                    continue
+                fb_codes = _normalize_codes(codes, fb_name)
+                data_map = fb_loader.fetch(
+                    fb_codes, config.get("start_date", ""),
+                    config.get("end_date", ""), interval=interval,
+                )
+                if data_map:
+                    logger.info("Runtime fallback: %s -> %s", source, fb_name)
+                    source = fb_name
+                    loader = fb_loader
+                    break
     if not data_map:
         print(json.dumps({"error": "No data fetched"}))
         sys.exit(1)
@@ -476,6 +496,21 @@ def _fetch_auto(codes: List[str], config: dict, interval: str = "1D") -> dict:
         normalized_codes = _normalize_codes(market_codes, src_name)
         fields = config.get("extra_fields") if src_name == "tushare" else None
         result = loader.fetch(normalized_codes, start_date, end_date, fields=fields, interval=interval)
+
+        # Runtime fallback: try remaining sources when primary returns empty
+        if not result:
+            for fb_name in FALLBACK_CHAINS.get(market, []):
+                if fb_name == src_name or fb_name not in LOADER_REGISTRY:
+                    continue
+                fb_loader = LOADER_REGISTRY[fb_name]()
+                if not fb_loader.is_available():
+                    continue
+                fb_codes = _normalize_codes(market_codes, fb_name)
+                result = fb_loader.fetch(fb_codes, start_date, end_date, interval=interval)
+                if result:
+                    logger.info("Runtime fallback: %s -> %s for %s", src_name, fb_name, market)
+                    break
+
         merged.update(result)
 
     return merged
