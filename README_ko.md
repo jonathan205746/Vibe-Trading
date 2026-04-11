@@ -51,6 +51,7 @@
 
 ## 📰 뉴스
 
+- **2026-04-11** 🛡️ **안정성 및 DX 개선**: `vibe-trading init` 대화형 .env 부트스트랩([#19](https://github.com/HKUDS/Vibe-Trading/pull/19)), 시작 시 LLM·데이터소스 프리플라이트 체크, 기본 데이터소스 빈 응답 시 런타임 폴백, 백테스트 엔진 데이터 검증 및 에러 격리 강화, 에이전트·Swarm 프롬프트에 현재 날짜/시간 주입. 커뮤니티 PR [#21](https://github.com/HKUDS/Vibe-Trading/pull/21)로 다국어 README(zh/ja/ko) 추가.
 - **2026-04-10** 📦 **v0.1.4**: Docker 빌드 수정([#8](https://github.com/HKUDS/Vibe-Trading/issues/8)), `web_search` MCP 도구 추가(총 17개), 의존성 및 MCP에 `akshare`/`ccxt` 추가. 11개 LLM 제공자(DeepSeek, Groq, Gemini, Ollama 등), 모든 튜닝 파라미터를 `.env`로 설정. `ml-strategy` 스킬 하드닝. PyPI와 ClawHub에 게시.
 - **2026-04-09** 📊 **Backtest Wave 2 — 멀티자산 엔진**: ChinaFutures(CFFEX/SHFE/DCE/ZCE, 50+ 종목), GlobalFutures(CME/ICE/Eurex, 30+ 종목), Forex(24 페어, 스프레드 + 스왑), Options v2(미국형 행사, IV 스마일) 추가. 통계 검증: 몬테카를로 순열 테스트, Bootstrap 샤프 CI, 워크포워드 분석.
 - **2026-04-08** 🔧 **다중 시장 백테스트**: 시장별 규칙, TradingView용 **Pine Script v6 내보내기**. **데이터 소스 확장**: 자동 폴백 포함 5개 소스, `web_search` 도구, 스킬 7개 카테고리화.

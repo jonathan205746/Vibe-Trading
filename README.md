@@ -51,6 +51,7 @@
 
 ## 📰 News
 
+- **2026-04-11** 🛡️ **Reliability & DX**: `vibe-trading init` interactive .env bootstrap ([#19](https://github.com/HKUDS/Vibe-Trading/pull/19)), startup preflight checks for LLM & data sources, runtime data-source fallback when primary returns empty, hardened backtest engine with data validation & error isolation, date/time context injection into agent & swarm prompts. Multi-language README (zh/ja/ko) via community PR [#21](https://github.com/HKUDS/Vibe-Trading/pull/21).
 - **2026-04-10** 📦 **v0.1.4**: Fix Docker build ([#8](https://github.com/HKUDS/Vibe-Trading/issues/8)), add `web_search` MCP tool (17 total), `akshare`/`ccxt` in deps & MCP. 11 LLM providers (DeepSeek, Groq, Gemini, Ollama, etc.), all tuning params via `.env`. Hardened `ml-strategy` skill. Published to PyPI and ClawHub.
 - **2026-04-09** 📊 **Backtest Wave 2 — multi-asset engines**: added ChinaFutures (CFFEX/SHFE/DCE/ZCE, 50+ contracts), GlobalFutures (CME/ICE/Eurex, 30+ contracts), Forex (24 pairs, spread + swap), Options v2 (American exercise, IV smile). Statistical validation: Monte Carlo permutation test, Bootstrap Sharpe CI, Walk-Forward analysis.
 - **2026-04-08** 🔧 **Multi-market backtest** with per-market rules; **Pine Script v6 export** for TradingView. **Data source expansion**: 5 sources with auto-fallback, `web_search` tool, skill categorization (7 categories).

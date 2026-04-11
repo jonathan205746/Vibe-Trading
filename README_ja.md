@@ -51,6 +51,7 @@
 
 ## 📰 ニュース
 
+- **2026-04-11** 🛡️ **信頼性とDX向上**：`vibe-trading init` 対話式 .env ブートストラップ（[#19](https://github.com/HKUDS/Vibe-Trading/pull/19)）、起動時にLLM・データソースのプリフライトチェック、プライマリソースが空の場合のランタイムフォールバック、バックテストエンジンのデータ検証とエラー分離を強化、エージェントとSwarmプロンプトに現在日時を注入。コミュニティPR [#21](https://github.com/HKUDS/Vibe-Trading/pull/21) で多言語README（zh/ja/ko）を追加。
 - **2026-04-10** 📦 **v0.1.4**: Dockerビルドを修正（[#8](https://github.com/HKUDS/Vibe-Trading/issues/8)）、`web_search` MCPツールを追加（合計17）、依存関係とMCPに`akshare`/`ccxt`を追加。11のLLMプロバイダー（DeepSeek, Groq, Gemini, Ollama など）、すべての調整パラメータを`.env`で設定可能。`ml-strategy`スキルを強化。PyPIとClawHubに公開。
 - **2026-04-09** 📊 **Backtest Wave 2 — マルチアセットエンジン**: ChinaFutures（CFFEX/SHFE/DCE/ZCE、50+銘柄）、GlobalFutures（CME/ICE/Eurex、30+銘柄）、Forex（24通貨ペア、スプレッド＋スワップ）、Options v2（アメリカン行使、IVスマイル）を追加。統計的検証: モンテカルロ置換検定、ブートストラップSharpe信頼区間、ウォークフォワード分析。
 - **2026-04-08** 🔧 **マルチマーケットバックテスト**（市場別ルール対応）と**TradingView向けPine Script v6エクスポート**。**データソース拡張**: 自動フォールバック付き5ソース、`web_search`ツール、スキル分類（7カテゴリ）。
