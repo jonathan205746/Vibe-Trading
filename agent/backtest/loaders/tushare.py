@@ -9,6 +9,7 @@ from typing import Dict, List, Optional
 
 import pandas as pd
 
+from backtest.loaders.base import validate_date_range
 from backtest.loaders.registry import register
 
 
@@ -51,6 +52,8 @@ class DataLoader:
         Returns:
             Mapping code -> OHLCV DataFrame.
         """
+        validate_date_range(start_date, end_date)
+
         if interval != "1D":
             return self._fetch_minutes(codes, start_date, end_date, interval)
 

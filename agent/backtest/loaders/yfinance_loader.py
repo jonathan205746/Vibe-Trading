@@ -8,6 +8,7 @@ from typing import Dict, List, Optional, Union
 import pandas as pd
 import yfinance as yf
 
+from backtest.loaders.base import validate_date_range
 from backtest.loaders.registry import register
 
 _OHLCV_COLUMNS = ["open", "high", "low", "close", "volume"]
@@ -230,6 +231,7 @@ class DataLoader:
         del fields
         if not codes:
             return {}
+        validate_date_range(start_date, end_date)
 
         requested_interval = str(interval or "1D").strip()
         yf_interval = _to_yfinance_interval(requested_interval)

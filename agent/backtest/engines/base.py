@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import importlib
 import json
+import logging
 import sys
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -17,6 +18,8 @@ from typing import Any, Callable, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 from backtest.metrics import (
     by_exit_reason_stats,
@@ -57,7 +60,18 @@ def _align(
     close = pd.DataFrame(index=dates, columns=codes, dtype=float)
     for c in codes:
         close[c] = data_map[c]["close"].reindex(dates)
-    close = close.ffill().bfill()
+
+    # ffill with limit to avoid masking long suspensions (e.g. 3-week halt)
+    close = close.ffill(limit=5)
+
+    # Drop symbols that are entirely NaN (no data overlap with date range)
+    all_nan_cols = [c for c in codes if close[c].isna().all()]
+    if all_nan_cols:
+        logger.warning("Symbols dropped (no usable price data): %s", all_nan_cols)
+        codes = [c for c in codes if c not in all_nan_cols]
+        if not codes:
+            raise ValueError(f"All symbols have no data in the requested date range")
+        close = close[codes]
 
     pos = pd.DataFrame(0.0, index=dates, columns=codes)
     for c in codes:
@@ -255,6 +269,9 @@ class BaseEngine(ABC):
             data_map, signal_map, valid_codes, optimizer=opt_fn,
         )
 
+        # Sync codes after _align may have dropped all-NaN symbols
+        valid_codes = [c for c in valid_codes if c in target_pos.columns]
+
         # 4. Bar-by-bar execution
         self._execute_bars(dates, data_map, close_df, target_pos, valid_codes)
 
@@ -314,8 +331,11 @@ class BaseEngine(ABC):
             # b. Rebalance each symbol to target weight
             equity = self._calc_equity(close_df, ts)
             for c in codes:
-                target_w = float(target_pos.at[ts, c]) if ts in target_pos.index else 0.0
-                self._rebalance(c, target_w, data_map.get(c), ts, equity)
+                try:
+                    target_w = float(target_pos.at[ts, c]) if ts in target_pos.index else 0.0
+                    self._rebalance(c, target_w, data_map.get(c), ts, equity)
+                except Exception as exc:
+                    logger.warning("Rebalance failed for %s at %s: %s", c, ts, exc)
 
             # c. Record equity snapshot
             snap_equity = self._calc_equity(close_df, ts)

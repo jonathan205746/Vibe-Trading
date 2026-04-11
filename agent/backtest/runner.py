@@ -13,7 +13,10 @@ import logging
 import re
 import sys
 from pathlib import Path
-from typing import Dict, List
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
+from pydantic import BaseModel, ConfigDict, model_validator, field_validator
 
 try:
     from dotenv import load_dotenv
@@ -29,6 +32,70 @@ from backtest.loaders.registry import (
 from backtest.loaders.base import NoAvailableSourceError
 
 logger = logging.getLogger(__name__)
+
+_VALID_INTERVALS = {"1m", "5m", "15m", "30m", "1H", "4H", "1D"}
+_VALID_ENGINES = {"daily", "options"}
+_VALID_SOURCES = {"tushare", "okx", "yfinance", "akshare", "ccxt", "auto"}
+
+
+class BacktestConfigSchema(BaseModel):
+    """Validates backtest config.json before execution."""
+
+    model_config = ConfigDict(extra="allow")
+
+    codes: List[str]
+    start_date: str
+    end_date: str
+    source: str = "tushare"
+    interval: str = "1D"
+    engine: str = "daily"
+
+    @field_validator("codes")
+    @classmethod
+    def codes_not_empty(cls, v: List[str]) -> List[str]:
+        if not v:
+            raise ValueError("codes must be a non-empty list")
+        if any(not c.strip() for c in v):
+            raise ValueError("codes must not contain empty strings")
+        return v
+
+    @field_validator("start_date", "end_date")
+    @classmethod
+    def valid_date(cls, v: str) -> str:
+        try:
+            pd.Timestamp(v)
+        except Exception:
+            raise ValueError(f"invalid date format: {v!r} (expected YYYY-MM-DD)")
+        return v
+
+    @field_validator("interval")
+    @classmethod
+    def valid_interval(cls, v: str) -> str:
+        if v not in _VALID_INTERVALS:
+            raise ValueError(f"unsupported interval {v!r}, must be one of {_VALID_INTERVALS}")
+        return v
+
+    @field_validator("engine")
+    @classmethod
+    def valid_engine(cls, v: str) -> str:
+        if v not in _VALID_ENGINES:
+            raise ValueError(f"unsupported engine {v!r}, must be one of {_VALID_ENGINES}")
+        return v
+
+    @field_validator("source")
+    @classmethod
+    def valid_source(cls, v: str) -> str:
+        if v not in _VALID_SOURCES:
+            raise ValueError(f"unsupported source {v!r}, must be one of {_VALID_SOURCES}")
+        return v
+
+    @model_validator(mode="after")
+    def start_before_end(self) -> "BacktestConfigSchema":
+        if pd.Timestamp(self.start_date) > pd.Timestamp(self.end_date):
+            raise ValueError(
+                f"start_date ({self.start_date}) must be <= end_date ({self.end_date})"
+            )
+        return self
 
 
 def _load_module_from_file(file_path: Path, module_name: str):
@@ -192,7 +259,17 @@ def main(run_dir: Path) -> None:
         print(json.dumps({"error": "config.json not found"}))
         sys.exit(1)
 
-    config = json.loads(config_path.read_text(encoding="utf-8"))
+    raw_config = json.loads(config_path.read_text(encoding="utf-8"))
+
+    # Validate config schema
+    try:
+        BacktestConfigSchema(**raw_config)
+    except Exception as exc:
+        errors = str(exc)
+        print(json.dumps({"error": f"Invalid config: {errors}"}))
+        sys.exit(1)
+
+    config = raw_config
     source = config.get("source", "tushare")
     codes = config.get("codes", [])
 

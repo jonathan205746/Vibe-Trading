@@ -11,6 +11,7 @@ from typing import Dict, List, Optional
 
 import pandas as pd
 
+from backtest.loaders.base import validate_date_range
 from backtest.loaders.registry import register
 
 logger = logging.getLogger(__name__)
@@ -78,6 +79,8 @@ class DataLoader:
         Returns:
             Mapping symbol -> OHLCV DataFrame.
         """
+        validate_date_range(start_date, end_date)
+
         result: Dict[str, pd.DataFrame] = {}
         for code in codes:
             try:

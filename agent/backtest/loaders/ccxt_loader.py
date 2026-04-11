@@ -13,6 +13,7 @@ from typing import Dict, List, Optional
 
 import pandas as pd
 
+from backtest.loaders.base import validate_date_range
 from backtest.loaders.registry import register
 
 logger = logging.getLogger(__name__)
@@ -73,6 +74,8 @@ class DataLoader:
         Returns:
             Mapping symbol -> OHLCV DataFrame.
         """
+        validate_date_range(start_date, end_date)
+
         exchange = self._get_exchange()
         timeframe = _INTERVAL_MAP.get(interval, "1d")
         since_ms = int(pd.Timestamp(start_date).timestamp() * 1000)

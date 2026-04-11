@@ -11,6 +11,25 @@ class NoAvailableSourceError(Exception):
     """Raised when no data source is available for a given market."""
 
 
+def validate_date_range(start_date: str, end_date: str) -> None:
+    """Validate that start_date <= end_date.
+
+    Args:
+        start_date: Start date string (YYYY-MM-DD).
+        end_date: End date string (YYYY-MM-DD).
+
+    Raises:
+        ValueError: If dates are invalid or start > end.
+    """
+    try:
+        start = pd.Timestamp(start_date)
+        end = pd.Timestamp(end_date)
+    except Exception as exc:
+        raise ValueError(f"Invalid date format: start={start_date!r}, end={end_date!r}") from exc
+    if start > end:
+        raise ValueError(f"start_date ({start_date}) > end_date ({end_date})")
+
+
 @runtime_checkable
 class DataLoaderProtocol(Protocol):
     """Interface that every data source loader must satisfy."""

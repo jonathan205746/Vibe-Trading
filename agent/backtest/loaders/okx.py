@@ -10,6 +10,7 @@ from typing import Dict, List, Optional
 import pandas as pd
 import requests
 
+from backtest.loaders.base import validate_date_range
 from backtest.loaders.registry import register
 
 BASE_URL = "https://www.okx.com/api/v5"
@@ -52,6 +53,8 @@ class DataLoader:
         Returns:
             Mapping symbol -> DataFrame.
         """
+        validate_date_range(start_date, end_date)
+
         if fields:
             print(f"[WARN] OKX ignores extra fields: {fields}")
 
