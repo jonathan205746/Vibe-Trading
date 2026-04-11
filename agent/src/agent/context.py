@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from src.agent.memory import WorkspaceMemory
@@ -53,6 +54,10 @@ Decide which workflow to use based on the request:
 - Output results as markdown tables. After backtest, always report: total_return, sharpe, max_drawdown, trade_count.
 - All file paths are relative to run_dir (auto-injected).
 - Respond in the same language the user used.
+
+## Current Date & Time
+
+Today is {current_datetime}.
 """
 
 
@@ -89,10 +94,12 @@ class ContextBuilder:
         Returns:
             System prompt text.
         """
+        now = datetime.now()
         return _SYSTEM_PROMPT.format(
             tool_descriptions=self._format_tool_descriptions(),
             skill_descriptions=self.skills_loader.get_descriptions(),
             memory_summary=self.memory.to_summary(),
+            current_datetime=now.strftime("%A, %B %d, %Y %H:%M (local)"),
         )
 
     def build_messages(self, user_message: str, history: Optional[List[Dict[str, Any]]] = None) -> List[Dict[str, Any]]:
