@@ -51,6 +51,7 @@
 
 ## 📰 News
 
+- **2026-04-12** 🌍 **Multi-Platform Indicator Export**: `/pine` now exports strategies to **TradingView (Pine Script v6)**, **通达信/同花顺/东方财富 (TDX formula)**, and **MetaTrader 5 (MQL5)** in a single file — covering international equities, China A-shares, and global forex/CFD markets. One command, three platforms.
 - **2026-04-11** 🛡️ **Reliability & DX**: `vibe-trading init` interactive .env bootstrap ([#19](https://github.com/HKUDS/Vibe-Trading/pull/19)), startup preflight checks for LLM & data sources, runtime data-source fallback when primary returns empty, hardened backtest engine with data validation & error isolation, date/time context injection into agent & swarm prompts. Multi-language README (zh/ja/ko) via community PR [#21](https://github.com/HKUDS/Vibe-Trading/pull/21).
 - **2026-04-10** 📦 **v0.1.4**: Fix Docker build ([#8](https://github.com/HKUDS/Vibe-Trading/issues/8)), add `web_search` MCP tool (17 total), `akshare`/`ccxt` in deps & MCP. 11 LLM providers (DeepSeek, Groq, Gemini, Ollama, etc.), all tuning params via `.env`. Hardened `ml-strategy` skill. Published to PyPI and ClawHub.
 - **2026-04-09** 📊 **Backtest Wave 2 — multi-asset engines**: added ChinaFutures (CFFEX/SHFE/DCE/ZCE, 50+ contracts), GlobalFutures (CME/ICE/Eurex, 30+ contracts), Forex (24 pairs, spread + swap), Options v2 (American exercise, IV smile). Statistical validation: Monte Carlo permutation test, Bootstrap Sharpe CI, Walk-Forward analysis.
@@ -67,7 +68,7 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
 • **Strategy Generation** — Automatically writes trading code from your ideas<br>
 • **Smart Data Access** — 5 data sources with automatic fallback; zero-config for all markets<br>
 • **Performance Testing** — Tests your strategies against historical market data<br>
-• **TradingView Export** — One-click convert strategies to Pine Script v6 for TradingView<br>
+• **Multi-Platform Export** — One-click convert strategies to TradingView, 通达信/同花顺/东方财富, and MT5<br>
 • **Expert Teams** — Deploys specialized AI agents for complex research tasks<br>
 • **Live Updates** — Watch the entire analysis process in real-time
 
@@ -334,7 +335,7 @@ vibe-trading serve         # API server
 | `/list` | Recent runs |
 | `/show <run_id>` | Run details + metrics |
 | `/code <run_id>` | Generated strategy code |
-| `/pine <run_id>` | Pine Script for TradingView |
+| `/pine <run_id>` | Export indicators (TradingView + TDX + MT5) |
 | `/trace <run_id>` | Full execution replay |
 | `/continue <run_id> <prompt>` | Continue a run with new instructions |
 | `/sessions` | List chat sessions |
@@ -362,7 +363,7 @@ vibe-trading --swarm-run investment_committee '{"topic":"BTC outlook"}'
 vibe-trading --list
 vibe-trading --show <run_id>
 vibe-trading --code <run_id>
-vibe-trading --pine <run_id>           # Pine Script for TradingView
+vibe-trading --pine <run_id>           # Export indicators (TradingView + TDX + MT5)
 vibe-trading --trace <run_id>
 vibe-trading --continue <run_id> "refine the strategy"
 vibe-trading --upload report.pdf
@@ -382,7 +383,7 @@ vibe-trading serve --port 8899
 |--------|----------|-------------|
 | `GET` | `/runs` | List runs |
 | `GET` | `/runs/{run_id}` | Run details |
-| `GET` | `/runs/{run_id}/pine` | Pine Script export |
+| `GET` | `/runs/{run_id}/pine` | Multi-platform indicator export |
 | `POST` | `/sessions` | Create session |
 | `POST` | `/sessions/{id}/messages` | Send message |
 | `GET` | `/sessions/{id}/events` | SSE event stream |

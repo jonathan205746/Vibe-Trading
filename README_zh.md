@@ -51,6 +51,7 @@
 
 ## 📰 新闻
 
+- **2026-04-12** 🌍 **多平台指标导出**：`/pine` 命令现在一次性导出 **TradingView (Pine Script v6)**、**通达信/同花顺/东方财富 (TDX 公式)** 和 **MetaTrader 5 (MQL5)** 三个平台的指标代码 — 覆盖国际股票、中国 A 股和全球外汇/CFD 市场。一条命令，三大平台。
 - **2026-04-11** 🛡️ **可靠性与开发体验**：`vibe-trading init` 交互式 .env 引导（[#19](https://github.com/HKUDS/Vibe-Trading/pull/19)），启动预检 LLM 与数据源连通性，主数据源返空时自动回退，回测引擎数据校验与错误隔离加固，Agent 与 Swarm 提示词注入当前日期时间。社区 PR [#21](https://github.com/HKUDS/Vibe-Trading/pull/21) 贡献多语言 README（zh/ja/ko）。
 - **2026-04-10** 📦 **v0.1.4**：修复 Docker 构建（[#8](https://github.com/HKUDS/Vibe-Trading/issues/8)），新增 `web_search` MCP 工具（共 17 个），在依赖与 MCP 中加入 `akshare`/`ccxt`。支持 11 家 LLM 提供商（DeepSeek、Groq、Gemini、Ollama 等），全部调优参数可通过 `.env` 配置。加固 `ml-strategy` 技能。已发布至 PyPI 和 ClawHub。
 - **2026-04-09** 📊 **回测 Wave 2 —— 多资产引擎**：新增 ChinaFutures（CFFEX/SHFE/DCE/ZCE，50+ 合约）、GlobalFutures（CME/ICE/Eurex，30+ 合约）、Forex（24 货币对，点差 + 掉期）、Options v2（美式行权、IV 微笑）。统计验证：蒙特卡洛置换检验、Bootstrap 夏普区间、Walk-Forward 分析。
@@ -67,7 +68,7 @@ Vibe-Trading 是一个由 AI 驱动的多代理金融工作台，将自然语言
 • **Strategy Generation** —— 从你的想法自动生成交易代码<br>
 • **Smart Data Access** —— 5 大数据源自动回退；所有市场零配置<br>
 • **Performance Testing** —— 使用历史行情测试你的策略<br>
-• **TradingView Export** —— 一键转换为 TradingView 的 Pine Script v6<br>
+• **Multi-Platform Export** —— 一键导出到 TradingView、通达信/同花顺/东方财富 和 MT5<br>
 • **Expert Teams** —— 部署专职 AI 代理处理复杂研究任务<br>
 • **Live Updates** —— 全程实时查看分析过程
 
@@ -332,7 +333,7 @@ vibe-trading serve         # API 服务器
 | `/list` | 最近的运行 |
 | `/show <run_id>` | 运行详情与指标 |
 | `/code <run_id>` | 生成的策略代码 |
-| `/pine <run_id>` | TradingView 的 Pine Script |
+| `/pine <run_id>` | 导出指标代码（TradingView + TDX + MT5）|
 | `/trace <run_id>` | 完整执行回放 |
 | `/continue <run_id> <prompt>` | 带新指令继续运行 |
 | `/sessions` | 列出聊天会话 |
@@ -359,7 +360,7 @@ vibe-trading --swarm-run investment_committee '{"topic":"BTC outlook"}'
 vibe-trading --list
 vibe-trading --show <run_id>
 vibe-trading --code <run_id>
-vibe-trading --pine <run_id>           # TradingView 的 Pine Script
+vibe-trading --pine <run_id>           # 导出指标代码（TradingView + TDX + MT5）
 vibe-trading --trace <run_id>
 vibe-trading --continue <run_id> "refine the strategy"
 vibe-trading --upload report.pdf
@@ -379,7 +380,7 @@ vibe-trading serve --port 8899
 |--------|----------|-------------|
 | `GET` | `/runs` | 列出运行 |
 | `GET` | `/runs/{run_id}` | 运行详情 |
-| `GET` | `/runs/{run_id}/pine` | Pine Script 导出 |
+| `GET` | `/runs/{run_id}/pine` | 多平台指标导出 |
 | `POST` | `/sessions` | 创建会话 |
 | `POST` | `/sessions/{id}/messages` | 发送消息 |
 | `GET` | `/sessions/{id}/events` | SSE 事件流 |
