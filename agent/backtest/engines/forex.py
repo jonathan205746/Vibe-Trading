@@ -15,6 +15,7 @@ from __future__ import annotations
 import pandas as pd
 
 from backtest.engines.base import BaseEngine
+from backtest.engines._market_hooks import calc_forex_swap
 
 
 # ── Typical spreads in pips (1 pip = 0.0001 for most pairs, 0.01 for JPY) ──
@@ -32,18 +33,6 @@ _SPREAD_PIPS: dict[str, float] = {
     "USD/SGD": 3.0, "USD/HKD": 3.0, "USD/CNH": 5.0,
 }
 _DEFAULT_SPREAD_PIPS = 2.0
-
-# ── Daily swap points (per standard lot, in account currency) ──
-# Positive = receive, negative = pay. Varies by broker/rates; simplified table.
-
-_SWAP_LONG: dict[str, float] = {
-    "EUR/USD": -6.5, "GBP/USD": -3.0, "USD/JPY": 8.0, "USD/CHF": 4.0,
-    "AUD/USD": -2.0, "USD/CAD": 2.0, "NZD/USD": -1.5,
-}
-_SWAP_SHORT: dict[str, float] = {
-    "EUR/USD": 3.5, "GBP/USD": -1.0, "USD/JPY": -12.0, "USD/CHF": -8.0,
-    "AUD/USD": -1.0, "USD/CAD": -5.0, "NZD/USD": -2.0,
-}
 
 # Standard lot size
 STANDARD_LOT = 100_000
@@ -149,41 +138,12 @@ class ForexEngine(BaseEngine):
         """Apply daily swap/rollover at end of trading day."""
         if not self.swap_enabled:
             return
-        self._apply_swap(symbol, timestamp)
+        swap = calc_forex_swap(
+            symbol, timestamp, self.positions,
+            self.lot_size, self._last_swap_dates,
+        )
+        self.capital += swap
 
     def get_contract_multiplier(self, symbol: str) -> float:
         """Forex: multiplier is 1.0 (size is in currency units)."""
         return 1.0
-
-    # ── Swap (overnight rollover) ──
-
-    def _apply_swap(self, symbol: str, timestamp: pd.Timestamp) -> None:
-        """Deduct/credit swap at daily rollover (once per calendar day).
-
-        Triple swap on Wednesday (covers weekend).
-        """
-        if not hasattr(timestamp, "date"):
-            return
-
-        current_date = timestamp.date()
-        if self._last_swap_dates.get(symbol) == current_date:
-            return
-        self._last_swap_dates[symbol] = current_date
-
-        pos = self.positions.get(symbol)
-        if pos is None:
-            return
-
-        pair = _normalize_symbol(symbol)
-        lots = pos.size / self.lot_size
-
-        if pos.direction == 1:
-            swap_per_lot = _SWAP_LONG.get(pair, -1.0)
-        else:
-            swap_per_lot = _SWAP_SHORT.get(pair, -1.0)
-
-        # Wednesday = triple swap (covers Sat+Sun)
-        multiplier = 3.0 if timestamp.weekday() == 2 else 1.0
-        swap = lots * swap_per_lot * multiplier
-
-        self.capital += swap

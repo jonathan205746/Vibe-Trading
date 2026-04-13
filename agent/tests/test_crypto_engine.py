@@ -14,7 +14,14 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from backtest.engines.crypto import CryptoEngine, _FUNDING_HOURS, _TIER_TABLE
+from backtest.engines.crypto import CryptoEngine
+from backtest.engines._market_hooks import (
+    FUNDING_HOURS as _FUNDING_HOURS,
+    _TIER_TABLE,
+    calc_crypto_funding_fee,
+    check_crypto_liquidation,
+    _maintenance_rate,
+)
 from backtest.models import Position
 
 
@@ -131,7 +138,7 @@ class TestFundingFee:
         initial_capital = engine.capital
         bar = _make_bar(close=60000.0)
         ts = pd.Timestamp("2025-01-01 08:00:00")  # settlement hour
-        engine._apply_funding_fee("BTC-USDT", bar, ts)
+        engine.on_bar("BTC-USDT", bar, ts)
         # Long pays: 1.0 × 60000 × 0.0001 × 1(long) = $6
         assert engine.capital == pytest.approx(initial_capital - 6.0)
 
@@ -144,7 +151,7 @@ class TestFundingFee:
         initial_capital = engine.capital
         bar = _make_bar(close=60000.0)
         ts = pd.Timestamp("2025-01-01 05:00:00")  # not settlement hour
-        engine._apply_funding_fee("BTC-USDT", bar, ts)
+        engine.on_bar("BTC-USDT", bar, ts)
         # Daily fallback: applies once even at non-settlement hour
         assert engine.capital == pytest.approx(initial_capital - 6.0)
 
@@ -156,7 +163,7 @@ class TestFundingFee:
         initial_capital = engine.capital
         bar = _make_bar(close=60000.0)
         ts = pd.Timestamp("2025-01-01 08:00:00")
-        engine._apply_funding_fee("BTC-USDT", bar, ts)
+        engine.on_bar("BTC-USDT", bar, ts)
         # Short: direction=-1, fee = notional × rate × direction = negative → capital increases
         assert engine.capital > initial_capital
 
@@ -167,10 +174,10 @@ class TestFundingFee:
         )
         bar = _make_bar(close=60000.0)
         ts = pd.Timestamp("2025-01-01 08:00:00")
-        engine._apply_funding_fee("BTC-USDT", bar, ts)
+        engine.on_bar("BTC-USDT", bar, ts)
         capital_after_first = engine.capital
         # Call again at same hour — should not deduct again
-        engine._apply_funding_fee("BTC-USDT", bar, ts)
+        engine.on_bar("BTC-USDT", bar, ts)
         assert engine.capital == capital_after_first
 
     def test_no_funding_without_position(self) -> None:
@@ -178,7 +185,7 @@ class TestFundingFee:
         initial_capital = engine.capital
         bar = _make_bar()
         ts = pd.Timestamp("2025-01-01 08:00:00")
-        engine._apply_funding_fee("BTC-USDT", bar, ts)
+        engine.on_bar("BTC-USDT", bar, ts)
         assert engine.capital == initial_capital
 
     def test_daily_bars_apply_each_day(self) -> None:
@@ -191,17 +198,17 @@ class TestFundingFee:
         initial = engine.capital
 
         # Day 1
-        engine._apply_funding_fee("BTC-USDT", bar, pd.Timestamp("2025-01-01"))
+        engine.on_bar("BTC-USDT", bar, pd.Timestamp("2025-01-01"))
         after_day1 = engine.capital
         assert after_day1 < initial  # fee deducted
 
         # Day 2 (same hour=0, different date)
-        engine._apply_funding_fee("BTC-USDT", bar, pd.Timestamp("2025-01-02"))
+        engine.on_bar("BTC-USDT", bar, pd.Timestamp("2025-01-02"))
         after_day2 = engine.capital
         assert after_day2 < after_day1  # fee deducted again
 
         # Day 3
-        engine._apply_funding_fee("BTC-USDT", bar, pd.Timestamp("2025-01-03"))
+        engine.on_bar("BTC-USDT", bar, pd.Timestamp("2025-01-03"))
         after_day3 = engine.capital
         assert after_day3 < after_day2  # fee deducted again
 
@@ -222,9 +229,9 @@ class TestFundingFee:
         bar_eth = _make_bar(close=3000.0)
         ts = pd.Timestamp("2025-01-01 08:00:00")
 
-        engine._apply_funding_fee("BTC-USDT", bar_btc, ts)
+        engine.on_bar("BTC-USDT", bar_btc, ts)
         after_btc = engine.capital
-        engine._apply_funding_fee("ETH-USDT", bar_eth, ts)
+        engine.on_bar("ETH-USDT", bar_eth, ts)
         after_both = engine.capital
 
         # BTC: 1 × 60000 × 0.0001 = $6
@@ -259,7 +266,7 @@ class TestLiquidation:
         # unrealized = -6000, equity = 0 → clearly liquidated
         bar = _make_bar(close=54000.0)
         ts = pd.Timestamp("2025-01-02")
-        engine._check_liquidation("BTC-USDT", bar, ts)
+        engine.on_bar("BTC-USDT", bar, ts)
         assert "BTC-USDT" not in engine.positions
         assert len(engine.trades) == 1
         assert engine.trades[0].exit_reason == "liquidation"
@@ -271,7 +278,7 @@ class TestLiquidation:
         )
         bar = _make_bar(close=65000.0)
         ts = pd.Timestamp("2025-01-02")
-        engine._check_liquidation("BTC-USDT", bar, ts)
+        engine.on_bar("BTC-USDT", bar, ts)
         assert "BTC-USDT" in engine.positions
 
     def test_no_liquidation_for_spot(self) -> None:
@@ -282,7 +289,7 @@ class TestLiquidation:
         )
         bar = _make_bar(close=30000.0)  # 50% drop
         ts = pd.Timestamp("2025-01-02")
-        engine._check_liquidation("BTC-USDT", bar, ts)
+        engine.on_bar("BTC-USDT", bar, ts)
         assert "BTC-USDT" in engine.positions
 
     def test_short_liquidation(self) -> None:
@@ -295,7 +302,7 @@ class TestLiquidation:
         # equity_in_pos = 6000 - 6500 = -$500 < 0 → liquidated
         bar = _make_bar(close=66500.0)
         ts = pd.Timestamp("2025-01-02")
-        engine._check_liquidation("BTC-USDT", bar, ts)
+        engine.on_bar("BTC-USDT", bar, ts)
         assert "BTC-USDT" not in engine.positions
 
 
@@ -306,17 +313,17 @@ class TestLiquidation:
 
 class TestMaintenanceRate:
     def test_small_position(self) -> None:
-        assert CryptoEngine._maintenance_rate(50_000) == 0.004
+        assert _maintenance_rate(50_000) == 0.004
 
     def test_medium_position(self) -> None:
-        assert CryptoEngine._maintenance_rate(300_000) == 0.006
+        assert _maintenance_rate(300_000) == 0.006
 
     def test_large_position(self) -> None:
-        assert CryptoEngine._maintenance_rate(2_000_000) == 0.02
+        assert _maintenance_rate(2_000_000) == 0.02
 
     def test_tier_boundaries(self) -> None:
-        assert CryptoEngine._maintenance_rate(100_000) == 0.004
-        assert CryptoEngine._maintenance_rate(100_001) == 0.006
+        assert _maintenance_rate(100_000) == 0.004
+        assert _maintenance_rate(100_001) == 0.006
 
     def test_maximum_tier(self) -> None:
-        assert CryptoEngine._maintenance_rate(100_000_000) == 0.10
+        assert _maintenance_rate(100_000_000) == 0.10

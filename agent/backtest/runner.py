@@ -333,7 +333,12 @@ def main(run_dir: Path) -> None:
     # Annualization bars
     effective_source = _detect_primary_source(codes, source)
     from backtest.metrics import calc_bars_per_year
-    bars_per_year = calc_bars_per_year(interval, effective_source)
+    # Cross-market: use calendar-day annualization (bars_per_year=None)
+    market_types = {_detect_market(c) for c in codes}
+    if len(market_types) > 1:
+        bars_per_year = None
+    else:
+        bars_per_year = calc_bars_per_year(interval, effective_source)
 
     # Auto mode: wrap preloaded data in a dummy loader
     if source == "auto":
@@ -364,6 +369,11 @@ def _create_market_engine(source: str, config: dict, codes: List[str]):
     """
     # Detect dominant market type from codes
     markets = {_detect_market(c) for c in codes} if codes else set()
+
+    # Cross-market -> CompositeEngine
+    if len(markets) > 1:
+        from backtest.engines.composite import CompositeEngine
+        return CompositeEngine(config, codes)
 
     # Futures routing (Wave 2)
     if "futures" in markets:

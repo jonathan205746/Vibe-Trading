@@ -13,12 +13,17 @@ Wave 2:
   - GlobalFuturesEngine: International futures (CME/ICE/Eurex)
   - ForexEngine: FX spot/CFD (spread, swap, high leverage)
 
+Wave 3:
+  - CompositeEngine: Cross-market engine with shared capital pool
+  - _market_hooks: Extracted on_bar logic (funding, liquidation, swap)
+
 Inheritance:
   BaseEngine
   ├── ChinaAEngine
   ├── GlobalEquityEngine
   ├── CryptoEngine
   ├── ForexEngine
+  ├── CompositeEngine (delegates to sub-engines as rule providers)
   └── FuturesBaseEngine
       ├── ChinaFuturesEngine
       └── GlobalFuturesEngine

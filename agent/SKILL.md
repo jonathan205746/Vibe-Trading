@@ -1,7 +1,7 @@
 ---
 name: vibe-trading
 version: 0.1.4
-description: Professional finance research toolkit — backtesting (6 engines), factor analysis, options pricing, 68 finance skills, and 29 multi-agent swarm teams across 5 data sources (tushare, yfinance, okx, akshare, ccxt).
+description: Professional finance research toolkit — backtesting (7 engines), factor analysis, options pricing, 69 finance skills, and 29 multi-agent swarm teams across 5 data sources (tushare, yfinance, okx, akshare, ccxt).
 dependencies:
   python: ">=3.11"
   pip:
@@ -23,7 +23,7 @@ mcp:
 
 # Vibe-Trading
 
-Professional finance research toolkit with AI-powered backtesting (6 engines), multi-agent teams, and 68 specialized skills.
+Professional finance research toolkit with AI-powered backtesting (7 engines), multi-agent teams, and 69 specialized skills.
 
 ## Setup
 
@@ -53,7 +53,7 @@ Add to your agent's MCP config:
 
 ### API Key Requirements
 
-**16 of 17 MCP tools work with zero API keys.** After `pip install`, backtesting, market data, factor analysis, options pricing, chart patterns, web search, and all 68 skills are ready to use for HK/US equities and crypto.
+**16 of 17 MCP tools work with zero API keys.** After `pip install`, backtesting, market data, factor analysis, options pricing, chart patterns, web search, and all 69 skills are ready to use for HK/US equities and crypto.
 
 | Feature | Key needed | When |
 |---------|-----------|------|
@@ -64,7 +64,7 @@ Add to your agent's MCP config:
 ## What You Can Do
 
 ### Backtesting
-Create and run quantitative strategies across 6 engines (ChinaA, GlobalEquity, Crypto, ChinaFutures, GlobalFutures, Forex + options) with 5 data sources:
+Create and run quantitative strategies across 7 engines (ChinaA, GlobalEquity, Crypto, ChinaFutures, GlobalFutures, Forex + options) with 5 data sources:
 - **HK/US equities** via yfinance (free, no API key)
 - **Cryptocurrency** via OKX or CCXT/100+ exchanges (free, no API key)
 - **China A-shares** via Tushare (token) or AKShare (free fallback)
@@ -105,7 +105,7 @@ Use `load_skill(name)` to access full methodology docs with code templates.
 
 | Tool | Description | API Key |
 |------|-------------|---------|
-| `list_skills` | List all 68 finance skills | None |
+| `list_skills` | List all 69 finance skills | None |
 | `load_skill` | Load full skill documentation | None |
 | `backtest` | Run vectorized backtest engine | None* |
 | `factor_analysis` | IC/IR analysis + layered backtest | None* |
@@ -131,7 +131,7 @@ Use `load_skill(name)` to access full methodology docs with code templates.
 pip install vibe-trading-ai
 ```
 
-That's it — no API keys needed for HK/US/crypto markets. Start using `backtest`, `get_market_data`, `analyze_options`, `web_search`, and all 68 skills immediately.
+That's it — no API keys needed for HK/US/crypto markets. Start using `backtest`, `get_market_data`, `analyze_options`, `web_search`, and all 69 skills immediately.
 
 ## Examples
 

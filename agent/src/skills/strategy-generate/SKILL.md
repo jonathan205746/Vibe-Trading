@@ -183,6 +183,14 @@ If improvements are needed after evaluation, write `action_items`:
   - `"Add stop-loss: force close when loss exceeds 5%"`
   - `"Add volume filter in signal_engine.py: only trigger buy on high volume"`
 
+## Cross-Market Strategies
+
+When the user requests a backtest with codes from **different markets** (e.g. `["000001.SZ", "BTC-USDT"]`):
+- Set `source: "auto"` in `config.json`
+- The `CompositeEngine` handles calendar alignment, shared capital, and per-market rules automatically
+- Use volatility-adjusted weights so high-vol assets (crypto) don't dominate the risk budget
+- See the [cross-market-strategy](../cross-market-strategy/SKILL.md) skill for per-market parameters, vol-adjustment, and example code
+
 ## Supporting Files
 
 - [examples.md](examples.md) — example call sequence

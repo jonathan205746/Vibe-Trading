@@ -19,7 +19,7 @@
   <a href="https://pypi.org/project/vibe-trading-ai/"><img src="https://img.shields.io/pypi/v/vibe-trading-ai?style=flat&logo=pypi&logoColor=white" alt="PyPI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=flat" alt="License"></a>
   <br>
-  <img src="https://img.shields.io/badge/Skills-68-orange" alt="Skills">
+  <img src="https://img.shields.io/badge/Skills-69-orange" alt="Skills">
   <img src="https://img.shields.io/badge/Swarm_Presets-29-7C3AED" alt="Swarm">
   <img src="https://img.shields.io/badge/Tools-21-0F766E" alt="Tools">
   <img src="https://img.shields.io/badge/Data_Sources-5-2563EB" alt="Data Sources">
@@ -51,6 +51,7 @@
 
 ## 📰 News
 
+- **2026-04-13** 🌐 **Cross-Market Composite Backtest**: New `CompositeEngine` enables backtesting portfolios that span multiple markets (e.g. A-shares + crypto) in a single run with a **shared capital pool**. Per-market rules (T+1, funding fees, swap) enforced per symbol, signals aligned on each symbol's own trading calendar. Use `source: "auto"` with mixed codes like `["000001.SZ", "BTC-USDT"]`. Includes volatility-adjusted weighting skill and calendar-day annualization for accurate cross-market Sharpe.
 - **2026-04-12** 🌍 **Multi-Platform Indicator Export**: `/pine` now exports strategies to **TradingView (Pine Script v6)**, **通达信/同花顺/东方财富 (TDX formula)**, and **MetaTrader 5 (MQL5)** in a single file — covering international equities, China A-shares, and global forex/CFD markets. One command, three platforms.
 - **2026-04-11** 🛡️ **Reliability & DX**: `vibe-trading init` interactive .env bootstrap ([#19](https://github.com/HKUDS/Vibe-Trading/pull/19)), startup preflight checks for LLM & data sources, runtime data-source fallback when primary returns empty, hardened backtest engine with data validation & error isolation, date/time context injection into agent & swarm prompts. Multi-language README (zh/ja/ko) via community PR [#21](https://github.com/HKUDS/Vibe-Trading/pull/21).
 - **2026-04-10** 📦 **v0.1.4**: Fix Docker build ([#8](https://github.com/HKUDS/Vibe-Trading/issues/8)), add `web_search` MCP tool (17 total), `akshare`/`ccxt` in deps & MCP. 11 LLM providers (DeepSeek, Groq, Gemini, Ollama, etc.), all tuning params via `.env`. Hardened `ml-strategy` skill. Published to PyPI and ClawHub.
@@ -81,7 +82,7 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
     <td align="center" width="25%" valign="top">
       <img src="assets/scene-research.png" height="150" alt="Research"/><br>
       <h3>🔍 DeepResearch for Trading</h3>
-      <img src="https://img.shields.io/badge/68_Skills-FF6B6B?style=for-the-badge&logo=bookstack&logoColor=white" alt="Skills" /><br><br>
+      <img src="https://img.shields.io/badge/69_Skills-FF6B6B?style=for-the-badge&logo=bookstack&logoColor=white" alt="Skills" /><br><br>
       <div align="left" style="font-size: 4px;">
         • Multi-domain analysis coverage across markets<br>
         • Auto strategy and signal generation<br>
@@ -106,7 +107,7 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
       <img src="https://img.shields.io/badge/5_Data_Sources-FFD93D?style=for-the-badge&logo=bitcoin&logoColor=black" alt="Backtest" /><br><br>
       <div align="left">
         • A-shares, HK/US equities, crypto, futures & forex<br>
-        • 7 market engines: A-share, US/HK equity, crypto, China futures, global futures, forex<br>
+        • 7 market engines + composite cross-market engine with shared capital pool<br>
         • Statistical validation: Monte Carlo, Bootstrap CI, Walk-Forward<br>
         • 15+ performance metrics & 4 optimizers
       </div>
@@ -125,16 +126,16 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
   </tr>
 </table>
 
-## 68 Skills across 7 Categories
+## 69 Skills across 7 Categories
 
-- 📊 68 specialized finance skills organized into 7 categories
+- 📊 69 specialized finance skills organized into 7 categories
 - 🌐 Complete coverage from traditional markets to crypto & DeFi
 - 🔬 Comprehensive capabilities spanning data sourcing to quantitative research
 
 | Category | Skills | Examples |
 |----------|--------|----------|
 | Data Source | 6 | `data-routing`, `tushare`, `yfinance`, `okx-market`, `akshare`, `ccxt` |
-| Strategy | 16 | `strategy-generate`, `technical-basic`, `candlestick`, `ichimoku`, `elliott-wave`, `smc`, `multi-factor`, `ml-strategy` |
+| Strategy | 17 | `strategy-generate`, `cross-market-strategy`, `technical-basic`, `candlestick`, `ichimoku`, `elliott-wave`, `smc`, `multi-factor`, `ml-strategy` |
 | Analysis | 15 | `factor-research`, `macro-analysis`, `global-macro`, `valuation-model`, `earnings-forecast`, `credit-analysis` |
 | Asset Class | 9 | `options-strategy`, `options-advanced`, `convertible-bond`, `etf-analysis`, `asset-allocation`, `sector-rotation` |
 | Crypto | 7 | `perp-funding-basis`, `liquidation-heatmap`, `stablecoin-flow`, `defi-yield`, `onchain-analysis` |
@@ -326,7 +327,7 @@ vibe-trading serve         # API server
 | Command | Description |
 |---------|-------------|
 | `/help` | Show all commands |
-| `/skills` | List all 68 finance skills |
+| `/skills` | List all 69 finance skills |
 | `/swarm` | List 29 swarm team presets |
 | `/swarm run <preset> [vars_json]` | Run a swarm team with live streaming |
 | `/swarm list` | Swarm run history |
@@ -460,7 +461,7 @@ Browse on ClawHub: [clawhub.ai/skills/vibe-trading](https://clawhub.ai/skills/vi
 <details>
 <summary><b>OpenSpace — self-evolving skills</b></summary>
 
-All 68 finance skills are published on [open-space.cloud](https://open-space.cloud) and evolve autonomously through OpenSpace's self-evolution engine.
+All 69 finance skills are published on [open-space.cloud](https://open-space.cloud) and evolve autonomously through OpenSpace's self-evolution engine.
 
 To use with OpenSpace, add both MCP servers to your agent config:
 
@@ -482,7 +483,7 @@ To use with OpenSpace, add both MCP servers to your agent config:
 }
 ```
 
-OpenSpace will auto-discover all 68 skills, enabling auto-fix, auto-improve, and community sharing. Search for Vibe-Trading skills via `search_skills("finance backtest")` in any OpenSpace-connected agent.
+OpenSpace will auto-discover all 69 skills, enabling auto-fix, auto-improve, and community sharing. Search for Vibe-Trading skills via `search_skills("finance backtest")` in any OpenSpace-connected agent.
 
 </details>
 
@@ -503,7 +504,7 @@ Vibe-Trading/
 │   ├── src/
 │   │   ├── agent/                  # ReAct agent core
 │   │   │   ├── loop.py             #   main reasoning loop
-│   │   │   ├── skills.py           #   skill loader (68 SKILL.md files, 7 categories)
+│   │   │   ├── skills.py           #   skill loader (69 SKILL.md files, 7 categories)
 │   │   │   ├── tools.py            #   tool orchestration
 │   │   │   ├── context.py          #   system prompt builder
 │   │   │   ├── memory.py           #   run memory / artifact store
@@ -520,13 +521,13 @@ Vibe-Trading/
 │   │   │   ├── swarm_tool.py       #   launch swarm teams
 │   │   │   └── ...                 #   file I/O, bash, tasks, etc.
 │   │   │
-│   │   ├── skills/                 # 68 finance skills in 7 categories (SKILL.md each)
+│   │   ├── skills/                 # 69 finance skills in 7 categories (SKILL.md each)
 │   │   ├── swarm/                  # Swarm DAG execution engine
 │   │   ├── session/                # Multi-turn chat session management
 │   │   └── providers/              # LLM provider abstraction
 │   │
 │   ├── backtest/                   # Backtest engines
-│   │   ├── engines/                #   7 engines: china_a, global_equity, crypto, china_futures, global_futures, forex + options_portfolio
+│   │   ├── engines/                #   7 engines + composite cross-market engine + options_portfolio
 │   │   ├── loaders/                #   5 sources: tushare, okx, yfinance, akshare, ccxt
 │   │   │   ├── base.py             #   DataLoader Protocol
 │   │   │   └── registry.py         #   Registry + auto-fallback chains

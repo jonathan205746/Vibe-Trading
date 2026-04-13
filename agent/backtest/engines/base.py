@@ -29,6 +29,23 @@ from backtest.metrics import (
 from backtest.models import EquitySnapshot, Position, TradeRecord
 
 
+# ─── Market detection (lightweight, for signal alignment only) ───
+
+import re as _re
+
+_CRYPTO_RE = _re.compile(r"^[A-Z]+-USDT$|^[A-Z]+/USDT$", _re.I)
+_FOREX_RE = _re.compile(r"^[A-Z]{3}/[A-Z]{3}$|^[A-Z]{6}\.FX$")
+
+
+def _detect_market_for_align(code: str) -> str:
+    """Lightweight market detection for ffill_limit calculation."""
+    if _CRYPTO_RE.match(code):
+        return "crypto"
+    if _FOREX_RE.match(code):
+        return "forex"
+    return "equity"
+
+
 # ─── Signal alignment (reused from daily_portfolio logic) ───
 
 
@@ -62,7 +79,9 @@ def _align(
         close[c] = data_map[c]["close"].reindex(dates)
 
     # ffill with limit to avoid masking long suspensions (e.g. 3-week halt)
-    close = close.ffill(limit=5)
+    # Cross-market needs larger limit (Chinese New Year can be 9-10 bars)
+    ffill_limit = 10 if len({_detect_market_for_align(c) for c in codes}) > 1 else 5
+    close = close.ffill(limit=ffill_limit)
 
     # Drop symbols that are entirely NaN (no data overlap with date range)
     all_nan_cols = [c for c in codes if close[c].isna().all()]
@@ -75,8 +94,11 @@ def _align(
 
     pos = pd.DataFrame(0.0, index=dates, columns=codes)
     for c in codes:
-        raw = signal_map[c].reindex(dates).fillna(0.0).clip(-1.0, 1.0)
-        pos[c] = raw.shift(1).fillna(0.0)
+        # Shift on each symbol's OWN trading calendar, then ffill to unified
+        own_dates = data_map[c].index
+        raw = signal_map[c].reindex(own_dates).fillna(0.0).clip(-1.0, 1.0)
+        shifted = raw.shift(1).fillna(0.0)
+        pos[c] = shifted.reindex(dates).ffill(limit=ffill_limit).fillna(0.0)
 
     ret = close.pct_change().fillna(0.0)
 

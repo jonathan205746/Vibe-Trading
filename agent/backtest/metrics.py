@@ -147,7 +147,7 @@ def calc_metrics(
     equity_curve: pd.Series,
     trades: List[TradeRecord],
     initial_cash: float,
-    bars_per_year: int = 252,
+    bars_per_year: Optional[int] = 252,
     bench_ret: Optional[pd.Series] = None,
 ) -> Dict[str, Any]:
     """Full set of performance metrics.
@@ -156,7 +156,8 @@ def calc_metrics(
         equity_curve: Equity time series (index=timestamp, values=equity).
         trades: Completed round-trip trades.
         initial_cash: Starting capital.
-        bars_per_year: Bars per year for annualisation.
+        bars_per_year: Bars per year for annualisation. None = auto-detect
+            from equity curve dates (calendar-day method, for cross-market).
         bench_ret: Benchmark per-bar return series (optional).
 
     Returns:
@@ -166,7 +167,15 @@ def calc_metrics(
         return _empty_metrics(initial_cash)
 
     n = len(equity_curve)
-    bpy = bars_per_year
+
+    # Calendar-day annualization for cross-market (bars_per_year=None)
+    if bars_per_year is None:
+        first, last = equity_curve.index[0], equity_curve.index[-1]
+        calendar_days = (last - first).days
+        years = calendar_days / 365.25 if calendar_days > 0 else 1.0
+        bpy = int(n / years) if years > 0 else 252
+    else:
+        bpy = bars_per_year
 
     port_ret = equity_curve.pct_change().fillna(0.0)
 

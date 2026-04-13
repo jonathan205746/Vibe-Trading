@@ -13,21 +13,10 @@ from __future__ import annotations
 import pandas as pd
 
 from backtest.engines.base import BaseEngine
-
-
-# OKX tiered maintenance margin table (simplified)
-# (max_notional_usd, maintenance_margin_rate)
-_TIER_TABLE = [
-    (100_000, 0.004),
-    (500_000, 0.006),
-    (1_000_000, 0.01),
-    (5_000_000, 0.02),
-    (10_000_000, 0.05),
-    (float("inf"), 0.10),
-]
-
-# Funding fee settlement hours (UTC)
-_FUNDING_HOURS = {0, 8, 16}
+from backtest.engines._market_hooks import (
+    calc_crypto_funding_fee,
+    check_crypto_liquidation,
+)
 
 
 class CryptoEngine(BaseEngine):
@@ -70,80 +59,15 @@ class CryptoEngine(BaseEngine):
 
     def on_bar(self, symbol: str, bar: pd.Series, timestamp: pd.Timestamp) -> None:
         """Crypto per-bar hooks: funding fee + liquidation check."""
-        self._apply_funding_fee(symbol, bar, timestamp)
-        self._check_liquidation(symbol, bar, timestamp)
-
-    # ── Funding fee (exchange-enforced, every 8h) ──
-
-    def _apply_funding_fee(
-        self, symbol: str, bar: pd.Series, timestamp: pd.Timestamp,
-    ) -> None:
-        """Deduct/credit funding fee at settlement hours.
-
-        Positive rate: longs pay shorts. Negative rate: shorts pay longs.
-
-        For intraday bars: applies at each 8h settlement (0/8/16 UTC).
-        For daily bars: applies once per calendar day regardless of hour.
-        Dedup is per-(symbol, date, hour) so multi-symbol portfolios work.
-        """
-        if not hasattr(timestamp, "date"):
-            return
-
-        current_date = timestamp.date()
-        hour = timestamp.hour if hasattr(timestamp, "hour") else 0
-
-        if hour in _FUNDING_HOURS:
-            key = (symbol, current_date, hour)
-            if key in self._funding_applied:
-                return
-            self._funding_applied.add(key)
-        else:
-            # Non-settlement hour (e.g. daily bar at 12:00 UTC)
-            # Apply once per day as approximation
-            day_key = (symbol, current_date)
-            if day_key in self._funding_daily_done:
-                return
-            self._funding_daily_done.add(day_key)
-
-        pos = self.positions.get(symbol)
-        if pos is None:
-            return
-
-        mark_price = float(bar.get("close", pos.entry_price))
-        notional = pos.size * mark_price
-        fee = notional * self.funding_rate * pos.direction
+        fee = calc_crypto_funding_fee(
+            symbol, bar, timestamp, self.positions,
+            self.funding_rate, self._funding_applied, self._funding_daily_done,
+        )
         self.capital -= fee
 
-    # ── Liquidation (exchange-enforced) ──
-
-    def _check_liquidation(
-        self, symbol: str, bar: pd.Series, timestamp: pd.Timestamp,
-    ) -> None:
-        """Force-close when maintenance margin ratio drops to / below 100%."""
-        pos = self.positions.get(symbol)
-        if pos is None or pos.leverage <= 1.0:
-            return  # spot has no liquidation
-
-        mark_price = float(bar.get("close", pos.entry_price))
-        margin = pos.size * pos.entry_price / pos.leverage
-        unrealized = pos.direction * pos.size * (mark_price - pos.entry_price)
-
-        # Maintenance margin rate (tiered)
-        notional = pos.size * mark_price
-        maint_rate = self._maintenance_rate(notional)
-        maint_margin = notional * maint_rate
-
-        # Margin ratio = (margin + unrealized) / maint_margin
-        equity_in_pos = margin + unrealized
-        if equity_in_pos <= maint_margin:
-            # Liquidation: close at mark price with taker fee
-            liq_price = self.apply_slippage(mark_price, -pos.direction)
-            self._close_position(symbol, liq_price, timestamp, "liquidation")
-
-    @staticmethod
-    def _maintenance_rate(notional_usd: float) -> float:
-        """Look up tiered maintenance margin rate."""
-        for tier_max, rate in _TIER_TABLE:
-            if notional_usd <= tier_max:
-                return rate
-        return _TIER_TABLE[-1][1]
+        if check_crypto_liquidation(symbol, bar, self.positions):
+            pos = self.positions.get(symbol)
+            if pos is not None:
+                mark_price = float(bar.get("close", pos.entry_price))
+                liq_price = self.apply_slippage(mark_price, -pos.direction)
+                self._close_position(symbol, liq_price, timestamp, "liquidation")

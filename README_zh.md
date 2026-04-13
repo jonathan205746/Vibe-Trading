@@ -19,7 +19,7 @@
   <a href="https://pypi.org/project/vibe-trading-ai/"><img src="https://img.shields.io/pypi/v/vibe-trading-ai?style=flat&logo=pypi&logoColor=white" alt="PyPI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=flat" alt="License"></a>
   <br>
-  <img src="https://img.shields.io/badge/Skills-68-orange" alt="Skills">
+  <img src="https://img.shields.io/badge/Skills-69-orange" alt="Skills">
   <img src="https://img.shields.io/badge/Swarm_Presets-29-7C3AED" alt="Swarm">
   <img src="https://img.shields.io/badge/Tools-21-0F766E" alt="Tools">
   <img src="https://img.shields.io/badge/Data_Sources-5-2563EB" alt="Data Sources">
@@ -51,6 +51,7 @@
 
 ## 📰 新闻
 
+- **2026-04-13** 🌐 **跨市场复合回测**：新增 `CompositeEngine`，支持在同一次回测中混合不同市场的标的（如 A 股 + 加密货币），共享资金池，各市场规则（T+1、资金费率、掉期）按标的独立执行，信号按各自交易日历对齐。使用 `source: "auto"` 配合混合代码如 `["000001.SZ", "BTC-USDT"]` 即可。包含波动率加权策略技能和日历日年化计算。
 - **2026-04-12** 🌍 **多平台指标导出**：`/pine` 命令现在一次性导出 **TradingView (Pine Script v6)**、**通达信/同花顺/东方财富 (TDX 公式)** 和 **MetaTrader 5 (MQL5)** 三个平台的指标代码 — 覆盖国际股票、中国 A 股和全球外汇/CFD 市场。一条命令，三大平台。
 - **2026-04-11** 🛡️ **可靠性与开发体验**：`vibe-trading init` 交互式 .env 引导（[#19](https://github.com/HKUDS/Vibe-Trading/pull/19)），启动预检 LLM 与数据源连通性，主数据源返空时自动回退，回测引擎数据校验与错误隔离加固，Agent 与 Swarm 提示词注入当前日期时间。社区 PR [#21](https://github.com/HKUDS/Vibe-Trading/pull/21) 贡献多语言 README（zh/ja/ko）。
 - **2026-04-10** 📦 **v0.1.4**：修复 Docker 构建（[#8](https://github.com/HKUDS/Vibe-Trading/issues/8)），新增 `web_search` MCP 工具（共 17 个），在依赖与 MCP 中加入 `akshare`/`ccxt`。支持 11 家 LLM 提供商（DeepSeek、Groq、Gemini、Ollama 等），全部调优参数可通过 `.env` 配置。加固 `ml-strategy` 技能。已发布至 PyPI 和 ClawHub。
@@ -81,7 +82,7 @@ Vibe-Trading 是一个由 AI 驱动的多代理金融工作台，将自然语言
     <td align="center" width="25%" valign="top">
       <img src="assets/scene-research.png" height="150" alt="Research"/><br>
       <h3>🔍 面向交易的深度研究</h3>
-      <img src="https://img.shields.io/badge/68_Skills-FF6B6B?style=for-the-badge&logo=bookstack&logoColor=white" alt="Skills" /><br><br>
+      <img src="https://img.shields.io/badge/69_Skills-FF6B6B?style=for-the-badge&logo=bookstack&logoColor=white" alt="Skills" /><br><br>
       <div align="left" style="font-size: 4px;">
         • 覆盖多市场的多领域分析<br>
         • 自动生成策略与信号<br>
@@ -106,7 +107,7 @@ Vibe-Trading 是一个由 AI 驱动的多代理金融工作台，将自然语言
       <img src="https://img.shields.io/badge/5_Data_Sources-FFD93D?style=for-the-badge&logo=bitcoin&logoColor=black" alt="Backtest" /><br><br>
       <div align="left">
         • A 股、港美股、加密、期货与外汇<br>
-        • 7 个市场引擎：A 股、美港股、加密、中国期货、全球期货、外汇<br>
+        • 7 个市场引擎 + 跨市场复合引擎（共享资金池）<br>
         • 统计验证：蒙特卡洛、Bootstrap 置信区间、Walk-Forward<br>
         • 15+ 绩效指标与 4 种优化器
       </div>
@@ -125,16 +126,16 @@ Vibe-Trading 是一个由 AI 驱动的多代理金融工作台，将自然语言
   </tr>
 </table>
 
-## 7 大类别中的 68 个技能
+## 7 大类别中的 69 个技能
 
-- 📊 68 个金融专长技能，划分 7 大类
+- 📊 69 个金融专长技能，划分 7 大类
 - 🌐 覆盖传统市场到加密与 DeFi
 - 🔬 覆盖数据获取到量化研究的全链路能力
 
 | Category | Skills | Examples |
 |----------|--------|----------|
 | Data Source | 6 | `data-routing`, `tushare`, `yfinance`, `okx-market`, `akshare`, `ccxt` |
-| Strategy | 16 | `strategy-generate`, `technical-basic`, `candlestick`, `ichimoku`, `elliott-wave`, `smc`, `multi-factor`, `ml-strategy` |
+| Strategy | 17 | `strategy-generate`, `cross-market-strategy`, `technical-basic`, `candlestick`, `ichimoku`, `elliott-wave`, `smc`, `multi-factor`, `ml-strategy` |
 | Analysis | 15 | `factor-research`, `macro-analysis`, `global-macro`, `valuation-model`, `earnings-forecast`, `credit-analysis` |
 | Asset Class | 9 | `options-strategy`, `options-advanced`, `convertible-bond`, `etf-analysis`, `asset-allocation`, `sector-rotation` |
 | Crypto | 7 | `perp-funding-basis`, `liquidation-heatmap`, `stablecoin-flow`, `defi-yield`, `onchain-analysis` |
@@ -324,7 +325,7 @@ vibe-trading serve         # API 服务器
 | Command | Description |
 |---------|-------------|
 | `/help` | 显示全部命令 |
-| `/skills` | 列出 68 个金融技能 |
+| `/skills` | 列出 69 个金融技能 |
 | `/swarm` | 列出 29 个 swarm 团队预设 |
 | `/swarm run <preset> [vars_json]` | 以流式输出运行一个 swarm 团队 |
 | `/swarm list` | Swarm 运行历史 |
@@ -457,7 +458,7 @@ npx clawhub@latest install vibe-trading --force
 <details>
 <summary><b>OpenSpace — 自进化技能</b></summary>
 
-全部 68 个金融技能已发布在 [open-space.cloud](https://open-space.cloud)，并通过 OpenSpace 的自进化引擎自动演进。
+全部 69 个金融技能已发布在 [open-space.cloud](https://open-space.cloud)，并通过 OpenSpace 的自进化引擎自动演进。
 
 要在 OpenSpace 中使用，在代理配置中添加两个 MCP 服务器：
 
@@ -479,7 +480,7 @@ npx clawhub@latest install vibe-trading --force
 }
 ```
 
-OpenSpace 会自动发现全部 68 个技能，支持自动修复、自动改进与社区共享。在任意连接 OpenSpace 的代理中通过 `search_skills("finance backtest")` 搜索 Vibe-Trading 技能。
+OpenSpace 会自动发现全部 69 个技能，支持自动修复、自动改进与社区共享。在任意连接 OpenSpace 的代理中通过 `search_skills("finance backtest")` 搜索 Vibe-Trading 技能。
 
 </details>
 
@@ -500,7 +501,7 @@ Vibe-Trading/
 │   ├── src/
 │   │   ├── agent/                  # ReAct 代理核心
 │   │   │   ├── loop.py             #   主推理循环
-│   │   │   ├── skills.py           #   技能加载器（68 个 SKILL.md，7 类）
+│   │   │   ├── skills.py           #   技能加载器（69 个 SKILL.md，7 类）
 │   │   │   ├── tools.py            #   工具编排
 │   │   │   ├── context.py          #   系统提示构建器
 │   │   │   ├── memory.py           #   运行记忆 / artifact 存储
@@ -517,13 +518,13 @@ Vibe-Trading/
 │   │   │   ├── swarm_tool.py       #   启动 swarm 团队
 │   │   │   └── ...                 #   文件 I/O、bash、任务等
 │   │   │
-│   │   ├── skills/                 # 68 个金融技能（7 类，每个 SKILL.md）
+│   │   ├── skills/                 # 69 个金融技能（7 类，每个 SKILL.md）
 │   │   ├── swarm/                  # Swarm DAG 执行引擎
 │   │   ├── session/                # 多轮对话管理
 │   │   └── providers/              # LLM 提供商抽象
 │   │
 │   ├── backtest/                   # 回测引擎
-│   │   ├── engines/                #   7 个引擎：china_a、global_equity、crypto、china_futures、global_futures、forex + options_portfolio
+│   │   ├── engines/                #   7 个引擎 + 跨市场复合引擎 + options_portfolio
 │   │   ├── loaders/                #   5 个数据源：tushare、okx、yfinance、akshare、ccxt
 │   │   │   ├── base.py             #   DataLoader Protocol
 │   │   │   └── registry.py         #   注册表 + 自动回退链

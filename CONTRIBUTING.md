@@ -42,7 +42,7 @@ cd frontend && npm install && npm run dev
 
 | Directory | What lives here | Open to contribute? |
 |-----------|----------------|:-------------------:|
-| `agent/src/skills/` | 68 finance skill definitions (SKILL.md) | Yes |
+| `agent/src/skills/` | 69 finance skill definitions (SKILL.md) | Yes |
 | `agent/src/tools/` | 21 agent tools | Yes |
 | `agent/backtest/` | Backtest engines, loaders, optimizers | Yes |
 | `agent/config/swarm/` | 29 swarm preset YAMLs | Yes |
