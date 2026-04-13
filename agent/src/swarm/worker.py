@@ -227,11 +227,18 @@ def run_worker(
     skill_desc = _filter_skill_descriptions(skills_loader, agent_spec.skills)
     system_prompt = build_worker_prompt(agent_spec, upstream_summaries, skill_desc)
 
-    # 4. Resolve prompt template with user vars
+    # 4. Resolve prompt template with user vars (missing vars → LLM infers)
+    class _FallbackDict(dict):
+        """Dict that hints LLM to infer missing template variables."""
+        def __missing__(self, key: str) -> str:
+            return f"(determine the appropriate {key} based on the objective)"
+
+    template_vars = _FallbackDict(user_vars)
+
     try:
-        user_prompt = task.prompt_template.format(**user_vars)
-    except KeyError as exc:
-        error_msg = f"Missing variable in prompt template: {exc}"
+        user_prompt = task.prompt_template.format_map(_FallbackDict(template_vars))
+    except (KeyError, ValueError) as exc:
+        error_msg = f"Failed to render prompt template: {exc}"
         _emit(event_callback, "worker_failed", agent_id, task_id, {"error": error_msg})
         return WorkerResult(
             status="failed", summary="", iterations=0, error=error_msg,

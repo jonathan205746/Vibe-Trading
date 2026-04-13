@@ -330,7 +330,7 @@ export function Agent() {
       return dash.agents[agentId];
     };
 
-    const flush = () => { swarmDashRef.current = dash; setSwarmDash({ ...dash }); scrollToBottom(); };
+    const flush = () => { lastEventRef.current = Date.now(); swarmDashRef.current = dash; setSwarmDash({ ...dash }); scrollToBottom(); };
 
     try {
       const result = await api.createSwarmRun(presetName, { goal: prompt });
