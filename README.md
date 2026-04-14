@@ -51,12 +51,13 @@
 
 ## 📰 News
 
-- **2026-04-13** 🌐 **Cross-Market Composite Backtest & Swarm Fixes**: New `CompositeEngine` enables backtesting portfolios that span multiple markets (e.g. A-shares + crypto) in a single run with a **shared capital pool**. Per-market rules (T+1, funding fees, swap) enforced per symbol, signals aligned on each symbol's own trading calendar. Use `source: "auto"` with mixed codes like `["000001.SZ", "BTC-USDT"]`. Also fixed two Swarm bugs: preset prompt templates with missing variables (e.g. `{market}`, `{target}`) now auto-infer from context instead of crashing workers; frontend safety timeout no longer kills swarm runs prematurely.
-- **2026-04-12** 🌍 **Multi-Platform Indicator Export**: `/pine` now exports strategies to **TradingView (Pine Script v6)**, **通达信/同花顺/东方财富 (TDX formula)**, and **MetaTrader 5 (MQL5)** in a single file — covering international equities, China A-shares, and global forex/CFD markets. One command, three platforms.
-- **2026-04-11** 🛡️ **Reliability & DX**: `vibe-trading init` interactive .env bootstrap ([#19](https://github.com/HKUDS/Vibe-Trading/pull/19)), startup preflight checks for LLM & data sources, runtime data-source fallback when primary returns empty, hardened backtest engine with data validation & error isolation, date/time context injection into agent & swarm prompts. Multi-language README (zh/ja/ko) via community PR [#21](https://github.com/HKUDS/Vibe-Trading/pull/21).
-- **2026-04-10** 📦 **v0.1.4**: Fix Docker build ([#8](https://github.com/HKUDS/Vibe-Trading/issues/8)), add `web_search` MCP tool (17 total), `akshare`/`ccxt` in deps & MCP. 11 LLM providers (DeepSeek, Groq, Gemini, Ollama, etc.), all tuning params via `.env`. Hardened `ml-strategy` skill. Published to PyPI and ClawHub.
-- **2026-04-09** 📊 **Backtest Wave 2 — multi-asset engines**: added ChinaFutures (CFFEX/SHFE/DCE/ZCE, 50+ contracts), GlobalFutures (CME/ICE/Eurex, 30+ contracts), Forex (24 pairs, spread + swap), Options v2 (American exercise, IV smile). Statistical validation: Monte Carlo permutation test, Bootstrap Sharpe CI, Walk-Forward analysis.
-- **2026-04-08** 🔧 **Multi-market backtest** with per-market rules; **Pine Script v6 export** for TradingView. **Data source expansion**: 5 sources with auto-fallback, `web_search` tool, skill categorization (7 categories).
+- **2026-04-14** 🔧 **MCP Stability**: Fixed backtest tool `Connection closed` error on stdio transport ([#32](https://github.com/HKUDS/Vibe-Trading/pull/32)).
+- **2026-04-13** 🌐 **Cross-Market Composite Backtest**: New `CompositeEngine` backtests mixed-market portfolios (e.g. A-shares + crypto) with shared capital pool and per-market rules. Also fixed swarm template variable fallback and frontend timeout.
+- **2026-04-12** 🌍 **Multi-Platform Export**: `/pine` exports strategies to TradingView (Pine Script v6), TDX (通达信/同花顺/东方财富), and MetaTrader 5 (MQL5) in one command.
+- **2026-04-11** 🛡️ **Reliability & DX**: `vibe-trading init` .env bootstrap ([#19](https://github.com/HKUDS/Vibe-Trading/pull/19)), preflight checks, runtime data-source fallback, hardened backtest engine. Multi-language README ([#21](https://github.com/HKUDS/Vibe-Trading/pull/21)).
+- **2026-04-10** 📦 **v0.1.4**: Docker fix ([#8](https://github.com/HKUDS/Vibe-Trading/issues/8)), `web_search` MCP tool, 12 LLM providers, `akshare`/`ccxt` deps. Published to PyPI and ClawHub.
+- **2026-04-09** 📊 **Backtest Wave 2**: ChinaFutures, GlobalFutures, Forex, Options v2 engines. Monte Carlo, Bootstrap CI, Walk-Forward validation.
+- **2026-04-08** 🔧 **Multi-market backtest** with per-market rules, Pine Script v6 export, 5 data sources with auto-fallback.
 
 ---
 

@@ -51,13 +51,13 @@
 
 ## 📰 新闻
 
-- **2026-04-13** 🌐 **跨市场复合回测**：新增 `CompositeEngine`，支持在同一次回测中混合不同市场的标的（如 A 股 + 加密货币），共享资金池，各市场规则（T+1、资金费率、掉期）按标的独立执行，信号按各自交易日历对齐。使用 `source: "auto"` 配合混合代码如 `["000001.SZ", "BTC-USDT"]` 即可。包含波动率加权策略技能和日历日年化计算。
-- **2026-04-12** 🌍 **多平台指标导出**：`/pine` 命令现在一次性导出 **TradingView (Pine Script v6)**、**通达信/同花顺/东方财富 (TDX 公式)** 和 **MetaTrader 5 (MQL5)** 三个平台的指标代码 — 覆盖国际股票、中国 A 股和全球外汇/CFD 市场。一条命令，三大平台。
-- **2026-04-11** 🛡️ **可靠性与开发体验**：`vibe-trading init` 交互式 .env 引导（[#19](https://github.com/HKUDS/Vibe-Trading/pull/19)），启动预检 LLM 与数据源连通性，主数据源返空时自动回退，回测引擎数据校验与错误隔离加固，Agent 与 Swarm 提示词注入当前日期时间。社区 PR [#21](https://github.com/HKUDS/Vibe-Trading/pull/21) 贡献多语言 README（zh/ja/ko）。
-- **2026-04-10** 📦 **v0.1.4**：修复 Docker 构建（[#8](https://github.com/HKUDS/Vibe-Trading/issues/8)），新增 `web_search` MCP 工具（共 17 个），在依赖与 MCP 中加入 `akshare`/`ccxt`。支持 11 家 LLM 提供商（DeepSeek、Groq、Gemini、Ollama 等），全部调优参数可通过 `.env` 配置。加固 `ml-strategy` 技能。已发布至 PyPI 和 ClawHub。
-- **2026-04-09** 📊 **回测 Wave 2 —— 多资产引擎**：新增 ChinaFutures（CFFEX/SHFE/DCE/ZCE，50+ 合约）、GlobalFutures（CME/ICE/Eurex，30+ 合约）、Forex（24 货币对，点差 + 掉期）、Options v2（美式行权、IV 微笑）。统计验证：蒙特卡洛置换检验、Bootstrap 夏普区间、Walk-Forward 分析。
-- **2026-04-08** 🔧 **多市场回测** 支持分市场规则；**TradingView Pine Script v6 导出**。**数据源扩展**：5 源自动回退，`web_search` 工具，技能分 7 类。
-- **2026-04-01** 🚀 **v0.1.0** —— 初始发布：ReAct 代理，64 技能，29 个 swarm 预设，跨市场回测，CLI + Web UI + MCP 服务器。
+- **2026-04-14** 🔧 **MCP 稳定性**：修复回测工具在 stdio 传输中的 `Connection closed` 错误（[#32](https://github.com/HKUDS/Vibe-Trading/pull/32)）。
+- **2026-04-13** 🌐 **跨市场复合回测**：新增 `CompositeEngine`，混合不同市场标的（如 A 股 + 加密货币）共享资金池回测，各市场规则按标的独立执行。同时修复 swarm 模板变量回退和前端超时问题。
+- **2026-04-12** 🌍 **多平台指标导出**：`/pine` 一次性导出 TradingView (Pine Script v6)、通达信/同花顺/东方财富 (TDX)、MetaTrader 5 (MQL5) 三大平台。
+- **2026-04-11** 🛡️ **可靠性与 DX**：`vibe-trading init` .env 引导（[#19](https://github.com/HKUDS/Vibe-Trading/pull/19)），启动预检、数据源自动回退、回测引擎加固。多语言 README（[#21](https://github.com/HKUDS/Vibe-Trading/pull/21)）。
+- **2026-04-10** 📦 **v0.1.4**：Docker 修复（[#8](https://github.com/HKUDS/Vibe-Trading/issues/8)），`web_search` MCP 工具，12 家 LLM 提供商，`akshare`/`ccxt` 依赖。已发布至 PyPI 和 ClawHub。
+- **2026-04-09** 📊 **回测 Wave 2**：新增 ChinaFutures、GlobalFutures、Forex、Options v2 引擎。蒙特卡洛、Bootstrap CI、Walk-Forward 统计验证。
+- **2026-04-08** 🔧 **多市场回测**：分市场规则，Pine Script v6 导出，5 数据源自动回退。
 
 ---
 
