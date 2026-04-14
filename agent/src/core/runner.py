@@ -13,7 +13,7 @@ from typing import Any, Dict, Optional
 from rich.console import Console
 
 
-console = Console()
+console = Console(stderr=True)
 
 
 @dataclass
@@ -147,6 +147,7 @@ class Runner:
         try:
             probe = subprocess.run(
                 [python_cmd, "-c", "import pandas,numpy; print('ok')"],
+                stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
@@ -201,13 +202,9 @@ class Runner:
             existing = env.get("PYTHONPATH", "")
             env["PYTHONPATH"] = str(pythonpath_extra) + (os.pathsep + existing if existing else "")
 
-        runtime_home = run_dir / ".home"
-        runtime_home.mkdir(parents=True, exist_ok=True)
-        env["HOME"] = str(runtime_home)
-        if os.name == "nt":
-            env["USERPROFILE"] = str(runtime_home)
-
         # Preserve system proxy settings; data sources (OKX/yfinance) need network access
+        # NOTE: do NOT override HOME/USERPROFILE — data libraries (yfinance, akshare)
+        # cache downloads under ~/; overriding HOME causes full re-download every run.
 
         return env
 
@@ -252,6 +249,7 @@ class Runner:
         process = subprocess.run(
             cmd,
             cwd=str(effective_cwd),
+            stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
