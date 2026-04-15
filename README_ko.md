@@ -224,7 +224,7 @@ vibe-trading-mcp               # MCP 서버 시작(stdio)
 - 경로 B용 **Python 3.11+**
 - 경로 A용 **Docker**
 
-> **지원 LLM 제공자:** OpenRouter, OpenAI, DeepSeek, Gemini, Groq, DashScope/Qwen, Zhipu, Moonshot/Kimi, MiniMax, Xiaomi MIMO, Ollama(로컬). 설정은 `.env.example` 참고.
+> **지원 LLM 제공자:** OpenRouter, OpenAI, DeepSeek, Gemini, Groq, DashScope/Qwen, Zhipu, Moonshot/Kimi, MiniMax, Xiaomi MIMO, Z.ai, Ollama(로컬). 설정은 `.env.example` 참고.
 
 > **팁:** 모든 시장은 자동 폴백 덕분에 API 키 없이도 작동합니다. yfinance(HK/US), OKX(크립토), AKShare(A주, 미국, HK, 선물, FX)는 모두 무료입니다. Tushare 토큰은 선택 사항 — AKShare가 A주 무료 폴백을 제공합니다.
 
@@ -298,7 +298,7 @@ npx clawhub@latest install vibe-trading --force
 
 | Variable | Required | Description |
 |----------|:--------:|-------------|
-| `LANGCHAIN_PROVIDER` | Yes | 제공자 이름(`openrouter`, `deepseek`, `groq`, `ollama` 등) |
+| `LANGCHAIN_PROVIDER` | Yes | 제공자 이름(`openrouter`, `deepseek`, `groq`, `z.ai`, `ollama` 등) |
 | `<PROVIDER>_API_KEY` | Yes* | API 키(`OPENROUTER_API_KEY`, `DEEPSEEK_API_KEY` 등) |
 | `<PROVIDER>_BASE_URL` | Yes | API 엔드포인트 URL |
 | `LANGCHAIN_MODEL_NAME` | Yes | 모델 이름(예: `deepseek/deepseek-v3.2`) |

@@ -224,7 +224,7 @@ vibe-trading-mcp               # MCPサーバー（stdio）起動
 - Path Bでは**Python 3.11+**
 - Path Aでは**Docker**
 
-> **サポートされるLLMプロバイダー:** OpenRouter, OpenAI, DeepSeek, Gemini, Groq, DashScope/Qwen, Zhipu, Moonshot/Kimi, MiniMax, Xiaomi MIMO, Ollama（ローカル）。設定は`.env.example`を参照。
+> **サポートされるLLMプロバイダー:** OpenRouter, OpenAI, DeepSeek, Gemini, Groq, DashScope/Qwen, Zhipu, Moonshot/Kimi, MiniMax, Xiaomi MIMO, Z.ai, Ollama（ローカル）。設定は`.env.example`を参照。
 
 > **Tip:** すべての市場でAPIキーなしでも動作（自動フォールバック）。yfinance（HK/US）、OKX（暗号）、AKShare（A株・US・HK・先物・FX）は無料。Tushareトークンは任意 — A株はAKShareで無料フォールバック。
 

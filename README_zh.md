@@ -224,7 +224,7 @@ vibe-trading-mcp               # 启动 MCP 服务器（stdio）
 - Path B 需 **Python 3.11+**
 - Path A 需 **Docker**
 
-> **支持的 LLM 提供商：** OpenRouter、OpenAI、DeepSeek、Gemini、Groq、DashScope/Qwen、智谱、Moonshot/Kimi、MiniMax、小米 MIMO、Ollama（本地）。参见 `.env.example` 配置。
+> **支持的 LLM 提供商：** OpenRouter、OpenAI、DeepSeek、Gemini、Groq、DashScope/Qwen、智谱、Moonshot/Kimi、MiniMax、小米 MIMO、Z.ai、Ollama（本地）。参见 `.env.example` 配置。
 
 > **提示：** 所有市场都可在无 API key 情况下运行，因自动回退。yfinance（港美股）、OKX（加密）、AKShare（A 股、美股、港股、期货、外汇）均免费。Tushare token 可选——A 股可回退到 AKShare 免费获取。
 
@@ -298,7 +298,7 @@ npx clawhub@latest install vibe-trading --force
 
 | Variable | Required | Description |
 |----------|:--------:|-------------|
-| `LANGCHAIN_PROVIDER` | Yes | 提供商名称（`openrouter`、`deepseek`、`groq`、`ollama` 等） |
+| `LANGCHAIN_PROVIDER` | Yes | 提供商名称（`openrouter`、`deepseek`、`groq`、`z.ai`、`ollama` 等） |
 | `<PROVIDER>_API_KEY` | Yes* | API key（`OPENROUTER_API_KEY`、`DEEPSEEK_API_KEY` 等） |
 | `<PROVIDER>_BASE_URL` | Yes | API 端点 URL |
 | `LANGCHAIN_MODEL_NAME` | Yes | 模型名（如 `deepseek/deepseek-v3.2`） |
