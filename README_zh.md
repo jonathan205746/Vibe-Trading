@@ -51,6 +51,7 @@
 
 ## 📰 新闻
 
+- **2026-04-15** 🤖 **Z.ai + MiniMax**：新增 Z.ai 提供商（[#35](https://github.com/HKUDS/Vibe-Trading/pull/35)），修复 MiniMax temperature 及模型更新（[#33](https://github.com/HKUDS/Vibe-Trading/pull/33)）。共 13 家提供商。
 - **2026-04-14** 🔧 **MCP 稳定性**：修复回测工具在 stdio 传输中的 `Connection closed` 错误（[#32](https://github.com/HKUDS/Vibe-Trading/pull/32)）。
 - **2026-04-13** 🌐 **跨市场复合回测**：新增 `CompositeEngine`，混合不同市场标的（如 A 股 + 加密货币）共享资金池回测，各市场规则按标的独立执行。同时修复 swarm 模板变量回退和前端超时问题。
 - **2026-04-12** 🌍 **多平台指标导出**：`/pine` 一次性导出 TradingView (Pine Script v6)、通达信/同花顺/东方财富 (TDX)、MetaTrader 5 (MQL5) 三大平台。

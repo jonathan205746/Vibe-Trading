@@ -51,6 +51,7 @@
 
 ## 📰 뉴스
 
+- **2026-04-15** 🤖 **Z.ai + MiniMax**: Z.ai 제공자 추가([#35](https://github.com/HKUDS/Vibe-Trading/pull/35)), MiniMax temperature 수정 + 모델 업데이트([#33](https://github.com/HKUDS/Vibe-Trading/pull/33)). 13개 제공자.
 - **2026-04-14** 🔧 **MCP 안정성**: 백테스트 도구의 stdio 전송에서 `Connection closed` 오류 수정([#32](https://github.com/HKUDS/Vibe-Trading/pull/32)).
 - **2026-04-13** 🌐 **크로스마켓 복합 백테스트**: 새 `CompositeEngine`으로 서로 다른 시장 종목(예: A주 + 암호화폐)을 공유 자금 풀로 동시 백테스트, 시장 규칙은 종목별 적용. Swarm 템플릿 변수 폴백 및 프론트엔드 타임아웃도 수정.
 - **2026-04-12** 🌍 **멀티 플랫폼 내보내기**: `/pine`으로 TradingView (Pine Script v6), TDX (통달신/동화순/동방재부), MetaTrader 5 (MQL5) 한 번에 내보내기.

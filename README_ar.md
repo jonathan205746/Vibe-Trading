@@ -51,6 +51,7 @@
 
 ## 📰 أحدث الأخبار
 
+- **2026-04-15** 🤖 **Z.ai + MiniMax**: إضافة مزود Z.ai ([#35](https://github.com/HKUDS/Vibe-Trading/pull/35))، إصلاح temperature وتحديث نموذج MiniMax ([#33](https://github.com/HKUDS/Vibe-Trading/pull/33)). 13 مزوداً.
 - **2026-04-14** 🔧 **استقرار MCP**: إصلاح خطأ `Connection closed` في أداة الاختبار الرجعي عبر نقل stdio ([#32](https://github.com/HKUDS/Vibe-Trading/pull/32)).
 - **2026-04-13** 🌐 **الاختبار الرجعي المركب عبر الأسواق**: محرك `CompositeEngine` الجديد لاختبار محافظ متعددة الأسواق (مثل أسهم A + العملات المشفرة) بمجمع رأسمال مشترك. إصلاح متغيرات قوالب Swarm ومهلة الواجهة الأمامية.
 - **2026-04-12** 🌍 **تصدير متعدد المنصات**: أمر `/pine` يصدّر إلى TradingView (Pine Script v6) وTDX (通达信/同花顺/东方财富) وMetaTrader 5 (MQL5) دفعة واحدة.

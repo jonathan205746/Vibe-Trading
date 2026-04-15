@@ -51,6 +51,7 @@
 
 ## 📰 ニュース
 
+- **2026-04-15** 🤖 **Z.ai + MiniMax**: Z.aiプロバイダー追加（[#35](https://github.com/HKUDS/Vibe-Trading/pull/35)）、MiniMax temperature修正+モデル更新（[#33](https://github.com/HKUDS/Vibe-Trading/pull/33)）。13プロバイダー対応。
 - **2026-04-14** 🔧 **MCP安定性**: バックテストツールのstdioトランスポートにおける`Connection closed`エラーを修正（[#32](https://github.com/HKUDS/Vibe-Trading/pull/32)）。
 - **2026-04-13** 🌐 **クロスマーケット複合バックテスト**: 新`CompositeEngine`で異なる市場の銘柄（例：A株＋暗号資産）を共有資金プールで同時バックテスト、市場ルールは銘柄ごとに適用。Swarmテンプレート変数フォールバックとフロントエンドタイムアウトも修正。
 - **2026-04-12** 🌍 **マルチプラットフォーム出力**: `/pine`でTradingView (Pine Script v6)、TDX（通達信/同花順/東方財富）、MetaTrader 5 (MQL5) に一括エクスポート。
