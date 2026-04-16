@@ -21,7 +21,7 @@
   <br>
   <img src="https://img.shields.io/badge/Skills-69-orange" alt="Skills">
   <img src="https://img.shields.io/badge/Swarm_Presets-29-7C3AED" alt="Swarm">
-  <img src="https://img.shields.io/badge/Tools-21-0F766E" alt="Tools">
+  <img src="https://img.shields.io/badge/Tools-27-0F766E" alt="Tools">
   <img src="https://img.shields.io/badge/Data_Sources-5-2563EB" alt="Data Sources">
   <br>
   <a href="https://github.com/HKUDS/.github/blob/main/profile/README.md"><img src="https://img.shields.io/badge/Feishu-Group-E9DBFC?style=flat-square&logo=feishu&logoColor=white" alt="Feishu"></a>
@@ -51,6 +51,7 @@
 
 ## 📰 News
 
+- **2026-04-16** 🧠 **Agent Harness**: Persistent cross-session memory, FTS5 session search, self-evolving skills (full CRUD), 5-layer context compression, read/write tool batching. 27 tools, 107 new tests.
 - **2026-04-15** 🤖 **Z.ai + MiniMax**: Z.ai provider ([#35](https://github.com/HKUDS/Vibe-Trading/pull/35)), MiniMax temperature fix + model update ([#33](https://github.com/HKUDS/Vibe-Trading/pull/33)). 13 providers.
 - **2026-04-14** 🔧 **MCP Stability**: Fixed backtest tool `Connection closed` error on stdio transport ([#32](https://github.com/HKUDS/Vibe-Trading/pull/32)).
 - **2026-04-13** 🌐 **Cross-Market Composite Backtest**: New `CompositeEngine` backtests mixed-market portfolios (e.g. A-shares + crypto) with shared capital pool and per-market rules. Also fixed swarm template variable fallback and frontend timeout.
@@ -67,12 +68,12 @@
 Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural language requests into executable trading strategies, research insights, and portfolio analysis across global markets.
 
 ### Key Capabilities:
-• **Strategy Generation** — Automatically writes trading code from your ideas<br>
-• **Smart Data Access** — 5 data sources with automatic fallback; zero-config for all markets<br>
-• **Performance Testing** — Tests your strategies against historical market data<br>
-• **Multi-Platform Export** — One-click convert strategies to TradingView, 通达信/同花顺/东方财富, and MT5<br>
-• **Expert Teams** — Deploys specialized AI agents for complex research tasks<br>
-• **Live Updates** — Watch the entire analysis process in real-time
+• **Natural Language → Strategy** — Describe an idea; the agent writes, tests, and exports trading code<br>
+• **5 Data Sources, Zero Config** — A-shares, HK/US, crypto, futures & forex with automatic fallback<br>
+• **29 Expert Teams** — Pre-built multi-agent swarm workflows for investment, trading & risk<br>
+• **Cross-Session Memory** — Remembers preferences and insights; creates & evolves reusable skills<br>
+• **7 Backtest Engines** — Cross-market composite testing with statistical validation & 4 optimizers<br>
+• **Multi-Platform Export** — One-click to TradingView, TDX (通达信/同花顺), and MetaTrader 5
 
 ---
 
@@ -85,10 +86,10 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
       <h3>🔍 DeepResearch for Trading</h3>
       <img src="https://img.shields.io/badge/69_Skills-FF6B6B?style=for-the-badge&logo=bookstack&logoColor=white" alt="Skills" /><br><br>
       <div align="left" style="font-size: 4px;">
-        • Multi-domain analysis coverage across markets<br>
-        • Auto strategy and signal generation<br>
-        • Macro economic research and insights<br>
-        • Natural-language task routing via chat
+        • 69 specialist skills with persistent cross-session memory<br>
+        • Self-evolving: agent creates & refines workflows from experience<br>
+        • 5-layer context compression — no info lost in long sessions<br>
+        • Natural-language task routing across all finance domains
       </div>
     </td>
     <td align="center" width="25%" valign="top">
@@ -98,8 +99,8 @@ Vibe-Trading is an AI-powered multi-agent finance workspace that turns natural l
       <div align="left">
         • 29 out-of-the-box trading team presets<br>
         • DAG-based multi-agent orchestration<br>
-        • Real-time decision streaming dashboard<br>
-        • Custom team building through YAML
+        • Real-time streaming dashboard with live agent status<br>
+        • FTS5 session search across all past conversations
       </div>
     </td>
     <td align="center" width="25%" valign="top">
@@ -504,27 +505,29 @@ Vibe-Trading/
 │   │
 │   ├── src/
 │   │   ├── agent/                  # ReAct agent core
-│   │   │   ├── loop.py             #   main reasoning loop
-│   │   │   ├── skills.py           #   skill loader (69 SKILL.md files, 7 categories)
-│   │   │   ├── tools.py            #   tool orchestration
-│   │   │   ├── context.py          #   system prompt builder
-│   │   │   ├── memory.py           #   run memory / artifact store
+│   │   │   ├── loop.py             #   5-layer compression + read/write tool batching
+│   │   │   ├── context.py          #   system prompt + auto-recall from persistent memory
+│   │   │   ├── skills.py           #   skill loader (69 bundled + user-created via CRUD)
+│   │   │   ├── tools.py            #   tool base class + registry
+│   │   │   ├── memory.py           #   lightweight workspace state per run
+│   │   │   ├── frontmatter.py      #   shared YAML frontmatter parser
 │   │   │   └── trace.py            #   execution trace writer
 │   │   │
-│   │   ├── tools/                  # 21 agent tools
+│   │   ├── memory/                 # Cross-session persistent memory
+│   │   │   └── persistent.py       #   file-based memory (~/.vibe-trading/memory/)
+│   │   │
+│   │   ├── tools/                  # 27 auto-discovered agent tools
 │   │   │   ├── backtest_tool.py    #   run backtests
-│   │   │   ├── factor_analysis_tool.py
-│   │   │   ├── options_pricing_tool.py
-│   │   │   ├── pattern_tool.py     #   chart pattern detection
-│   │   │   ├── doc_reader_tool.py  #   PDF reader (OCR fallback)
-│   │   │   ├── web_reader_tool.py  #   web page reader (Jina)
-│   │   │   ├── web_search_tool.py  #   DuckDuckGo web search
+│   │   │   ├── remember_tool.py    #   cross-session memory (save/recall/forget)
+│   │   │   ├── skill_writer_tool.py #  skill CRUD (save/patch/delete/file)
+│   │   │   ├── session_search_tool.py # FTS5 cross-session search
 │   │   │   ├── swarm_tool.py       #   launch swarm teams
-│   │   │   └── ...                 #   file I/O, bash, tasks, etc.
+│   │   │   ├── web_search_tool.py  #   DuckDuckGo web search
+│   │   │   └── ...                 #   bash, file I/O, factor analysis, options, etc.
 │   │   │
 │   │   ├── skills/                 # 69 finance skills in 7 categories (SKILL.md each)
 │   │   ├── swarm/                  # Swarm DAG execution engine
-│   │   ├── session/                # Multi-turn chat session management
+│   │   ├── session/                # Multi-turn chat + FTS5 session search
 │   │   └── providers/              # LLM provider abstraction
 │   │
 │   ├── backtest/                   # Backtest engines
@@ -585,17 +588,21 @@ Vibe-Trading is part of the **[HKUDS](https://github.com/HKUDS)** agent ecosyste
 
 | Phase | Feature | Status |
 |-------|---------|--------|
+| **Agent Harness** | Persistent cross-session memory (remember / recall / forget) | **Done** |
+| | Self-evolving skills — agent creates, patches, and deletes its own workflows | **Done** |
+| | FTS5 cross-session search across all past conversations | **Done** |
+| | 5-layer context compression (micro → collapse → auto → manual → iterative) | **Done** |
+| | Read/write tool batching — parallel execution for readonly tools | **Done** |
+| **Next Up** | Autonomous research loop — agent iterates hypotheses overnight | In Progress |
+| | IM integration (Slack / Telegram / WeChat) | Planned |
 | **Analysis & Viz** | Options volatility surface & Greeks 3D visualization | Planned |
 | | Cross-asset correlation heatmap with rolling window & clustering | Planned |
 | | Benchmark comparison in CLI backtest output | Planned |
-| | Calmar Ratio & Omega Ratio in backtest metrics | Planned |
 | **Skills & Presets** | Dividend Analysis skill | Planned |
 | | ESG / Sustainable Investing swarm preset | Planned |
-| | Emerging Markets Research Desk swarm preset | Planned |
 | **Portfolio & Optimization** | Advanced portfolio optimizer: leverage, sector caps, turnover constraints | Planned |
-| **Future** | Beginner tutorial: "5-minute natural language backtest" | Planned |
+| **Future** | Strategy marketplace (share & discover) | Exploring |
 | | Live data streaming via WebSocket | Exploring |
-| | Strategy marketplace (share & discover) | Exploring |
 
 ---
 
