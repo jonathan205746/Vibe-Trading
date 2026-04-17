@@ -313,6 +313,18 @@ Copy `agent/.env.example` to `agent/.env` and uncomment the provider block you w
 
 **Free data (no key needed):** A-shares via AKShare, HK/US equities via yfinance, crypto via OKX, 100+ crypto exchanges via CCXT. The system automatically selects the best available source for each market.
 
+### 🎯 Recommended Models
+
+Vibe-Trading is a tool-heavy agent — skills, backtests, memory, and swarms all flow through tool calls. Model choice directly decides whether the agent *uses* its tools or fabricates answers from training data.
+
+| Tier | Examples | When to use |
+|------|----------|-------------|
+| **Best** | `anthropic/claude-opus-4.7`, `anthropic/claude-sonnet-4.6`, `openai/gpt-5.4`, `google/gemini-3.1-pro-preview` | Complex swarms (3+ agents), long research sessions, paper-grade analysis |
+| **Sweet spot** (default) | `deepseek/deepseek-v3.2`, `x-ai/grok-4.20`, `z-ai/glm-5.1`, `moonshotai/kimi-k2.5`, `qwen/qwen3-max-thinking` | Daily driver — reliable tool-calling at ~1/10 the cost |
+| **Avoid for agent use** | `*-nano`, `*-flash-lite`, `*-coder-next`, small / distilled variants | Tool-calling is unreliable — the agent will appear to "answer from memory" instead of loading skills or running backtests |
+
+The default `agent/.env.example` ships with `deepseek/deepseek-v3.2` — the cheapest option in the sweet-spot tier.
+
 ---
 
 ## 🖥 CLI Reference

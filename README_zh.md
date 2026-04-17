@@ -311,6 +311,18 @@ npx clawhub@latest install vibe-trading --force
 
 **免费数据（无需 key）：** A 股经 AKShare，港美股经 yfinance，加密经 OKX，100+ 加密交易所经 CCXT。系统会为每个市场自动选择最佳可用数据源。
 
+### 🎯 推荐模型
+
+Vibe-Trading 是重度依赖工具调用的 agent — skills、回测、记忆、swarm 全部通过 tool call 完成。模型选择直接决定 agent 是**真的在用工具**，还是从训练数据里编答案。
+
+| 等级 | 示例 | 适用场景 |
+|------|------|---------|
+| **最佳** | `anthropic/claude-opus-4.7`、`anthropic/claude-sonnet-4.6`、`openai/gpt-5.4`、`google/gemini-3.1-pro-preview` | 复杂 swarm（3+ agent）、长研究会话、论文级分析 |
+| **性价比**（默认） | `deepseek/deepseek-v3.2`、`x-ai/grok-4.20`、`z-ai/glm-5.1`、`moonshotai/kimi-k2.5`、`qwen/qwen3-max-thinking` | 日常使用 — tool-calling 稳定，成本约 1/10 |
+| **不建议用于 agent** | `*-nano`、`*-flash-lite`、`*-coder-next`、小参数 / 蒸馏版 | tool-calling 不可靠 — agent 会"凭记忆回答"而不加载 skill 或跑回测 |
+
+默认 `agent/.env.example` 使用 `deepseek/deepseek-v3.2` — 性价比档里最便宜的选项。
+
 ---
 
 ## 🖥 CLI 参考

@@ -311,6 +311,18 @@ npx clawhub@latest install vibe-trading --force
 
 **무료 데이터(키 불필요):** AKShare의 A주, yfinance의 HK/US 주식, OKX의 크립토, CCXT의 100+ 크립토 거래소. 시스템이 시장별로 최적 소스를 자동 선택합니다.
 
+### 🎯 권장 모델
+
+Vibe-Trading은 툴 호출에 크게 의존하는 에이전트입니다 — skill, 백테스트, 메모리, swarm이 모두 tool call을 통해 실행됩니다. 모델 선택이 에이전트가 **실제로 툴을 사용하는지**, 아니면 학습 데이터에서 답을 꾸며내는지를 결정합니다.
+
+| 등급 | 예시 | 용도 |
+|------|------|------|
+| **최상** | `anthropic/claude-opus-4.7`, `anthropic/claude-sonnet-4.6`, `openai/gpt-5.4`, `google/gemini-3.1-pro-preview` | 복잡한 swarm(3+ 에이전트), 긴 연구 세션, 논문급 분석 |
+| **가성비**(기본값) | `deepseek/deepseek-v3.2`, `x-ai/grok-4.20`, `z-ai/glm-5.1`, `moonshotai/kimi-k2.5`, `qwen/qwen3-max-thinking` | 일상 사용 — 안정적인 tool-calling, 비용 약 1/10 |
+| **에이전트용으로 피할 것** | `*-nano`, `*-flash-lite`, `*-coder-next`, 소형 / 증류 버전 | tool-calling 불안정 — skill 로드나 backtest 실행 대신 "기억으로 답변" |
+
+기본 `agent/.env.example`은 `deepseek/deepseek-v3.2` 사용 — 가성비 등급에서 가장 저렴한 옵션.
+
 ---
 
 ## 🖥 CLI 참조
