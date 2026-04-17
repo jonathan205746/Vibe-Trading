@@ -16,6 +16,7 @@ agent/sessions/
 agent/runs/
 agent/.ui_runtime/
 agent/.tasks/
+agent/uploads/
 agent/tests/*_result.json
 .ruff_cache/
 frontend/dist/

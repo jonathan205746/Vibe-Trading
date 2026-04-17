@@ -10,8 +10,6 @@ import pytest
 
 from src.tools.doc_reader_tool import read_document
 
-FIXTURES = Path(__file__).parent / "fixtures" / "trade_journal"
-
 
 def _call(path: Path, pages: str = "") -> dict:
     return json.loads(read_document(str(path), pages))
@@ -68,11 +66,13 @@ def test_unknown_extension_treated_as_text(tmp_path: Path) -> None:
     assert result["text"] == "abc"
 
 
-def test_csv_read_as_text() -> None:
-    result = _call(FIXTURES / "futu_hk_us.csv")
+def test_csv_read_as_text(tmp_path: Path) -> None:
+    csv_path = tmp_path / "sample.csv"
+    csv_path.write_text("a,b,c\n1,2,3\n4,5,6\n", encoding="utf-8")
+    result = _call(csv_path)
     assert result["status"] == "ok"
     assert result["format"] == "text"
-    assert result["char_count"] > 0
+    assert "a,b,c" in result["text"]
 
 
 # ---------------- DOCX ----------------

@@ -52,6 +52,12 @@ Decide which workflow to use based on the request:
 **Document / web** — user provides a PDF or URL:
 - `read_document(path=...)` for PDFs, `read_url(url=...)` for web pages.
 
+**Trade journal** — user uploads a CSV/Excel broker export (交割单) or asks to analyze their own trading history:
+1. `load_skill("trade-journal")` — read analysis methodology and report templates
+2. `analyze_trade_journal(file_path=..., analysis_type="full")` — parse + profile
+3. Present results as the markdown report in the skill. Offer follow-ups: time-slice, symbol deep-dive, market split.
+4. Behavior diagnostics + strategy extraction are Phase 4b — tell the user they're coming, don't fabricate.
+
 ## Guidelines
 
 - Load the relevant skill BEFORE starting any task. Skills contain the exact API contracts and examples.
