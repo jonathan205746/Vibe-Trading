@@ -587,8 +587,14 @@ export function Agent() {
     const file = e.target.files?.[0];
     if (!file) return;
     e.target.value = "";
-    if (!file.name.toLowerCase().endsWith(".pdf")) {
-      toast.error("Only PDF files are supported");
+    const blockedExts = [
+      ".exe", ".msi", ".bat", ".cmd", ".com", ".scr", ".app", ".dmg",
+      ".so", ".dll", ".dylib",
+      ".zip", ".rar", ".7z", ".tar", ".gz", ".tgz", ".bz2", ".xz",
+    ];
+    const lowered = file.name.toLowerCase();
+    if (blockedExts.some((ext) => lowered.endsWith(ext))) {
+      toast.error("Executables and archives are not allowed");
       return;
     }
     if (file.size > 50 * 1024 * 1024) {
@@ -785,7 +791,7 @@ export function Agent() {
             <input
               ref={fileInputRef}
               type="file"
-              accept=".pdf"
+              accept=".pdf,.docx,.xlsx,.xls,.pptx,.csv,.tsv,.txt,.md,.log,.json,.yaml,.yml,.toml,.html,.xml,.rst,.png,.jpg,.jpeg,.gif,.bmp,.webp,.tiff"
               onChange={handleFileSelect}
               className="hidden"
             />

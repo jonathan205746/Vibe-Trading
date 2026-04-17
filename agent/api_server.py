@@ -814,11 +814,31 @@ async def session_events(
 # File Upload
 # ============================================================================
 
+_BLOCKED_UPLOAD_EXT = {
+    # binaries / executables we should never accept
+    ".exe", ".msi", ".bat", ".cmd", ".com", ".scr", ".app", ".dmg",
+    ".so", ".dll", ".dylib",
+    # archives — don't auto-extract; user can unpack locally
+    ".zip", ".rar", ".7z", ".tar", ".gz", ".tgz", ".bz2", ".xz",
+}
+
+
 @app.post("/upload", dependencies=[Depends(require_auth)])
 async def upload_file(file: UploadFile):
-    """Upload a PDF; stored under uploads/ with a UUID name (max 50MB)."""
-    if not file.filename or not file.filename.lower().endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+    """Upload any document or data file (max 50MB).
+
+    Accepts most common formats: PDF, Word, Excel, PowerPoint, images,
+    CSV/TSV, plain text, JSON/YAML/TOML, source code. Executables and
+    archives are rejected — unpack locally before uploading.
+    """
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="Missing filename")
+    ext = Path(file.filename).suffix.lower()
+    if ext in _BLOCKED_UPLOAD_EXT:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File type {ext} is not allowed (executables/archives blocked).",
+        )
 
     content = await file.read()
     if len(content) > MAX_UPLOAD_SIZE:
@@ -829,7 +849,7 @@ async def upload_file(file: UploadFile):
 
     UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
-    safe_name = f"{uuid.uuid4().hex}.pdf"
+    safe_name = f"{uuid.uuid4().hex}{ext}"
     dest = UPLOADS_DIR / safe_name
     dest.write_bytes(content)
 
