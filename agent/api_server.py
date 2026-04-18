@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, Request, Security, UploadFile, status
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
@@ -821,6 +821,34 @@ _BLOCKED_UPLOAD_EXT = {
     # archives — don't auto-extract; user can unpack locally
     ".zip", ".rar", ".7z", ".tar", ".gz", ".tgz", ".bz2", ".xz",
 }
+
+
+_SHADOW_ID_RE = __import__("re").compile(r"^shadow_[0-9a-f]{8}$")
+
+
+@app.get("/shadow-reports/{shadow_id}")
+async def get_shadow_report(shadow_id: str, format: str = "html"):
+    """Serve a rendered Shadow Account report (HTML by default, PDF if available).
+
+    Reports live under ``~/.vibe-trading/shadow_reports/<shadow_id>.{html,pdf}``.
+    """
+    if not _SHADOW_ID_RE.match(shadow_id):
+        raise HTTPException(status_code=400, detail="invalid shadow_id")
+    if format not in ("html", "pdf"):
+        raise HTTPException(status_code=400, detail="format must be html or pdf")
+
+    reports_dir = Path.home() / ".vibe-trading" / "shadow_reports"
+    path = reports_dir / f"{shadow_id}.{format}"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail=f"Shadow report not found: {shadow_id}.{format}")
+
+    media_type = "text/html; charset=utf-8" if format == "html" else "application/pdf"
+    # Inline so browsers render HTML/PDF directly instead of forcing download.
+    return FileResponse(
+        path,
+        media_type=media_type,
+        headers={"Content-Disposition": f'inline; filename="{shadow_id}.{format}"'},
+    )
 
 
 @app.post("/upload", dependencies=[Depends(require_auth)])

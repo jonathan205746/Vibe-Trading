@@ -1,0 +1,80 @@
+"""Shadow Account generated signal engine — {{ shadow_id }}
+
+Rules distilled from {{ profitable_roundtrips }} profitable roundtrips
+over {{ date_range[0] }} → {{ date_range[1] }}.
+
+This file is auto-generated; do not hand-edit. Regenerate via
+`src.shadow_account.codegen.render_signal_engine`.
+"""
+from __future__ import annotations
+
+import pandas as pd
+
+SHADOW_ID = "{{ shadow_id }}"
+PREFERRED_MARKETS = {{ preferred_markets | tojson }}
+
+RULES = [
+{% for rule in rules %}    {
+        "rule_id": "{{ rule.rule_id }}",
+        "market": {{ rule.market | tojson }},
+        "entry_hour_min": {{ rule.entry_hour_min }},
+        "entry_hour_max": {{ rule.entry_hour_max }},
+        "hold_days": {{ rule.hold_days }},
+        "weight": {{ rule.weight }},
+    },
+{% endfor %}]
+
+
+def _market_of(code: str) -> str:
+    """Infer a coarse market bucket from a symbol (matches backtest.runner)."""
+    c = (code or "").upper()
+    if c.endswith(".SH") or c.endswith(".SZ") or c.endswith(".BJ"):
+        return "china_a"
+    if c.endswith(".HK"):
+        return "hk"
+    if "-USDT" in c or "-USD" in c or "/" in c:
+        return "crypto"
+    if c and c[0].isalpha():
+        return "us"
+    return "other"
+
+
+class SignalEngine:
+    """Shadow Account signal engine (rule-replay, daily timeframe).
+
+    For each code we pick the first rule whose market matches, then emit
+    a long signal (= rule.weight) for ``hold_days`` bars every
+    ``2 * hold_days`` bars — a deliberate period-replay of the user's
+    profitable holding cadence. Non-matching codes yield a zero series.
+    """
+
+    def generate(self, data_map: dict) -> dict:
+        signals: dict[str, pd.Series] = {}
+        for code, df in data_map.items():
+            sig = pd.Series(0.0, index=df.index)
+            rule = self._pick_rule(code)
+            if rule is not None:
+                sig = self._replay_rule(df.index, rule)
+            signals[code] = sig
+        return signals
+
+    def _pick_rule(self, code: str) -> dict | None:
+        market = _market_of(code)
+        for rule in RULES:
+            if rule["market"] == market or rule["market"] == "other":
+                return rule
+        # Fallback: first rule, regardless of market match.
+        return RULES[0] if RULES else None
+
+    @staticmethod
+    def _replay_rule(index: pd.Index, rule: dict) -> pd.Series:
+        hold = max(1, int(rule["hold_days"]))
+        period = max(2, hold * 2)
+        weight = float(rule["weight"])
+        values = [0.0] * len(index)
+        i = 0
+        while i < len(index):
+            for j in range(i, min(i + hold, len(index))):
+                values[j] = weight
+            i += period
+        return pd.Series(values, index=index)

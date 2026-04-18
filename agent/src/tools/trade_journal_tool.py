@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 _ALLOWED_EXT = {".csv", ".xlsx", ".xls"}
 
 
-def _pair_trades_fifo(df: pd.DataFrame) -> list[dict[str, Any]]:
+def pair_trades_fifo(df: pd.DataFrame) -> list[dict[str, Any]]:
     """Pair buys and sells per symbol using FIFO to compute per-roundtrip PnL.
 
     Args:
@@ -104,7 +104,7 @@ def _compute_profile(df: pd.DataFrame) -> dict[str, Any]:
     if df.empty:
         return {"error": "empty trade journal"}
 
-    rts = _pair_trades_fifo(df)
+    rts = pair_trades_fifo(df)
     rts_df = pd.DataFrame(rts)
 
     total_trades = len(df)
@@ -346,7 +346,7 @@ def _compute_behavior(df: pd.DataFrame) -> dict[str, Any]:
     """
     if df.empty:
         return {"error": "empty trade journal"}
-    rts_df = pd.DataFrame(_pair_trades_fifo(df))
+    rts_df = pd.DataFrame(pair_trades_fifo(df))
     return {
         "disposition_effect": _disposition_effect(rts_df),
         "overtrading": _overtrading(df, rts_df),

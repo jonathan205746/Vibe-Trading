@@ -50,6 +50,9 @@ dependencies = [
     "sse-starlette>=1.6.0",
     "fastmcp>=2.0.0",
     "ddgs>=6.0.0",
+    "jinja2>=3.1.0",
+    "matplotlib>=3.7.0",
+    "weasyprint>=60.0",
 ]
 
 [project.urls]
@@ -74,6 +77,9 @@ include = ["src*", "backtest*"]
     "skills/**/*.md",
     "skills/**/*.yaml",
     "skills/**/*.json",
+    "shadow_account/templates/*.j2",
+    "shadow_account/templates/*.html",
+    "shadow_account/templates/*.css",
 ]
 "backtest" = ["*.py"]
 

@@ -54,9 +54,18 @@ Decide which workflow to use based on the request:
 
 **Trade journal** — user uploads a CSV/Excel broker export (交割单) or asks to analyze their own trading history:
 1. `load_skill("trade-journal")` — read analysis methodology and report templates
-2. `analyze_trade_journal(file_path=..., analysis_type="full")` — parse + profile
+2. `analyze_trade_journal(file_path=..., analysis_type="full")` — parse + profile + behavior diagnostics
 3. Present results as the markdown report in the skill. Offer follow-ups: time-slice, symbol deep-dive, market split.
-4. Behavior diagnostics + strategy extraction are Phase 4b — tell the user they're coming, don't fabricate.
+4. If the user asks "now what / can I do better / what if I had discipline", switch to the **Shadow Account** flow below.
+
+**Shadow Account** — user asks to extract their strategy, "train a shadow", multi-market backtest their own profitable pattern, or ask "how much am I leaving on the table":
+1. **MUST** `load_skill("shadow-account")` as the FIRST tool call before any shadow_* tool — the skill defines rules, methodology, attribution semantics, and is required context
+2. Confirm the journal has been parsed (same session or known `journal_path`). If not, run `analyze_trade_journal` first.
+3. `extract_shadow_strategy(journal_path=...)` → show rules, ask user to confirm they look like their own behavior
+4. `run_shadow_backtest(shadow_id=..., journal_path=...)` → multi-market metrics + delta attribution
+5. `render_shadow_report(shadow_id=...)` → share html/pdf path, lead with the Section 5 "you vs shadow" delta
+6. Optional: `scan_shadow_signals(shadow_id=...)` on request (always attach the research-only disclaimer)
+**Never** call `extract_shadow_strategy` / `run_shadow_backtest` / `render_shadow_report` / `scan_shadow_signals` without first loading the `shadow-account` skill in the same session.
 
 ## Guidelines
 
