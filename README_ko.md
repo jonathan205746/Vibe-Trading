@@ -51,13 +51,14 @@
 
 ## 📰 뉴스
 
+- **2026-04-18** 👥 **섀도우 계정 Shadow Account**: 증권사 거래 명세서에서 자신의 전략 규칙을 추출 → 여러 시장에서 섀도우 백테스트 실행 → 8개 섹션 HTML/PDF 리포트가 어디에서 얼마를 놓쳤는지(규칙 위반, 조기 익절, 놓친 시그널, 역방향 거래) 정확히 보여줌. 신규 도구 4개, 신규 스킬 1개, 총 32개 도구. Trade Journal / Shadow Account 샘플 프롬프트가 Web UI 웰컴 화면에 추가.
 - **2026-04-17** 📊 **거래 명세서 분석기 + 유니버설 파일 리더**: 증권사 거래 명세서(同花顺/东财/富途/일반 CSV) 업로드 → 거래 프로필(보유 일수, 승률, 손익비, 최대 드로다운) + 4가지 행동 편향 진단(처분 효과, 과잉 거래, 추격 매수, 앵커링) 자동 생성. `read_document`는 이제 PDF, Word, Excel, PowerPoint, 이미지(OCR), 40+ 텍스트 형식을 하나의 호출로 통합 처리.
 - **2026-04-16** 🧠 **에이전트 하네스**: 크로스세션 영구 메모리, FTS5 세션 검색, 자가 진화 스킬(전체 CRUD), 5계층 컨텍스트 압축, 읽기/쓰기 도구 배치 처리. 27개 도구, 107개 신규 테스트.
-- **2026-04-15** 🤖 **Z.ai + MiniMax**: Z.ai 제공자 추가([#35](https://github.com/HKUDS/Vibe-Trading/pull/35)), MiniMax temperature 수정 + 모델 업데이트([#33](https://github.com/HKUDS/Vibe-Trading/pull/33)). 13개 제공자.
 
 <details>
 <summary>이전 뉴스</summary>
 
+- **2026-04-15** 🤖 **Z.ai + MiniMax**: Z.ai 제공자 추가([#35](https://github.com/HKUDS/Vibe-Trading/pull/35)), MiniMax temperature 수정 + 모델 업데이트([#33](https://github.com/HKUDS/Vibe-Trading/pull/33)). 13개 제공자.
 - **2026-04-14** 🔧 **MCP 안정성**: 백테스트 도구의 stdio 전송에서 `Connection closed` 오류 수정([#32](https://github.com/HKUDS/Vibe-Trading/pull/32)).
 - **2026-04-13** 🌐 **크로스마켓 복합 백테스트**: 새 `CompositeEngine`으로 서로 다른 시장 종목(예: A주 + 암호화폐)을 공유 자금 풀로 동시 백테스트, 시장 규칙은 종목별 적용. Swarm 템플릿 변수 폴백 및 프론트엔드 타임아웃도 수정.
 - **2026-04-12** 🌍 **멀티 플랫폼 내보내기**: `/pine`으로 TradingView (Pine Script v6), TDX (통달신/동화순/동방재부), MetaTrader 5 (MQL5) 한 번에 내보내기.

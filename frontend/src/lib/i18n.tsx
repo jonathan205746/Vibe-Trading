@@ -15,6 +15,7 @@ const messages = {
   feat1: "AI Agent", feat1d: "Natural language strategy generation with ReAct reasoning",
   feat2: "Built-in Backtest", feat2d: "3 data sources: A-shares, US/HK, Crypto",
   feat3: "Real-time Streaming", feat3d: "Watch the agent think, call tools, and iterate",
+  feat4: "Strategy Replay", feat4d: "Trade journal analyzer + Shadow Account — extract your rules, backtest them, attribute PnL delta",
   score: "Score", passed: "Passed", failed: "Failed", findings: "Findings", recommendations: "Recommendations",
   darkMode: "Dark", lightMode: "Light", language: "Language",
   sessions: "Sessions", newChat: "New Chat", deleteConfirm: "Delete?",

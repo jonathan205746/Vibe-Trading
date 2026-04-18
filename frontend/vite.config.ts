@@ -20,6 +20,7 @@ export default defineConfig({
       "/upload": { target: "http://localhost:8899", changeOrigin: true },
       "/api": { target: "http://localhost:8899", changeOrigin: true },
       "/system": { target: "http://localhost:8899", changeOrigin: true },
+      "/shadow-reports": { target: "http://localhost:8899", changeOrigin: true },
     },
   },
   build: {

@@ -196,6 +196,14 @@ def _format_tool_result_preview(tool: str, status: str, preview: str) -> str:
         if ret:
             parts.append(f"return={float(ret.group(1))*100:.1f}%")
         return ", ".join(parts) if parts else ""
+    if tool == "render_shadow_report":
+        url = re.search(r'"report_url":\s*"([^"]+)"', preview)
+        if url:
+            return f"[bold cyan]report:[/bold cyan] [link]{url.group(1)}[/link]"
+        return ""
+    if tool in ("extract_shadow_strategy", "run_shadow_backtest"):
+        sid = re.search(r'"shadow_id":\s*"([^"]+)"', preview)
+        return f"shadow_id={sid.group(1)}" if sid else ""
     if tool in ("bash", "background_run"):
         if "OK" in preview[:50]:
             return "OK"
@@ -447,7 +455,9 @@ def _print_welcome() -> None:
         "\n"
         "  [cyan]/skills[/cyan]    List available skills       [cyan]/swarm[/cyan]     Agent team presets\n"
         "  [cyan]/list[/cyan]      Recent runs                 [cyan]/settings[/cyan]  Runtime config\n"
-        "  [cyan]/help[/cyan]      All commands                [cyan]/quit[/cyan]      Exit"
+        "  [cyan]/help[/cyan]      All commands                [cyan]/quit[/cyan]      Exit\n"
+        "\n"
+        "[dim]Try: \"analyze my trade journal\" or \"train my shadow account\"[/dim]"
     )
     console.print(Panel(welcome, border_style="cyan", padding=(1, 2)))
 
@@ -476,6 +486,10 @@ def _print_help() -> None:
         ("/settings", "Show runtime settings"),
         ("/clear", "Clear screen"),
         ("/quit", "Exit"),
+        ("", ""),
+        ("[dim]--- Natural language ---[/dim]", ""),
+        ('"analyze journal.csv"', "Parse broker export → profile + 4 behavior diagnostics"),
+        ('"train my shadow"', "Extract strategy → backtest → HTML/PDF report"),
     ]
     for cmd, desc in cmds:
         table.add_row(cmd, desc)

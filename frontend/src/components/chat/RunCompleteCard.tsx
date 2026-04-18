@@ -1,6 +1,6 @@
 import { memo, useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { BarChart3, Code2, Loader2 } from "lucide-react";
+import { BarChart3, Code2, FileText, Loader2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { api } from "@/lib/api";
 import { AgentAvatar } from "./AgentAvatar";
@@ -30,9 +30,13 @@ export const RunCompleteCard = memo(function RunCompleteCard({ msg }: Props) {
     }
   }, [msg.runId, curve]);
 
-  // Check if Pine Script exists for this run
+  // Check if Pine Script exists for this run (skip for shadow-only cards with no runId)
   useEffect(() => {
-    if (msg.runId && !pineChecked) {
+    if (!msg.runId) {
+      setPineChecked(true);
+      return;
+    }
+    if (!pineChecked) {
       api.getRunPine(msg.runId).then(r => {
         setPineChecked(true);
         if (r.exists && r.content) {
@@ -72,13 +76,15 @@ export const RunCompleteCard = memo(function RunCompleteCard({ msg }: Props) {
           <MiniEquityChart data={curve} height={80} />
         )}
         <div className="flex items-center gap-3 flex-wrap">
-          <Link
-            to={`/runs/${msg.runId}`}
-            className="text-sm text-primary hover:underline inline-flex items-center gap-1.5 font-medium"
-          >
-            <BarChart3 className="h-3.5 w-3.5" />
-            {t.fullReport}
-          </Link>
+          {msg.runId && (
+            <Link
+              to={`/runs/${msg.runId}`}
+              className="text-sm text-primary hover:underline inline-flex items-center gap-1.5 font-medium"
+            >
+              <BarChart3 className="h-3.5 w-3.5" />
+              {t.fullReport}
+            </Link>
+          )}
           {pineExists && (
             <button
               onClick={handlePineClick}
@@ -88,6 +94,17 @@ export const RunCompleteCard = memo(function RunCompleteCard({ msg }: Props) {
               {pineLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Code2 className="h-3.5 w-3.5" />}
               Pine Script
             </button>
+          )}
+          {msg.shadowId && (
+            <a
+              href={`/shadow-reports/${encodeURIComponent(msg.shadowId)}?format=html`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-teal-600 dark:text-teal-400 hover:underline inline-flex items-center gap-1.5 font-medium"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              Shadow Report
+            </a>
           )}
         </div>
         {showPine && pineCode && (

@@ -213,20 +213,30 @@ export function Agent() {
         const summary = String(d.summary || "");
         if (summary) s.addMessage({ id: "", type: "answer", content: summary, timestamp: Date.now() });
 
-        // Only show RunCompleteCard if backtest produced metrics
+        // Detect Shadow Account id if render_shadow_report fired successfully this turn
+        const shadowCall = completedTools.find(
+          (tc) => tc.tool === "render_shadow_report" && (tc.status || "ok") === "ok",
+        );
+        const shadowMatch = shadowCall?.preview?.match(/"shadow_id"\s*:\s*"(shadow_[A-Za-z0-9_]+)"/);
+        const shadowId = shadowMatch?.[1];
+
+        // Show RunCompleteCard when the turn produced backtest metrics or a shadow report
         if (runId) {
           try {
             const runData = await api.getRun(runId);
             const hasMetrics = runData.metrics && Object.keys(runData.metrics).length > 0;
-            if (hasMetrics) {
+            if (hasMetrics || shadowId) {
               s.addMessage({
                 id: "", type: "run_complete", content: "", runId,
-                metrics: runData.metrics,
+                metrics: hasMetrics ? runData.metrics : undefined,
                 equityCurve: runData.equity_curve?.map(e => ({ time: e.time, equity: e.equity })),
+                shadowId,
                 timestamp: Date.now(),
               });
             }
           } catch { /* ignore */ }
+        } else if (shadowId) {
+          s.addMessage({ id: "", type: "run_complete", content: "", shadowId, timestamp: Date.now() });
         }
 
         // Reset

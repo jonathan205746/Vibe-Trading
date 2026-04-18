@@ -51,13 +51,14 @@
 
 ## 📰 新闻
 
+- **2026-04-18** 👥 **影子账户 Shadow Account**：从券商交割单提取你自己的策略规则 → 跨市场回测这个"影子" → 8 节 HTML/PDF 报告精确告诉你每一块钱是怎么错过的（规则违反、过早止盈、漏掉信号、反向操作）。4 个新工具、1 个新技能、共 32 工具。Trade Journal / Shadow Account 例句已进 Web UI 欢迎屏。
 - **2026-04-17** 📊 **交割单分析器 + 通用文件阅读器**：上传券商交割单（同花顺/东财/富途/通用 CSV）→ 自动生成交易画像（持仓天数、胜率、盈亏比、最大回撤）+ 4 项行为偏差诊断（处置效应、过度交易、追涨杀跌、锚定效应）。`read_document` 现统一分发 PDF、Word、Excel、PowerPoint、图片（OCR）及 40+ 文本格式，一个调用走全部类型。
 - **2026-04-16** 🧠 **Agent Harness**：跨会话持久记忆、FTS5 会话搜索、自进化技能（完整 CRUD）、5 层上下文压缩、读写工具批处理。27 工具，107 新测试。
-- **2026-04-15** 🤖 **Z.ai + MiniMax**：新增 Z.ai 提供商（[#35](https://github.com/HKUDS/Vibe-Trading/pull/35)），修复 MiniMax temperature 及模型更新（[#33](https://github.com/HKUDS/Vibe-Trading/pull/33)）。共 13 家提供商。
 
 <details>
 <summary>更早的新闻</summary>
 
+- **2026-04-15** 🤖 **Z.ai + MiniMax**：新增 Z.ai 提供商（[#35](https://github.com/HKUDS/Vibe-Trading/pull/35)），修复 MiniMax temperature 及模型更新（[#33](https://github.com/HKUDS/Vibe-Trading/pull/33)）。共 13 家提供商。
 - **2026-04-14** 🔧 **MCP 稳定性**：修复回测工具在 stdio 传输中的 `Connection closed` 错误（[#32](https://github.com/HKUDS/Vibe-Trading/pull/32)）。
 - **2026-04-13** 🌐 **跨市场复合回测**：新增 `CompositeEngine`，混合不同市场标的（如 A 股 + 加密货币）共享资金池回测，各市场规则按标的独立执行。同时修复 swarm 模板变量回退和前端超时问题。
 - **2026-04-12** 🌍 **多平台指标导出**：`/pine` 一次性导出 TradingView (Pine Script v6)、通达信/同花顺/东方财富 (TDX)、MetaTrader 5 (MQL5) 三大平台。

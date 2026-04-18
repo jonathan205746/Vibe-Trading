@@ -1,4 +1,4 @@
-﻿import { Bot, TrendingUp, Bitcoin, Globe, Sparkles, Users } from "lucide-react";
+﻿import { Bot, TrendingUp, Bitcoin, Globe, Sparkles, Users, UserCircle2, NotebookPen } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
 interface Example {
@@ -88,12 +88,51 @@ const CATEGORIES: Category[] = [
       },
     ],
   },
+  {
+    label: "Trade Journal",
+    icon: <NotebookPen className="h-4 w-4" />,
+    color: "text-orange-400 border-orange-500/30 hover:border-orange-500/60 hover:bg-orange-500/5",
+    examples: [
+      {
+        title: "Analyze My Broker Export",
+        desc: "Parse 同花顺/东财/富途/generic CSV — holding days, win rate, PnL ratio, hourly distribution",
+        prompt: "Analyze the trade journal I just uploaded — full profile with holding stats, win rate, top symbols, and hourly distribution",
+      },
+      {
+        title: "Diagnose My Behavior Biases",
+        desc: "Disposition effect, overtrading, chasing momentum, anchoring — severity + numeric evidence",
+        prompt: "Run the 4 behavior diagnostics on my trade journal (disposition, overtrading, chasing, anchoring) and tell me which bias hurts my PnL most",
+      },
+    ],
+  },
+  {
+    label: "Shadow Account",
+    icon: <UserCircle2 className="h-4 w-4" />,
+    color: "text-emerald-400 border-emerald-500/30 hover:border-emerald-500/60 hover:bg-emerald-500/5",
+    examples: [
+      {
+        title: "Train My Shadow from Journal",
+        desc: "Extract your strategy rules from a broker CSV and persist a Shadow profile",
+        prompt: "Train my shadow account from the trading journal I just uploaded — show the extracted rules and confirm they look like my behavior",
+      },
+      {
+        title: "How Much Am I Leaving on the Table?",
+        desc: "Backtest your shadow strategy and attribute delta vs. your actual PnL",
+        prompt: "Run a shadow backtest for the last 90 days on the US market and break down where my PnL diverged from the shadow (rule violations, early exits, missed signals)",
+      },
+      {
+        title: "Generate Shadow Report",
+        desc: "8-section HTML/PDF — equity curve, per-market Sharpe, attribution waterfall",
+        prompt: "Render the shadow report and give me the URL — lead with the you-vs-shadow delta",
+      },
+    ],
+  },
 ];
 
 const CAPABILITY_CHIPS = [
-  "56 Finance Skills",
-  "25 Swarm Presets",
-  "19 Agent Tools",
+  "70 Finance Skills",
+  "29 Swarm Presets",
+  "32 Agent Tools",
   "3 Markets: A-Share · Crypto · HK/US",
   "Minute to Daily Timeframes",
   "4 Portfolio Optimizers",
@@ -101,6 +140,10 @@ const CAPABILITY_CHIPS = [
   "Options & Derivatives",
   "PDF & Web Research",
   "Factor Analysis & ML",
+  "Trade Journal Analyzer",
+  "Shadow Account Backtest",
+  "Persistent Memory",
+  "Session Search",
 ];
 
 interface Props {

@@ -51,13 +51,14 @@
 
 ## 📰 ニュース
 
+- **2026-04-18** 👥 **シャドウアカウント Shadow Account**: ブローカーの取引明細から自分の戦略ルールを抽出 → マーケット横断でシャドウをバックテスト → 8セクションのHTML/PDFレポートが、どこでいくら取りこぼしたか（ルール違反・早すぎる利確・見逃したシグナル・逆張り）を正確に可視化。新規ツール4つ、新スキル1つ、合計32ツール。Trade Journal / Shadow Accountのサンプル例文がWeb UIウェルカム画面に追加。
 - **2026-04-17** 📊 **取引明細アナライザー + ユニバーサルファイルリーダー**: ブローカーの取引明細（同花順/東方財富/富途/汎用CSV）をアップロード → 取引プロフィール（保有日数、勝率、損益比、最大ドローダウン）+ 4つの行動バイアス診断（処分効果、過剰取引、追随買い、アンカリング）を自動生成。`read_document`はPDF、Word、Excel、PowerPoint、画像（OCR）、40+テキスト形式を1回の呼び出しで統一処理。
 - **2026-04-16** 🧠 **エージェントハーネス**: クロスセッション永続メモリ、FTS5セッション検索、自己進化スキル（完全CRUD）、5層コンテキスト圧縮、読み書きツールバッチ処理。27ツール、107新テスト。
-- **2026-04-15** 🤖 **Z.ai + MiniMax**: Z.aiプロバイダー追加（[#35](https://github.com/HKUDS/Vibe-Trading/pull/35)）、MiniMax temperature修正+モデル更新（[#33](https://github.com/HKUDS/Vibe-Trading/pull/33)）。13プロバイダー対応。
 
 <details>
 <summary>過去のニュース</summary>
 
+- **2026-04-15** 🤖 **Z.ai + MiniMax**: Z.aiプロバイダー追加（[#35](https://github.com/HKUDS/Vibe-Trading/pull/35)）、MiniMax temperature修正+モデル更新（[#33](https://github.com/HKUDS/Vibe-Trading/pull/33)）。13プロバイダー対応。
 - **2026-04-14** 🔧 **MCP安定性**: バックテストツールのstdioトランスポートにおける`Connection closed`エラーを修正（[#32](https://github.com/HKUDS/Vibe-Trading/pull/32)）。
 - **2026-04-13** 🌐 **クロスマーケット複合バックテスト**: 新`CompositeEngine`で異なる市場の銘柄（例：A株＋暗号資産）を共有資金プールで同時バックテスト、市場ルールは銘柄ごとに適用。Swarmテンプレート変数フォールバックとフロントエンドタイムアウトも修正。
 - **2026-04-12** 🌍 **マルチプラットフォーム出力**: `/pine`でTradingView (Pine Script v6)、TDX（通達信/同花順/東方財富）、MetaTrader 5 (MQL5) に一括エクスポート。

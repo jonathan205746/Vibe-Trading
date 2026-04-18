@@ -17,6 +17,8 @@ export interface AgentMessage {
   equityCurve?: Array<{ time: string; equity: number | string }>;
   /** Phase label for thinking entries */
   stage?: string;
+  /** Shadow Account id if render_shadow_report fired in this turn (RunCompleteCard renders a "View Shadow Report" button). */
+  shadowId?: string;
 }
 
 /** Tool call tracking entry */

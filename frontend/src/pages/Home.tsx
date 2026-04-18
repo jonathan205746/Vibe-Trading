@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Bot, BarChart3, Zap } from "lucide-react";
+import { ArrowRight, Bot, BarChart3, Zap, UserCircle2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
 export function Home() {
@@ -9,6 +9,7 @@ export function Home() {
     { icon: Bot, title: t.feat1, desc: t.feat1d },
     { icon: BarChart3, title: t.feat2, desc: t.feat2d },
     { icon: Zap, title: t.feat3, desc: t.feat3d },
+    { icon: UserCircle2, title: t.feat4, desc: t.feat4d },
   ];
 
   return (
@@ -24,7 +25,7 @@ export function Home() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 max-w-4xl w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-16 max-w-5xl w-full">
         {FEATURES.map(({ icon: Icon, title, desc }) => (
           <div key={title} className="border rounded-lg p-6 space-y-3">
             <Icon className="h-8 w-8 text-primary" />

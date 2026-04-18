@@ -41,3 +41,12 @@ agent/vibe_trading_ai.egg-info/
 agent/tests/e2e_backtest/
 dist/
 build/
+
+# Local demo videos (too large for git; link to external host instead)
+assets/*.mp4
+
+# Manual E2E smoke tests — require live API keys (OpenRouter / yfinance),
+# would break CI if committed. Kept local; run explicitly when validating
+# a release.
+agent/tests/e2e_*.py
+agent/tests/test_e2e_*.py
