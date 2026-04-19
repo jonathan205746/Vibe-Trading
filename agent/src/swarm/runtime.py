@@ -9,7 +9,12 @@ from __future__ import annotations
 
 import logging
 import threading
-from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from concurrent.futures import (
+    Future,
+    ThreadPoolExecutor,
+    TimeoutError as FuturesTimeoutError,
+    as_completed,
+)
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
@@ -340,6 +345,7 @@ class SwarmRuntime:
 
         with ThreadPoolExecutor(max_workers=self._max_workers) as executor:
             futures: dict[Future[WorkerResult], str] = {}
+            layer_budget = 0  # seconds — max per-task (retries × timeout) across layer
 
             for tid in layer_task_ids:
                 task = task_store.load_task(tid)
@@ -378,17 +384,38 @@ class SwarmRuntime:
                     run_id=run.id,
                 )
                 futures[future] = tid
+                per_task_budget = agent_spec.timeout_seconds * (agent_spec.max_retries + 1)
+                layer_budget = max(layer_budget, per_task_budget)
 
-            # Collect results
-            for future in as_completed(futures):
-                tid = futures[future]
-                try:
-                    results[tid] = future.result()
-                except Exception as exc:
-                    logger.error("Worker for task %s raised exception", tid, exc_info=True)
+            # Collect results with a hard layer-level deadline — defends against
+            # worker threads stuck in C extensions / blocked I/O that bypass the
+            # in-loop timeout check (issue #42).
+            deadline_buffer = 60
+            layer_deadline = layer_budget + deadline_buffer if layer_budget else None
+
+            try:
+                for future in as_completed(futures, timeout=layer_deadline):
+                    tid = futures[future]
+                    try:
+                        results[tid] = future.result()
+                    except Exception as exc:
+                        logger.error("Worker for task %s raised exception", tid, exc_info=True)
+                        results[tid] = WorkerResult(
+                            status="failed", summary="",
+                            error=str(exc),
+                        )
+            except FuturesTimeoutError:
+                for pending, tid in futures.items():
+                    if tid in results:
+                        continue
+                    pending.cancel()
+                    logger.error(
+                        "Worker for task %s exceeded layer deadline (%ds)",
+                        tid, layer_deadline,
+                    )
                     results[tid] = WorkerResult(
-                        status="failed", summary="",
-                        error=str(exc),
+                        status="timeout", summary="",
+                        error=f"Worker exceeded layer deadline of {layer_deadline}s",
                     )
 
         return results

@@ -322,10 +322,21 @@ def run_worker(
         is_last_iteration = iteration == max_iterations - 1
         tool_defs = None if is_last_iteration else registry.get_definitions()
 
-        # Call LLM with remaining timeout
+        # Stream the LLM — moonshot/kimi non-streaming invoke is unreliable
+        # (issue #42), and streaming also feeds dashboard live progress.
         try:
             remaining_timeout = max(10, int(timeout - elapsed))
-            response = llm.chat(messages, tools=tool_defs, timeout=remaining_timeout)
+
+            def _on_text_chunk(delta: str) -> None:
+                _emit(event_callback, "worker_text", agent_id, task_id,
+                      {"content": delta, "iteration": iteration})
+
+            response = llm.stream_chat(
+                messages,
+                tools=tool_defs,
+                timeout=remaining_timeout,
+                on_text_chunk=_on_text_chunk,
+            )
         except Exception as exc:
             error_msg = f"LLM call failed at iteration {iteration}: {exc}"
             logger.warning(error_msg)
@@ -344,11 +355,6 @@ def run_worker(
         iter_in, iter_out = _estimate_tokens(messages, response)
         total_input_tokens += iter_in
         total_output_tokens += iter_out
-
-        # Emit agent thinking text for live streaming
-        if response.content and response.content.strip():
-            _emit(event_callback, "worker_text", agent_id, task_id,
-                  {"content": response.content, "iteration": iteration})
 
         # Track last meaningful assistant content
         if response.content and len(response.content.strip()) > 20:
