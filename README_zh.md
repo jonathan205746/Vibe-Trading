@@ -19,7 +19,7 @@
   <a href="https://pypi.org/project/vibe-trading-ai/"><img src="https://img.shields.io/pypi/v/vibe-trading-ai?style=flat&logo=pypi&logoColor=white" alt="PyPI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=flat" alt="License"></a>
   <br>
-  <img src="https://img.shields.io/badge/Skills-69-orange" alt="Skills">
+  <img src="https://img.shields.io/badge/Skills-71-orange" alt="Skills">
   <img src="https://img.shields.io/badge/Swarm_Presets-29-7C3AED" alt="Swarm">
   <img src="https://img.shields.io/badge/Tools-27-0F766E" alt="Tools">
   <img src="https://img.shields.io/badge/Data_Sources-5-2563EB" alt="Data Sources">
@@ -51,13 +51,14 @@
 
 ## 📰 新闻
 
+- **2026-04-19** 📦 **v0.1.5**：发布至 PyPI 与 ClawHub。`python-multipart` CVE 版本下限升级，5 个新 MCP 工具接入（`analyze_trade_journal` + 4 个影子账户工具），修复 `pattern_recognition` → `pattern` 工具注册名不一致，Docker 依赖对齐，SKILL 清单同步（22 MCP 工具 / 71 技能）。
 - **2026-04-18** 👥 **影子账户 Shadow Account**：从券商交割单提取你自己的策略规则 → 跨市场回测这个"影子" → 8 节 HTML/PDF 报告精确告诉你每一块钱是怎么错过的（规则违反、过早止盈、漏掉信号、反向操作）。4 个新工具、1 个新技能、共 32 工具。Trade Journal / Shadow Account 例句已进 Web UI 欢迎屏。
 - **2026-04-17** 📊 **交割单分析器 + 通用文件阅读器**：上传券商交割单（同花顺/东财/富途/通用 CSV）→ 自动生成交易画像（持仓天数、胜率、盈亏比、最大回撤）+ 4 项行为偏差诊断（处置效应、过度交易、追涨杀跌、锚定效应）。`read_document` 现统一分发 PDF、Word、Excel、PowerPoint、图片（OCR）及 40+ 文本格式，一个调用走全部类型。
-- **2026-04-16** 🧠 **Agent Harness**：跨会话持久记忆、FTS5 会话搜索、自进化技能（完整 CRUD）、5 层上下文压缩、读写工具批处理。27 工具，107 新测试。
 
 <details>
 <summary>更早的新闻</summary>
 
+- **2026-04-16** 🧠 **Agent Harness**：跨会话持久记忆、FTS5 会话搜索、自进化技能（完整 CRUD）、5 层上下文压缩、读写工具批处理。27 工具，107 新测试。
 - **2026-04-15** 🤖 **Z.ai + MiniMax**：新增 Z.ai 提供商（[#35](https://github.com/HKUDS/Vibe-Trading/pull/35)），修复 MiniMax temperature 及模型更新（[#33](https://github.com/HKUDS/Vibe-Trading/pull/33)）。共 13 家提供商。
 - **2026-04-14** 🔧 **MCP 稳定性**：修复回测工具在 stdio 传输中的 `Connection closed` 错误（[#32](https://github.com/HKUDS/Vibe-Trading/pull/32)）。
 - **2026-04-13** 🌐 **跨市场复合回测**：新增 `CompositeEngine`，混合不同市场标的（如 A 股 + 加密货币）共享资金池回测，各市场规则按标的独立执行。同时修复 swarm 模板变量回退和前端超时问题。
@@ -92,9 +93,9 @@ Vibe-Trading 是一个由 AI 驱动的多代理金融工作台，将自然语言
     <td align="center" width="25%" valign="top">
       <img src="assets/scene-research.png" height="150" alt="Research"/><br>
       <h3>🔍 面向交易的深度研究</h3>
-      <img src="https://img.shields.io/badge/69_Skills-FF6B6B?style=for-the-badge&logo=bookstack&logoColor=white" alt="Skills" /><br><br>
+      <img src="https://img.shields.io/badge/71_Skills-FF6B6B?style=for-the-badge&logo=bookstack&logoColor=white" alt="Skills" /><br><br>
       <div align="left" style="font-size: 4px;">
-        • 69 个专长技能 + 跨会话持久记忆<br>
+        • 71 个专长技能 + 跨会话持久记忆<br>
         • 自进化：代理从经验中创建并优化工作流<br>
         • 5 层上下文压缩——长对话不丢失信息<br>
         • 覆盖全金融领域的自然语言任务路由
@@ -136,9 +137,9 @@ Vibe-Trading 是一个由 AI 驱动的多代理金融工作台，将自然语言
   </tr>
 </table>
 
-## 7 大类别中的 69 个技能
+## 7 大类别中的 71 个技能
 
-- 📊 69 个金融专长技能，划分 7 大类
+- 📊 71 个金融专长技能，划分 7 大类
 - 🌐 覆盖传统市场到加密与 DeFi
 - 🔬 覆盖数据获取到量化研究的全链路能力
 
@@ -347,7 +348,7 @@ vibe-trading serve         # API 服务器
 | Command | Description |
 |---------|-------------|
 | `/help` | 显示全部命令 |
-| `/skills` | 列出 69 个金融技能 |
+| `/skills` | 列出 71 个金融技能 |
 | `/swarm` | 列出 29 个 swarm 团队预设 |
 | `/swarm run <preset> [vars_json]` | 以流式输出运行一个 swarm 团队 |
 | `/swarm list` | Swarm 运行历史 |
@@ -480,7 +481,7 @@ npx clawhub@latest install vibe-trading --force
 <details>
 <summary><b>OpenSpace — 自进化技能</b></summary>
 
-全部 69 个金融技能已发布在 [open-space.cloud](https://open-space.cloud)，并通过 OpenSpace 的自进化引擎自动演进。
+全部 71 个金融技能已发布在 [open-space.cloud](https://open-space.cloud)，并通过 OpenSpace 的自进化引擎自动演进。
 
 要在 OpenSpace 中使用，在代理配置中添加两个 MCP 服务器：
 
@@ -502,7 +503,7 @@ npx clawhub@latest install vibe-trading --force
 }
 ```
 
-OpenSpace 会自动发现全部 69 个技能，支持自动修复、自动改进与社区共享。在任意连接 OpenSpace 的代理中通过 `search_skills("finance backtest")` 搜索 Vibe-Trading 技能。
+OpenSpace 会自动发现全部 71 个技能，支持自动修复、自动改进与社区共享。在任意连接 OpenSpace 的代理中通过 `search_skills("finance backtest")` 搜索 Vibe-Trading 技能。
 
 </details>
 
@@ -542,7 +543,7 @@ Vibe-Trading/
 │   │   │   ├── web_search_tool.py  #   DuckDuckGo 搜索
 │   │   │   └── ...                 #   bash、文件 I/O、因子分析、期权等
 │   │   │
-│   │   ├── skills/                 # 69 个金融技能（7 类，每个 SKILL.md）
+│   │   ├── skills/                 # 71 个金融技能（7 类，每个 SKILL.md）
 │   │   ├── swarm/                  # Swarm DAG 执行引擎
 │   │   ├── session/                # 多轮对话 + FTS5 会话搜索
 │   │   └── providers/              # LLM 提供商抽象
