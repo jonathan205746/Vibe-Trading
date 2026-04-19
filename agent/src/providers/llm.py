@@ -22,12 +22,14 @@ if ChatOpenAI is not None:
     class ChatOpenAIWithReasoning(ChatOpenAI):  # type: ignore[misc,valid-type]
         """ChatOpenAI that preserves provider reasoning across invoke + stream.
 
-        langchain-openai 0.3.x drops non-standard fields in both paths:
-          * _convert_dict_to_message — invoke / ainvoke
-          * _convert_delta_to_message_chunk — stream / astream
+        langchain-openai 0.3.x drops non-standard fields in three paths:
+          * _convert_dict_to_message — invoke / ainvoke (inbound)
+          * _convert_delta_to_message_chunk — stream / astream (inbound)
+          * _convert_message_to_dict — request serialization (outbound)
         Moonshot/DeepSeek emit `reasoning_content`; OpenRouter relays as
-        `reasoning`. Both normalize to additional_kwargs["reasoning_content"],
-        so downstream reads one canonical key.
+        `reasoning`. Inbound paths normalize to additional_kwargs["reasoning_content"];
+        outbound path re-injects it so strict providers (kimi-k2.5) accept
+        multi-turn continuations.
         """
 
         @staticmethod
@@ -57,6 +59,30 @@ if ChatOpenAI is not None:
             if choices:
                 self._capture(choices[0]["delta"], gen.message)
             return gen
+
+        def _get_request_payload(  # type: ignore[override]
+            self,
+            input_: Any,
+            *,
+            stop: Optional[list[str]] = None,
+            **kwargs: Any,
+        ) -> dict:
+            """Re-inject reasoning_content and normalize assistant content.
+
+            LangChain strips ``reasoning_content`` when serializing AIMessages
+            back to OpenAI wire format. Moonshot kimi-k2.5 also rejects
+            assistant turns where ``content`` is null or ``reasoning_content``
+            is absent, breaking ReAct continuations after a tool call (#39).
+            """
+            payload = super()._get_request_payload(input_, stop=stop, **kwargs)
+            messages = super()._convert_input(input_).to_messages()
+            for i, m in enumerate(payload["messages"]):
+                if m.get("role") != "assistant":
+                    continue
+                if m.get("content") is None:
+                    m["content"] = ""
+                m["reasoning_content"] = messages[i].additional_kwargs.get("reasoning_content", "")
+            return payload
 else:
     ChatOpenAIWithReasoning = None  # type: ignore
 

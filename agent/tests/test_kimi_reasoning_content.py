@@ -294,3 +294,92 @@ class TestChatOpenAIWithReasoningStreaming:
         # pass it through unchanged (no choices to read reasoning from).
         assert gen_chunk is not None
         assert "reasoning_content" not in gen_chunk.message.additional_kwargs
+
+
+class TestChatOpenAIWithReasoningOutboundPayload:
+    """_get_request_payload path: re-inject reasoning_content on continuation
+    calls and normalize content=None for strict providers (issue #39 round-trip).
+    """
+
+    def _instance(self, model: str = "kimi-k2-0905-preview") -> Any:
+        os.environ.setdefault("OPENAI_API_KEY", "sk-test")
+        return ChatOpenAIWithReasoning(model=model, api_key="sk-test")
+
+    def test_reinjects_reasoning_content_from_additional_kwargs(self) -> None:
+        """Assistant messages with reasoning_content in additional_kwargs are
+        preserved across LangChain's dict → AIMessage → dict serialization."""
+        from langchain_core.messages import AIMessage, HumanMessage
+
+        instance = self._instance()
+        history = [
+            HumanMessage(content="hi"),
+            AIMessage(
+                content="",
+                additional_kwargs={
+                    "reasoning_content": "I should call a tool",
+                    "tool_calls": [
+                        {"id": "c1", "type": "function",
+                         "function": {"name": "t", "arguments": "{}"}},
+                    ],
+                },
+            ),
+        ]
+
+        payload = instance._get_request_payload(history)
+
+        assistant_msg = next(m for m in payload["messages"] if m["role"] == "assistant")
+        assert assistant_msg["reasoning_content"] == "I should call a tool"
+
+    def test_normalizes_none_content_on_assistant_messages(self) -> None:
+        """LangChain serializes AIMessage(content='', tool_calls=[...]) as
+        content=null; Moonshot kimi-k2.5 rejects that, so we normalize to ''."""
+        from langchain_core.messages import AIMessage, HumanMessage
+
+        instance = self._instance()
+        history = [
+            HumanMessage(content="hi"),
+            AIMessage(
+                content="",
+                additional_kwargs={
+                    "tool_calls": [
+                        {"id": "c1", "type": "function",
+                         "function": {"name": "t", "arguments": "{}"}},
+                    ],
+                },
+            ),
+        ]
+
+        payload = instance._get_request_payload(history)
+
+        assistant_msg = next(m for m in payload["messages"] if m["role"] == "assistant")
+        assert assistant_msg["content"] == ""
+
+    def test_injects_empty_reasoning_content_when_absent(self) -> None:
+        """kimi-k2.5 requires reasoning_content on every assistant turn."""
+        from langchain_core.messages import AIMessage, HumanMessage
+
+        instance = self._instance()
+        history = [
+            HumanMessage(content="hi"),
+            AIMessage(content="plain assistant reply"),
+        ]
+
+        payload = instance._get_request_payload(history)
+
+        assistant_msg = next(m for m in payload["messages"] if m["role"] == "assistant")
+        assert assistant_msg["reasoning_content"] == ""
+
+    def test_user_and_system_messages_untouched(self) -> None:
+        """Only assistant messages get the reasoning_content injection."""
+        from langchain_core.messages import HumanMessage, SystemMessage
+
+        instance = self._instance()
+        history = [
+            SystemMessage(content="be brief"),
+            HumanMessage(content="hi"),
+        ]
+
+        payload = instance._get_request_payload(history)
+
+        for m in payload["messages"]:
+            assert "reasoning_content" not in m
