@@ -218,7 +218,11 @@ class ContextBuilder:
 
         Args:
             tool_calls: List of tool call objects.
-            content: Model reasoning/thinking text.
+            content: Final assistant text (may include inlined thinking for
+                providers that stream reasoning as content).
+            reasoning_content: Provider-specific reasoning field (Kimi K2.5,
+                DeepSeek reasoner, Qwen thinking). Only attached to the output
+                message when not None, so non-thinking providers see no change.
 
         Returns:
             OpenAI-format assistant message.
