@@ -144,7 +144,7 @@ class TestMinimaxTemperature:
             "LANGCHAIN_TEMPERATURE": "0.0",
         }
         with patch.dict(os.environ, env, clear=True):
-            with patch.object(llm_mod, "ChatOpenAI", _FakeChatOpenAI):
+            with patch.object(llm_mod, "ChatOpenAIWithReasoning", _FakeChatOpenAI):
                 build_llm()
         assert captured["temperature"] == 0.01, (
             "MiniMax temperature must be clamped to 0.01 when 0.0 is configured"
@@ -169,7 +169,7 @@ class TestMinimaxTemperature:
             "LANGCHAIN_TEMPERATURE": "0.7",
         }
         with patch.dict(os.environ, env, clear=True):
-            with patch.object(llm_mod, "ChatOpenAI", _FakeChatOpenAI):
+            with patch.object(llm_mod, "ChatOpenAIWithReasoning", _FakeChatOpenAI):
                 build_llm()
         assert captured["temperature"] == 0.7
 
