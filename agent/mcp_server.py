@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Vibe-Trading MCP Server — expose 17 finance research tools to any MCP client.
+"""Vibe-Trading MCP Server — expose 22 finance research tools to any MCP client.
 
 Works with OpenClaw, Claude Desktop, Cursor, and any MCP-compatible client.
 Zero API key required for HK/US/crypto markets (yfinance, OKX, AKShare are free).
@@ -75,7 +75,7 @@ def _get_registry():
 def list_skills() -> str:
     """List all available finance skills with names and descriptions.
 
-    Returns a JSON array of {name, description} for all 68 skills.
+    Returns a JSON array of {name, description} for all 71 skills.
     Use load_skill(name) to get the full documentation for any skill.
     """
     loader = _get_skills_loader()
@@ -213,7 +213,7 @@ def pattern_recognition(run_dir: str) -> str:
         run_dir: Path to run directory containing artifacts/ohlcv_*.csv.
     """
     registry = _get_registry()
-    return registry.execute("pattern_recognition", {"run_dir": run_dir})
+    return registry.execute("pattern", {"run_dir": run_dir})
 
 
 # ---------------------------------------------------------------------------
@@ -535,6 +535,156 @@ def list_runs(limit: int = 20) -> str:
             "total_output_tokens": run.total_output_tokens,
         })
     return json.dumps(items, ensure_ascii=False, indent=2)
+
+
+# ---------------------------------------------------------------------------
+# Trade journal tool
+# ---------------------------------------------------------------------------
+
+@mcp.tool
+def analyze_trade_journal(
+    file_path: str,
+    analysis_type: str = "full",
+    filter_expr: str = "",
+) -> str:
+    """Analyze a user's trade journal (CSV/Excel broker export) and return
+    a trading profile plus behavior diagnostics.
+
+    Parses 同花顺 / 东方财富 / 富途 / generic formats (encoding auto-detected).
+    Output (JSON):
+      - profile: holding days, frequency, win rate, PnL ratio, top symbols,
+                 market distribution, hourly distribution
+      - behaviors: disposition effect, overtrading, chasing momentum,
+                   anchoring (each with severity + numeric evidence)
+
+    Args:
+        file_path: Absolute path to the uploaded CSV/Excel file.
+        analysis_type: "full" | "profile" | "behavior" | "strategy".
+        filter_expr: Optional filter (e.g. "2026-01 to 2026-03",
+                     "symbol=600519.SH", "market=china_a").
+    """
+    registry = _get_registry()
+    return registry.execute("analyze_trade_journal", {
+        "file_path": file_path,
+        "analysis_type": analysis_type,
+        "filter_expr": filter_expr,
+    })
+
+
+# ---------------------------------------------------------------------------
+# Shadow Account tools (4)
+# ---------------------------------------------------------------------------
+
+@mcp.tool
+def extract_shadow_strategy(
+    journal_path: str,
+    min_support: int = 3,
+    max_rules: int = 5,
+) -> str:
+    """Extract a Shadow Account profile (3-5 human-readable if-then rules)
+    from the user's profitable roundtrips in a trade journal.
+
+    Run `analyze_trade_journal` first if the journal hasn't been parsed.
+    Returns shadow_id + rules preview. Profile persists to
+    ~/.vibe-trading/shadow_accounts/.
+
+    Args:
+        journal_path: Path to the CSV/Excel broker export.
+        min_support: Minimum profitable roundtrips required to back one rule.
+        max_rules: Maximum rules to return (typically 3-5).
+    """
+    registry = _get_registry()
+    return registry.execute("extract_shadow_strategy", {
+        "journal_path": journal_path,
+        "min_support": min_support,
+        "max_rules": max_rules,
+    })
+
+
+@mcp.tool
+def run_shadow_backtest(
+    shadow_id: str,
+    window_start: str = "",
+    window_end: str = "",
+    markets: list[str] | None = None,
+    journal_path: str = "",
+) -> str:
+    """Run a multi-market backtest (A股/港股/美股/crypto) on a Shadow Account
+    profile and compute delta-PnL attribution vs the user's realized trades.
+
+    Requires `extract_shadow_strategy` to have run first.
+
+    Args:
+        shadow_id: ID returned by extract_shadow_strategy.
+        window_start: ISO date, default today-1y.
+        window_end: ISO date, default today.
+        markets: Subset of ["china_a", "hk", "us", "crypto"], default all four.
+        journal_path: Original journal path (enables attribution), optional.
+    """
+    registry = _get_registry()
+    params: dict[str, Any] = {"shadow_id": shadow_id}
+    if window_start:
+        params["window_start"] = window_start
+    if window_end:
+        params["window_end"] = window_end
+    if markets:
+        params["markets"] = markets
+    if journal_path:
+        params["journal_path"] = journal_path
+    return registry.execute("run_shadow_backtest", params)
+
+
+@mcp.tool
+def render_shadow_report(
+    shadow_id: str,
+    include_today_signals: bool = True,
+    window_start: str = "",
+    window_end: str = "",
+    journal_path: str = "",
+) -> str:
+    """Render the Shadow Account HTML/PDF report (8 sections + charts) for
+    a shadow_id. If no cached backtest, one is run automatically.
+
+    Args:
+        shadow_id: Shadow Account ID.
+        include_today_signals: Include today's market scan section.
+        window_start: Optional backtest window override.
+        window_end: Optional backtest window override.
+        journal_path: Original journal path (for attribution), optional.
+    """
+    registry = _get_registry()
+    params: dict[str, Any] = {
+        "shadow_id": shadow_id,
+        "include_today_signals": include_today_signals,
+    }
+    if window_start:
+        params["window_start"] = window_start
+    if window_end:
+        params["window_end"] = window_end
+    if journal_path:
+        params["journal_path"] = journal_path
+    return registry.execute("render_shadow_report", params)
+
+
+@mcp.tool
+def scan_shadow_signals(
+    shadow_id: str,
+    date: str = "",
+    per_market: int = 3,
+) -> str:
+    """List today's symbols that match the Shadow Account's entry cadence
+    (research use only — not a trade recommendation).
+
+    Args:
+        shadow_id: Shadow Account ID.
+        date: ISO YYYY-MM-DD target date, default today.
+        per_market: Max signals per market.
+    """
+    registry = _get_registry()
+    params: dict[str, Any] = {"shadow_id": shadow_id, "per_market": per_market}
+    if date:
+        params["date"] = date
+    return registry.execute("scan_shadow_signals", params)
 
 
 # ---------------------------------------------------------------------------

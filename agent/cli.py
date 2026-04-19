@@ -51,7 +51,7 @@ EXIT_RUN_FAILED = 1
 EXIT_USAGE_ERROR = 2
 RICH_TAG_PATTERN = re.compile(r"\[/?[^\]]+\]")
 
-_VERSION = "0.1.0"
+_VERSION = "0.1.5"
 
 # Agent color assignments for swarm display
 _AGENT_STYLES = ["cyan", "magenta", "green", "yellow", "blue", "bright_red", "bright_cyan", "bright_magenta"]

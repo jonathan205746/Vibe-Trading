@@ -67,7 +67,7 @@ body:
     attributes:
       label: Version
       description: "Run `pip show vibe-trading-ai` to check"
-      placeholder: "e.g., 0.1.3"
+      placeholder: "e.g., 0.1.5"
 
   - type: input
     id: environment

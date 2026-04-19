@@ -1,6 +1,6 @@
 [project]
 name = "vibe-trading-ai"
-version = "0.1.4"
+version = "0.1.5"
 description = "Natural-language finance research AI agent with backtesting"
 requires-python = ">=3.11"
 license = "MIT"
@@ -46,7 +46,7 @@ dependencies = [
     "fastapi>=0.104.0",
     "uvicorn[standard]>=0.24.0",
     "pydantic>=2.0.0",
-    "python-multipart>=0.0.6",
+    "python-multipart>=0.0.18",
     "sse-starlette>=1.6.0",
     "fastmcp>=2.0.0",
     "ddgs>=6.0.0",

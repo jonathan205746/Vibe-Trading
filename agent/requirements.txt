@@ -14,6 +14,13 @@ numpy>=1.24.0
 scipy>=1.10.0
 duckdb>=1.2.0
 
+# Document Readers (doc_reader_tool)
+openpyxl>=3.1.0
+python-docx>=1.1.0
+python-pptx>=0.6.23
+pypdfium2>=4.0.0
+Pillow>=10.0.0
+
 # ML Strategy
 scikit-learn>=1.3.0
 joblib>=1.3.0
@@ -33,8 +40,16 @@ ccxt>=4.0.0
 fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
 pydantic>=2.0.0
-python-multipart>=0.0.6
+python-multipart>=0.0.18
 sse-starlette>=1.6.0
 
 # MCP Server
 fastmcp>=2.0.0
+
+# Web Search
+ddgs>=6.0.0
+
+# Shadow Account HTML/PDF Report
+jinja2>=3.1.0
+matplotlib>=3.7.0
+weasyprint>=60.0

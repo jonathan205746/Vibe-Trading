@@ -225,7 +225,7 @@ export function Layout() {
                   </button>
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground/60">v0.1.0</p>
+              <p className="text-xs text-muted-foreground/60">v0.1.5</p>
             </>
           )}
         </div>
