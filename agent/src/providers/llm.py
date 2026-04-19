@@ -17,6 +17,34 @@ try:
 except ImportError:
     ChatOpenAI = None  # type: ignore
 
+
+if ChatOpenAI is not None:
+    class ChatOpenAIWithReasoning(ChatOpenAI):  # type: ignore[misc,valid-type]
+        """ChatOpenAI that preserves provider-specific reasoning fields.
+
+        langchain-openai 0.3.x's _convert_dict_to_message only copies
+        function_call / tool_calls / audio into additional_kwargs; unknown
+        fields like reasoning_content (Moonshot K2.5, DeepSeek reasoner,
+        Qwen thinking) are silently dropped. This subclass re-reads the
+        raw response and restores those fields so callers relying on
+        `msg.additional_kwargs["reasoning_content"]` can find them.
+        """
+
+        _PRESERVE_FIELDS = ("reasoning_content",)
+
+        def _create_chat_result(self, response, generation_info=None):  # type: ignore[override]
+            result = super()._create_chat_result(response, generation_info)
+            raw = response if isinstance(response, dict) else response.model_dump()
+            for gen, choice in zip(result.generations, raw.get("choices", []) or []):
+                message_dict = (choice or {}).get("message") or {}
+                for field in self._PRESERVE_FIELDS:
+                    value = message_dict.get(field)
+                    if value:
+                        gen.message.additional_kwargs[field] = value
+            return result
+else:
+    ChatOpenAIWithReasoning = None  # type: ignore
+
 AGENT_DIR = Path(__file__).resolve().parents[2]
 
 # .env search order: ~/.vibe-trading/.env → agent/.env → $CWD/.env
@@ -128,7 +156,7 @@ def build_llm(*, model_name: Optional[str] = None, callbacks: Any = None) -> Any
         temperature = 0.01
     timeout = int(os.getenv("TIMEOUT_SECONDS", "120"))
     max_retries = int(os.getenv("MAX_RETRIES", "2"))
-    return ChatOpenAI(
+    return ChatOpenAIWithReasoning(
         model=name,
         temperature=temperature,
         timeout=timeout,
