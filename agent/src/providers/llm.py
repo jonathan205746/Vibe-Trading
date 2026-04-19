@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Mapping, Optional
 
 try:
     from dotenv import load_dotenv
@@ -18,30 +18,65 @@ except ImportError:
     ChatOpenAI = None  # type: ignore
 
 
+# Provider-specific reasoning field variants, in priority order.
+# All normalize to the canonical key additional_kwargs["reasoning_content"].
+#   * Moonshot / DeepSeek official API → "reasoning_content"
+#   * OpenRouter relay (all thinking models) → "reasoning"
+_REASONING_FIELDS: tuple[str, ...] = ("reasoning_content", "reasoning")
+
+
+def _preserve(src: Mapping[str, Any], target_msg: Any) -> None:
+    """Copy provider reasoning field from src into target_msg.additional_kwargs.
+
+    Src is a response message dict (non-streaming) or stream delta dict.
+    The first non-empty variant in _REASONING_FIELDS wins; all write to the
+    same canonical key so downstream reads one place.
+    """
+    for field in _REASONING_FIELDS:
+        value = src.get(field)
+        if value:
+            target_msg.additional_kwargs["reasoning_content"] = value
+            return
+
+
 if ChatOpenAI is not None:
     class ChatOpenAIWithReasoning(ChatOpenAI):  # type: ignore[misc,valid-type]
         """ChatOpenAI that preserves provider-specific reasoning fields.
 
-        langchain-openai 0.3.x's _convert_dict_to_message only copies
-        function_call / tool_calls / audio into additional_kwargs; unknown
-        fields like reasoning_content (Moonshot K2.5, DeepSeek reasoner,
-        Qwen thinking) are silently dropped. This subclass re-reads the
-        raw response and restores those fields so callers relying on
-        `msg.additional_kwargs["reasoning_content"]` can find them.
-        """
+        langchain-openai 0.3.x drops non-standard fields (reasoning_content
+        from Moonshot K2.5, DeepSeek reasoner, Qwen thinking) in both
+        response paths:
+          * _convert_dict_to_message — invoke / ainvoke (non-streaming)
+          * _convert_delta_to_message_chunk — stream / astream
 
-        _PRESERVE_FIELDS = ("reasoning_content",)
+        This subclass hooks both so downstream code always reads one place:
+        msg.additional_kwargs["reasoning_content"]. For streaming, per-delta
+        writes are accumulated by AIMessageChunk.__add__ via merge_dicts.
+        """
 
         def _create_chat_result(self, response, generation_info=None):  # type: ignore[override]
             result = super()._create_chat_result(response, generation_info)
             raw = response if isinstance(response, dict) else response.model_dump()
-            for gen, choice in zip(result.generations, raw.get("choices", []) or []):
-                message_dict = (choice or {}).get("message") or {}
-                for field in self._PRESERVE_FIELDS:
-                    value = message_dict.get(field)
-                    if value:
-                        gen.message.additional_kwargs[field] = value
+            for gen, choice in zip(result.generations, raw["choices"]):
+                _preserve(choice["message"], gen.message)
             return result
+
+        def _convert_chunk_to_generation_chunk(  # type: ignore[override]
+            self,
+            chunk: dict,
+            default_chunk_class: type,
+            base_generation_info: Optional[dict],
+        ):
+            gen_chunk = super()._convert_chunk_to_generation_chunk(
+                chunk, default_chunk_class, base_generation_info
+            )
+            if gen_chunk is None:
+                return None
+            choices = chunk.get("choices") or chunk.get("chunk", {}).get("choices")
+            if not choices:
+                return gen_chunk
+            _preserve(choices[0]["delta"], gen_chunk.message)
+            return gen_chunk
 else:
     ChatOpenAIWithReasoning = None  # type: ignore
 
@@ -156,13 +191,21 @@ def build_llm(*, model_name: Optional[str] = None, callbacks: Any = None) -> Any
         temperature = 0.01
     timeout = int(os.getenv("TIMEOUT_SECONDS", "120"))
     max_retries = int(os.getenv("MAX_RETRIES", "2"))
-    return ChatOpenAIWithReasoning(
+    kwargs: Dict[str, Any] = dict(
         model=name,
         temperature=temperature,
         timeout=timeout,
         max_retries=max_retries,
         callbacks=callbacks,
     )
+    # Optional: enable reasoning on relays that require it (e.g. OpenRouter).
+    # Moonshot/DeepSeek official APIs emit reasoning_content by default, so
+    # this is only relevant for proxy layers. Unknown providers ignore the
+    # extra_body field (OpenAI-compatible contract).
+    effort = os.getenv("LANGCHAIN_REASONING_EFFORT", "").strip().lower()
+    if effort:
+        kwargs["extra_body"] = {"reasoning": {"effort": effort}}
+    return ChatOpenAIWithReasoning(**kwargs)
 
 
 def _extract_balanced_json(text: str) -> Optional[Dict[str, Any]]:

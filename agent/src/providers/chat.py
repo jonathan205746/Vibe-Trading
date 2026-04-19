@@ -10,6 +10,24 @@ from typing import Any, Dict, List, Optional
 
 from src.providers.llm import build_llm
 
+# Canonical finish_reason markers, in priority order. Used to deduplicate
+# relays (e.g. OpenRouter) that emit finish_reason on every stream chunk,
+# which AIMessageChunk.__add__ concatenates into "stopstop", "tool_callstool_calls", etc.
+_FINISH_REASON_MARKERS: tuple[str, ...] = (
+    "tool_calls",
+    "function_call",
+    "content_filter",
+    "length",
+    "stop",
+)
+
+
+def _normalize_finish_reason(raw: str) -> str:
+    for marker in _FINISH_REASON_MARKERS:
+        if marker in raw:
+            return marker
+    return raw or "stop"
+
 
 @dataclass
 class ToolCallRequest:
@@ -134,32 +152,25 @@ class ChatLLM:
 
     @staticmethod
     def _parse_response(ai_message: Any) -> LLMResponse:
-        """Convert a LangChain AIMessage to ``LLMResponse``.
+        """Convert a LangChain AIMessage (or AIMessageChunk) to ``LLMResponse``.
 
-        Args:
-            ai_message: LangChain AIMessage instance.
-
-        Returns:
-            ``LLMResponse``.
+        Single source of truth for provider-specific reasoning fields:
+        ``ai_message.additional_kwargs["reasoning_content"]``. Populated by
+        ``ChatOpenAIWithReasoning`` for both streaming and non-streaming paths.
         """
-        content = ai_message.content if hasattr(ai_message, "content") else None
-        reasoning_content = (
-            getattr(ai_message, "reasoning_content", None)
-            or getattr(ai_message, "additional_kwargs", {}).get("reasoning_content")
-            or getattr(ai_message, "response_metadata", {}).get("reasoning_content")
-        )
-        raw_calls = getattr(ai_message, "tool_calls", None) or []
-        tool_calls = []
-        for tc in raw_calls:
-            tool_calls.append(ToolCallRequest(
+        tool_calls = [
+            ToolCallRequest(
                 id=tc.get("id", ""),
                 name=tc.get("name", ""),
                 arguments=tc.get("args", {}),
-            ))
-        finish = getattr(ai_message, "response_metadata", {}).get("finish_reason", "stop")
+            )
+            for tc in (ai_message.tool_calls or [])
+        ]
         return LLMResponse(
-            content=content,
+            content=ai_message.content,
             tool_calls=tool_calls,
-            reasoning_content=reasoning_content,
-            finish_reason=finish,
+            reasoning_content=ai_message.additional_kwargs.get("reasoning_content"),
+            finish_reason=_normalize_finish_reason(
+                ai_message.response_metadata.get("finish_reason", "stop")
+            ),
         )

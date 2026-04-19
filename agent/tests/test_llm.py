@@ -174,6 +174,55 @@ class TestMinimaxTemperature:
         assert captured["temperature"] == 0.7
 
 
+class TestReasoningEffortPassthrough:
+    """LANGCHAIN_REASONING_EFFORT is forwarded as extra_body.reasoning.effort
+    to the underlying OpenAI-compatible client. Used for OpenRouter-style
+    relays that require opt-in to enable thinking."""
+
+    def _capture(self, env: dict[str, str]) -> dict:
+        import src.providers.llm as llm_mod
+        llm_mod._dotenv_loaded = True
+
+        captured: dict = {}
+
+        class _FakeChatOpenAI:
+            def __init__(self, **kwargs: object) -> None:
+                captured.update(kwargs)
+
+        with patch.dict(os.environ, env, clear=True):
+            with patch.object(llm_mod, "ChatOpenAIWithReasoning", _FakeChatOpenAI):
+                build_llm()
+        return captured
+
+    def test_effort_unset_omits_extra_body(self) -> None:
+        captured = self._capture({
+            "LANGCHAIN_PROVIDER": "openai",
+            "OPENAI_API_KEY": "sk-test",
+            "LANGCHAIN_MODEL_NAME": "gpt-4",
+        })
+        assert "extra_body" not in captured
+
+    def test_effort_medium_forwarded_as_extra_body(self) -> None:
+        captured = self._capture({
+            "LANGCHAIN_PROVIDER": "openrouter",
+            "OPENROUTER_API_KEY": "or-test",
+            "OPENROUTER_BASE_URL": "https://openrouter.ai/api/v1",
+            "LANGCHAIN_MODEL_NAME": "moonshotai/kimi-k2-thinking",
+            "LANGCHAIN_REASONING_EFFORT": "medium",
+        })
+        assert captured["extra_body"] == {"reasoning": {"effort": "medium"}}
+
+    def test_effort_case_insensitive(self) -> None:
+        captured = self._capture({
+            "LANGCHAIN_PROVIDER": "openrouter",
+            "OPENROUTER_API_KEY": "or-test",
+            "OPENROUTER_BASE_URL": "https://openrouter.ai/api/v1",
+            "LANGCHAIN_MODEL_NAME": "moonshotai/kimi-k2-thinking",
+            "LANGCHAIN_REASONING_EFFORT": "HIGH",
+        })
+        assert captured["extra_body"]["reasoning"]["effort"] == "high"
+
+
 class TestExtractBalancedJson:
     def test_simple_json(self) -> None:
         result = _extract_balanced_json('{"key": "value"}')
