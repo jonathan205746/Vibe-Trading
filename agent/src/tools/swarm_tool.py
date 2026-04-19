@@ -583,6 +583,7 @@ class SwarmTool(BaseTool):
         "required": ["prompt"],
     }
     is_readonly = False
+    repeatable = True  # loop.py dedups by tool name; each prompt is a distinct run (#42)
 
     def execute(self, **kwargs: Any) -> str:
         """Start a swarm run: auto-match preset, extract variables, wait for completion.

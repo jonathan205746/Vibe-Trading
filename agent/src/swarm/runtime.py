@@ -343,10 +343,14 @@ class SwarmRuntime:
         def _event_callback(event: SwarmEvent) -> None:
             self._emit_event(run.id, event)
 
-        with ThreadPoolExecutor(max_workers=self._max_workers) as executor:
-            futures: dict[Future[WorkerResult], str] = {}
-            layer_budget = 0  # seconds — max per-task (retries × timeout) across layer
-
+        # Manual executor lifecycle (not `with`) so KeyboardInterrupt and
+        # the layer deadline don't block main on `shutdown(wait=True)` —
+        # `wait=False + cancel_futures=True` lets pending work drop and
+        # the CLI return immediately. Running workers finish naturally.
+        executor = ThreadPoolExecutor(max_workers=self._max_workers)
+        futures: dict[Future[WorkerResult], str] = {}
+        layer_budget = 0  # seconds — max per-task (retries × timeout) across layer
+        try:
             for tid in layer_task_ids:
                 task = task_store.load_task(tid)
                 agent_spec = agent_map.get(task.agent_id)
@@ -417,6 +421,12 @@ class SwarmRuntime:
                         status="timeout", summary="",
                         error=f"Worker exceeded layer deadline of {layer_deadline}s",
                     )
+        except KeyboardInterrupt:
+            cancel_event.set()
+            logger.warning("Swarm layer interrupted — cancelling pending workers")
+            raise
+        finally:
+            executor.shutdown(wait=False, cancel_futures=True)
 
         return results
 
