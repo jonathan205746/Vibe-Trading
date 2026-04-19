@@ -90,6 +90,11 @@ class TestSkill:
 
 class TestSkillsLoader:
     @pytest.fixture()
+    def empty_user_dir(self, tmp_path_factory: pytest.TempPathFactory) -> Path:
+        """Isolated empty user-skills dir so tests don't pick up real user skills."""
+        return tmp_path_factory.mktemp("user_skills_empty")
+
+    @pytest.fixture()
     def skills_dir(self, tmp_path: Path) -> Path:
         """Create a minimal skills directory with 3 skills in 2 categories."""
         for name, cat, desc in [
@@ -105,53 +110,53 @@ class TestSkillsLoader:
             )
         return tmp_path
 
-    def test_loads_all_skills(self, skills_dir: Path) -> None:
-        loader = SkillsLoader(skills_dir)
+    def test_loads_all_skills(self, skills_dir: Path, empty_user_dir: Path) -> None:
+        loader = SkillsLoader(skills_dir, user_skills_dir=empty_user_dir)
         assert len(loader.skills) == 3
 
-    def test_category_assignment(self, skills_dir: Path) -> None:
-        loader = SkillsLoader(skills_dir)
+    def test_category_assignment(self, skills_dir: Path, empty_user_dir: Path) -> None:
+        loader = SkillsLoader(skills_dir, user_skills_dir=empty_user_dir)
         cats = {s.name: s.category for s in loader.skills}
         assert cats["alpha"] == "strategy"
         assert cats["beta"] == "data-source"
 
-    def test_get_descriptions_grouped(self, skills_dir: Path) -> None:
-        loader = SkillsLoader(skills_dir)
+    def test_get_descriptions_grouped(self, skills_dir: Path, empty_user_dir: Path) -> None:
+        loader = SkillsLoader(skills_dir, user_skills_dir=empty_user_dir)
         desc = loader.get_descriptions()
         # data-source comes before strategy in _CATEGORY_ORDER
         ds_pos = desc.index("data-source")
         st_pos = desc.index("strategy")
         assert ds_pos < st_pos
 
-    def test_get_descriptions_contains_all(self, skills_dir: Path) -> None:
-        loader = SkillsLoader(skills_dir)
+    def test_get_descriptions_contains_all(self, skills_dir: Path, empty_user_dir: Path) -> None:
+        loader = SkillsLoader(skills_dir, user_skills_dir=empty_user_dir)
         desc = loader.get_descriptions()
         assert "alpha" in desc
         assert "beta" in desc
         assert "gamma" in desc
 
-    def test_get_content_existing(self, skills_dir: Path) -> None:
-        loader = SkillsLoader(skills_dir)
+    def test_get_content_existing(self, skills_dir: Path, empty_user_dir: Path) -> None:
+        loader = SkillsLoader(skills_dir, user_skills_dir=empty_user_dir)
         content = loader.get_content("alpha")
         assert '<skill name="alpha">' in content
         assert "Body of alpha" in content
 
-    def test_get_content_missing(self, skills_dir: Path) -> None:
-        loader = SkillsLoader(skills_dir)
+    def test_get_content_missing(self, skills_dir: Path, empty_user_dir: Path) -> None:
+        loader = SkillsLoader(skills_dir, user_skills_dir=empty_user_dir)
         content = loader.get_content("nonexistent")
         assert "Error" in content
         assert "nonexistent" in content
 
-    def test_empty_dir(self, tmp_path: Path) -> None:
-        loader = SkillsLoader(tmp_path)
+    def test_empty_dir(self, tmp_path: Path, empty_user_dir: Path) -> None:
+        loader = SkillsLoader(tmp_path, user_skills_dir=empty_user_dir)
         assert loader.skills == []
         assert loader.get_descriptions() == "(no skills)"
 
-    def test_dir_without_skill_md_skipped(self, tmp_path: Path) -> None:
+    def test_dir_without_skill_md_skipped(self, tmp_path: Path, empty_user_dir: Path) -> None:
         (tmp_path / "empty_skill").mkdir()
-        loader = SkillsLoader(tmp_path)
+        loader = SkillsLoader(tmp_path, user_skills_dir=empty_user_dir)
         assert len(loader.skills) == 0
 
-    def test_nonexistent_dir(self, tmp_path: Path) -> None:
-        loader = SkillsLoader(tmp_path / "nope")
+    def test_nonexistent_dir(self, tmp_path: Path, empty_user_dir: Path) -> None:
+        loader = SkillsLoader(tmp_path / "nope", user_skills_dir=empty_user_dir)
         assert loader.skills == []
