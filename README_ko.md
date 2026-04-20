@@ -51,13 +51,15 @@
 
 ## 📰 뉴스
 
+- **2026-04-21** 🛡️ **워크스페이스 + 문서**: 상대 `run_dir`을 활성 run 디렉토리로 정규화([#43](https://github.com/HKUDS/Vibe-Trading/pull/43)). README 사용 예제 추가([#45](https://github.com/HKUDS/Vibe-Trading/pull/45)).
+- **2026-04-20** 🔌 **추론 모델 + Swarm 수정**: `reasoning_content`을 모든 `ChatOpenAI` 직렬화 경로에서 보존 — Kimi / DeepSeek / Qwen thinking 엔드투엔드 작동([#39](https://github.com/HKUDS/Vibe-Trading/issues/39)). Swarm 스트리밍 + 깔끔한 Ctrl+C 종료([#42](https://github.com/HKUDS/Vibe-Trading/issues/42)).
 - **2026-04-19** 📦 **v0.1.5**: PyPI 및 ClawHub에 게시. `python-multipart` CVE 하한 버전 업데이트, 5개 신규 MCP 도구 연결(`analyze_trade_journal` + 4개 섀도우 계정 도구), `pattern_recognition` → `pattern` 레지스트리 이름 불일치 수정, Docker 의존성 동기화, SKILL 매니페스트 동기화(22개 MCP 도구 / 71개 스킬).
-- **2026-04-18** 👥 **섀도우 계정 Shadow Account**: 증권사 거래 명세서에서 자신의 전략 규칙을 추출 → 여러 시장에서 섀도우 백테스트 실행 → 8개 섹션 HTML/PDF 리포트가 어디에서 얼마를 놓쳤는지(규칙 위반, 조기 익절, 놓친 시그널, 역방향 거래) 정확히 보여줌. 신규 도구 4개, 신규 스킬 1개, 총 32개 도구. Trade Journal / Shadow Account 샘플 프롬프트가 Web UI 웰컴 화면에 추가.
-- **2026-04-17** 📊 **거래 명세서 분석기 + 유니버설 파일 리더**: 증권사 거래 명세서(同花顺/东财/富途/일반 CSV) 업로드 → 거래 프로필(보유 일수, 승률, 손익비, 최대 드로다운) + 4가지 행동 편향 진단(처분 효과, 과잉 거래, 추격 매수, 앵커링) 자동 생성. `read_document`는 이제 PDF, Word, Excel, PowerPoint, 이미지(OCR), 40+ 텍스트 형식을 하나의 호출로 통합 처리.
 
 <details>
 <summary>이전 뉴스</summary>
 
+- **2026-04-18** 👥 **섀도우 계정 Shadow Account**: 증권사 거래 명세서에서 자신의 전략 규칙을 추출 → 여러 시장에서 섀도우 백테스트 실행 → 8개 섹션 HTML/PDF 리포트가 어디에서 얼마를 놓쳤는지(규칙 위반, 조기 익절, 놓친 시그널, 역방향 거래) 정확히 보여줌. 신규 도구 4개, 신규 스킬 1개, 총 32개 도구. Trade Journal / Shadow Account 샘플 프롬프트가 Web UI 웰컴 화면에 추가.
+- **2026-04-17** 📊 **거래 명세서 분석기 + 유니버설 파일 리더**: 증권사 거래 명세서(同花顺/东财/富途/일반 CSV) 업로드 → 거래 프로필(보유 일수, 승률, 손익비, 최대 드로다운) + 4가지 행동 편향 진단(처분 효과, 과잉 거래, 추격 매수, 앵커링) 자동 생성. `read_document`는 이제 PDF, Word, Excel, PowerPoint, 이미지(OCR), 40+ 텍스트 형식을 하나의 호출로 통합 처리.
 - **2026-04-16** 🧠 **에이전트 하네스**: 크로스세션 영구 메모리, FTS5 세션 검색, 자가 진화 스킬(전체 CRUD), 5계층 컨텍스트 압축, 읽기/쓰기 도구 배치 처리. 27개 도구, 107개 신규 테스트.
 - **2026-04-15** 🤖 **Z.ai + MiniMax**: Z.ai 제공자 추가([#35](https://github.com/HKUDS/Vibe-Trading/pull/35)), MiniMax temperature 수정 + 모델 업데이트([#33](https://github.com/HKUDS/Vibe-Trading/pull/33)). 13개 제공자.
 - **2026-04-14** 🔧 **MCP 안정성**: 백테스트 도구의 stdio 전송에서 `Connection closed` 오류 수정([#32](https://github.com/HKUDS/Vibe-Trading/pull/32)).

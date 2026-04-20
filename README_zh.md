@@ -51,13 +51,15 @@
 
 ## 📰 新闻
 
+- **2026-04-21** 🛡️ **工作区与文档**：相对路径 `run_dir` 归一化到当前 run 目录（[#43](https://github.com/HKUDS/Vibe-Trading/pull/43)）。README 加入使用示例（[#45](https://github.com/HKUDS/Vibe-Trading/pull/45)）。
+- **2026-04-20** 🔌 **推理模型与 Swarm 修复**：`reasoning_content` 在所有 `ChatOpenAI` 序列化路径上保留 —— Kimi / DeepSeek / Qwen thinking 端到端可用（[#39](https://github.com/HKUDS/Vibe-Trading/issues/39)）。Swarm 切流式调用 + 干净的 Ctrl+C 退出（[#42](https://github.com/HKUDS/Vibe-Trading/issues/42)）。
 - **2026-04-19** 📦 **v0.1.5**：发布至 PyPI 与 ClawHub。`python-multipart` CVE 版本下限升级，5 个新 MCP 工具接入（`analyze_trade_journal` + 4 个影子账户工具），修复 `pattern_recognition` → `pattern` 工具注册名不一致，Docker 依赖对齐，SKILL 清单同步（22 MCP 工具 / 71 技能）。
-- **2026-04-18** 👥 **影子账户 Shadow Account**：从券商交割单提取你自己的策略规则 → 跨市场回测这个"影子" → 8 节 HTML/PDF 报告精确告诉你每一块钱是怎么错过的（规则违反、过早止盈、漏掉信号、反向操作）。4 个新工具、1 个新技能、共 32 工具。Trade Journal / Shadow Account 例句已进 Web UI 欢迎屏。
-- **2026-04-17** 📊 **交割单分析器 + 通用文件阅读器**：上传券商交割单（同花顺/东财/富途/通用 CSV）→ 自动生成交易画像（持仓天数、胜率、盈亏比、最大回撤）+ 4 项行为偏差诊断（处置效应、过度交易、追涨杀跌、锚定效应）。`read_document` 现统一分发 PDF、Word、Excel、PowerPoint、图片（OCR）及 40+ 文本格式，一个调用走全部类型。
 
 <details>
 <summary>更早的新闻</summary>
 
+- **2026-04-18** 👥 **影子账户 Shadow Account**：从券商交割单提取你自己的策略规则 → 跨市场回测这个"影子" → 8 节 HTML/PDF 报告精确告诉你每一块钱是怎么错过的（规则违反、过早止盈、漏掉信号、反向操作）。4 个新工具、1 个新技能、共 32 工具。Trade Journal / Shadow Account 例句已进 Web UI 欢迎屏。
+- **2026-04-17** 📊 **交割单分析器 + 通用文件阅读器**：上传券商交割单（同花顺/东财/富途/通用 CSV）→ 自动生成交易画像（持仓天数、胜率、盈亏比、最大回撤）+ 4 项行为偏差诊断（处置效应、过度交易、追涨杀跌、锚定效应）。`read_document` 现统一分发 PDF、Word、Excel、PowerPoint、图片（OCR）及 40+ 文本格式，一个调用走全部类型。
 - **2026-04-16** 🧠 **Agent Harness**：跨会话持久记忆、FTS5 会话搜索、自进化技能（完整 CRUD）、5 层上下文压缩、读写工具批处理。27 工具，107 新测试。
 - **2026-04-15** 🤖 **Z.ai + MiniMax**：新增 Z.ai 提供商（[#35](https://github.com/HKUDS/Vibe-Trading/pull/35)），修复 MiniMax temperature 及模型更新（[#33](https://github.com/HKUDS/Vibe-Trading/pull/33)）。共 13 家提供商。
 - **2026-04-14** 🔧 **MCP 稳定性**：修复回测工具在 stdio 传输中的 `Connection closed` 错误（[#32](https://github.com/HKUDS/Vibe-Trading/pull/32)）。

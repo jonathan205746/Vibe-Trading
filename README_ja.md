@@ -51,13 +51,15 @@
 
 ## 📰 ニュース
 
+- **2026-04-21** 🛡️ **ワークスペース + ドキュメント**: 相対 `run_dir` をアクティブな run ディレクトリに正規化（[#43](https://github.com/HKUDS/Vibe-Trading/pull/43)）。README に使用例を追加（[#45](https://github.com/HKUDS/Vibe-Trading/pull/45)）。
+- **2026-04-20** 🔌 **推論モデル + Swarm 修正**: `reasoning_content` を `ChatOpenAI` の全シリアライズパスで保持 — Kimi / DeepSeek / Qwen thinking がエンドツーエンドで動作（[#39](https://github.com/HKUDS/Vibe-Trading/issues/39)）。Swarm をストリーミング化 + Ctrl+C のクリーン終了（[#42](https://github.com/HKUDS/Vibe-Trading/issues/42)）。
 - **2026-04-19** 📦 **v0.1.5**: PyPI と ClawHub に公開。`python-multipart` CVE 下限バンプ、新規 MCP ツール5つ接続（`analyze_trade_journal` + シャドウアカウント系4つ）、`pattern_recognition` → `pattern` レジストリ名の不一致を修正、Docker 依存を本体に合わせる、SKILL マニフェスト同期（22 MCP ツール / 71 スキル）。
-- **2026-04-18** 👥 **シャドウアカウント Shadow Account**: ブローカーの取引明細から自分の戦略ルールを抽出 → マーケット横断でシャドウをバックテスト → 8セクションのHTML/PDFレポートが、どこでいくら取りこぼしたか（ルール違反・早すぎる利確・見逃したシグナル・逆張り）を正確に可視化。新規ツール4つ、新スキル1つ、合計32ツール。Trade Journal / Shadow Accountのサンプル例文がWeb UIウェルカム画面に追加。
-- **2026-04-17** 📊 **取引明細アナライザー + ユニバーサルファイルリーダー**: ブローカーの取引明細（同花順/東方財富/富途/汎用CSV）をアップロード → 取引プロフィール（保有日数、勝率、損益比、最大ドローダウン）+ 4つの行動バイアス診断（処分効果、過剰取引、追随買い、アンカリング）を自動生成。`read_document`はPDF、Word、Excel、PowerPoint、画像（OCR）、40+テキスト形式を1回の呼び出しで統一処理。
 
 <details>
 <summary>過去のニュース</summary>
 
+- **2026-04-18** 👥 **シャドウアカウント Shadow Account**: ブローカーの取引明細から自分の戦略ルールを抽出 → マーケット横断でシャドウをバックテスト → 8セクションのHTML/PDFレポートが、どこでいくら取りこぼしたか（ルール違反・早すぎる利確・見逃したシグナル・逆張り）を正確に可視化。新規ツール4つ、新スキル1つ、合計32ツール。Trade Journal / Shadow Accountのサンプル例文がWeb UIウェルカム画面に追加。
+- **2026-04-17** 📊 **取引明細アナライザー + ユニバーサルファイルリーダー**: ブローカーの取引明細（同花順/東方財富/富途/汎用CSV）をアップロード → 取引プロフィール（保有日数、勝率、損益比、最大ドローダウン）+ 4つの行動バイアス診断（処分効果、過剰取引、追随買い、アンカリング）を自動生成。`read_document`はPDF、Word、Excel、PowerPoint、画像（OCR）、40+テキスト形式を1回の呼び出しで統一処理。
 - **2026-04-16** 🧠 **エージェントハーネス**: クロスセッション永続メモリ、FTS5セッション検索、自己進化スキル（完全CRUD）、5層コンテキスト圧縮、読み書きツールバッチ処理。27ツール、107新テスト。
 - **2026-04-15** 🤖 **Z.ai + MiniMax**: Z.aiプロバイダー追加（[#35](https://github.com/HKUDS/Vibe-Trading/pull/35)）、MiniMax temperature修正+モデル更新（[#33](https://github.com/HKUDS/Vibe-Trading/pull/33)）。13プロバイダー対応。
 - **2026-04-14** 🔧 **MCP安定性**: バックテストツールのstdioトランスポートにおける`Connection closed`エラーを修正（[#32](https://github.com/HKUDS/Vibe-Trading/pull/32)）。
