@@ -38,7 +38,6 @@ from rich.panel import Panel
 from rich.prompt import Confirm, IntPrompt, Prompt
 from rich.syntax import Syntax
 from rich.table import Table
-from rich.box import box
 
 console = Console()
 AGENT_DIR = Path(__file__).resolve().parent
