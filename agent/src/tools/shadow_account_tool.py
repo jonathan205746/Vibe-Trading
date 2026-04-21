@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from src.agent.tools import BaseTool
+from src.tools.path_utils import safe_user_path
 from src.shadow_account import (
     extract_shadow_profile,
     load_profile,
@@ -36,6 +37,18 @@ def _err(message: str, **extra: Any) -> str:
 
 def _ok(**payload: Any) -> str:
     return json.dumps({"status": "ok", **payload}, ensure_ascii=False, default=str)
+
+
+def _validate_optional_journal_path(raw: Any) -> str | None:
+    """Validate a journal_path kwarg that may be missing/empty.
+
+    Returns the resolved path string, or None when the caller didn't pass
+    one. Raises ValueError (already the contract of `safe_user_path`) when
+    the path escapes the user envelope.
+    """
+    if not raw:
+        return None
+    return str(safe_user_path(raw))
 
 
 # ---------------- Tool 1: extract ----------------
@@ -77,6 +90,10 @@ class ExtractShadowStrategyTool(BaseTool):
         journal_path = kwargs.get("journal_path")
         if not journal_path:
             return _err("journal_path is required")
+        try:
+            journal_path = str(safe_user_path(journal_path))
+        except ValueError as exc:
+            return _err(str(exc))
         try:
             profile = extract_shadow_profile(
                 journal_path,
@@ -163,12 +180,16 @@ class RunShadowBacktestTool(BaseTool):
         markets = tuple(kwargs.get("markets") or ("china_a", "hk", "us", "crypto"))
 
         try:
+            journal_path = _validate_optional_journal_path(kwargs.get("journal_path"))
+        except ValueError as exc:
+            return _err(str(exc))
+        try:
             result = run_shadow_backtest(
                 profile,
                 window_start=window_start,
                 window_end=window_end,
                 markets=markets,
-                journal_path=kwargs.get("journal_path"),
+                journal_path=journal_path,
             )
         except ValueError as exc:
             return _err(str(exc))
@@ -223,6 +244,11 @@ class RenderShadowReportTool(BaseTool):
         except FileNotFoundError as exc:
             return _err(str(exc))
 
+        try:
+            journal_path = _validate_optional_journal_path(kwargs.get("journal_path"))
+        except ValueError as exc:
+            return _err(str(exc))
+
         result = load_cached_result(profile.shadow_id)
         if result is None:
             today = date.today()
@@ -233,7 +259,7 @@ class RenderShadowReportTool(BaseTool):
                     profile,
                     window_start=window_start,
                     window_end=window_end,
-                    journal_path=kwargs.get("journal_path"),
+                    journal_path=journal_path,
                 )
             except Exception as exc:  # pragma: no cover — defensive
                 logger.warning("backtest failed during report render: %s", exc)

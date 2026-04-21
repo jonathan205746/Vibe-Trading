@@ -20,6 +20,7 @@ from typing import Any
 import pandas as pd
 
 from src.agent.tools import BaseTool
+from src.tools.path_utils import safe_user_path
 from src.tools.trade_journal_parsers import (
     TradeRecord,
     parse_file,
@@ -406,7 +407,10 @@ def analyze_trade_journal(file_path: str, analysis_type: str = "full", filter_ex
         JSON string. Keys: status, file, format_detected, total_records,
         date_range, market, profile / behavior (when applicable).
     """
-    path = Path(file_path)
+    try:
+        path = safe_user_path(file_path)
+    except ValueError as exc:
+        return json.dumps({"status": "error", "error": str(exc)}, ensure_ascii=False)
     if not path.exists():
         return json.dumps({"status": "error", "error": f"File not found: {file_path}"}, ensure_ascii=False)
     if path.suffix.lower() not in _ALLOWED_EXT:
