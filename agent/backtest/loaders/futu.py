@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 from typing import Dict, List, Optional
 
@@ -9,6 +10,8 @@ import pandas as pd
 
 from backtest.loaders.base import NoAvailableSourceError, validate_date_range
 from backtest.loaders.registry import register
+
+logger = logging.getLogger(__name__)
 
 _OHLCV_COLUMNS = ["open", "high", "low", "close", "volume"]
 
@@ -151,7 +154,7 @@ class FutuLoader:
                     max_count=10_000,
                 )
                 if ret != futu.RET_OK:
-                    print(f"[WARN] Futu returned error for {futu_code}: {data}")
+                    logger.warning("Futu returned error for %s: %s", futu_code, data)
                     continue
                 results[code] = _normalize_frame(data)
         finally:
