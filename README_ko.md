@@ -658,6 +658,12 @@ MIT License — [LICENSE](LICENSE) 참조
 
 ---
 
+## 스타 히스토리
+
+[![Star History Chart](https://api.star-history.com/svg?repos=HKUDS/Vibe-Trading&type=Date)](https://star-history.com/#HKUDS/Vibe-Trading&Date)
+
+---
+
 <p align="center">
   방문해 주셔서 감사합니다 <b>Vibe-Trading</b> ✨
 </p>

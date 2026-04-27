@@ -730,6 +730,12 @@ MIT License — see [LICENSE](LICENSE)
 
 ---
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=HKUDS/Vibe-Trading&type=Date)](https://star-history.com/#HKUDS/Vibe-Trading&Date)
+
+---
+
 <p align="center">
   Thanks for visiting <b>Vibe-Trading</b> ✨
 </p>

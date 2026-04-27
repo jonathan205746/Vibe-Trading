@@ -657,6 +657,12 @@ MIT License — [LICENSE](LICENSE)を参照
 
 ---
 
+## スター履歴
+
+[![Star History Chart](https://api.star-history.com/svg?repos=HKUDS/Vibe-Trading&type=Date)](https://star-history.com/#HKUDS/Vibe-Trading&Date)
+
+---
+
 <p align="center">
   <b>Vibe-Trading</b>への訪問に感謝 ✨
 </p>
