@@ -85,8 +85,8 @@ export function CorrelationMatrix({ labels, matrix, height = 500 }: Props) {
             fontSize: 10,
             color: t.textColor,
             formatter: (params: unknown) => {
-              const p = params as { value: number };
-              return p.value.toFixed(2);
+              const p = params as { value: [number, number, number] };
+              return p.value[2].toFixed(2);
             },
           },
           emphasis: {

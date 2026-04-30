@@ -19,11 +19,15 @@ def infer_market(code: str) -> str:
     crypto_suffixes = ("USDT", "BTC", "ETH", "BNB", "SOL", "ADA", "DOGE")
     if any(code_upper.endswith(s) for s in crypto_suffixes) or "/" in code:
         return "crypto"
+    # Check .HK suffix FIRST so leading-zero tickers like 0700.HK / 0005.HK
+    # are correctly classified before the A-share prefix checks
+    if code_upper.endswith(".HK"):
+        return "hk_equity"
     if code_upper.startswith(("6", "000", "001", "002")):
         return "a_share"
     if code_upper.startswith(("0", "399")):
         return "a_share"
-    if code_upper.endswith(".HK") or code_upper.startswith(("0", "1", "2", "3", "4")):
+    if code_upper.startswith(("0", "1", "2", "3", "4")):
         return "hk_equity"
     return "us_equity"
 
@@ -74,6 +78,10 @@ def _rolling_correlation_matrix(
     aligned = pd.concat(returns_frames, axis=1).dropna()
     if aligned.empty:
         raise ValueError("No overlapping return data between assets")
+
+    # Apply the trailing window — only use the last `window` rows of aligned data
+    if len(aligned) > window:
+        aligned = aligned.iloc[-window:]
 
     n = len(aligned)
     if n < 2:

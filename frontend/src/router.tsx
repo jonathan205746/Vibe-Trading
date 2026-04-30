@@ -16,7 +16,6 @@ const Settings = lazy(() =>
 const Correlation = lazy(() =>
   import("@/pages/Correlation").then((m) => ({ default: m.Correlation })),
 );
-);
 
 function PageLoader() {
   return (
