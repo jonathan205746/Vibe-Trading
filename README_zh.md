@@ -51,13 +51,14 @@
 
 ## 📰 新闻
 
+- **2026-05-01** 🔥 **相关性热力图 + OpenAI Codex OAuth + A 股 pre-ST 过滤器**：新增相关性仪表盘/API，可计算滚动收益相关性，并用 ECharts 热力图展示组合与标的相关结构（[#64](https://github.com/HKUDS/Vibe-Trading/pull/64)）。OpenAI Codex provider 现支持通过 `vibe-trading provider login openai-codex` 使用 ChatGPT OAuth，并补齐 Settings 元数据与适配器回归测试（[#65](https://github.com/HKUDS/Vibe-Trading/pull/65)）。新增并加固 `ashare-pre-st-filter` 技能，用于 A 股 ST/*ST 风险筛查；Sina 处罚公告相关性过滤会避免证券账户名单提及误计入 E2 频次（[#63](https://github.com/HKUDS/Vibe-Trading/pull/63)）。
 - **2026-04-30** ⚙️ **Web UI 设置页 + validation CLI 加固**：新增 Settings 页面，可在本地配置 LLM provider/model、Base URL、reasoning effort 以及数据源凭据；对应 settings API 已加本地/鉴权保护，并把 provider 元数据改为数据驱动配置（[#57](https://github.com/HKUDS/Vibe-Trading/pull/57)）。同时加固 `python -m backtest.validation <run_dir>`：缺参、空路径、非法路径、不存在路径、非目录路径都会在验证开始前给出明确错误（[#60](https://github.com/HKUDS/Vibe-Trading/pull/60)）。
 - **2026-04-28** 🚀 **v0.1.6 发布**（`pip install -U vibe-trading-ai`）：修复 `pip install` / `uv tool install` 安装后 `vibe-trading --swarm-presets` 返回空的问题（[#55](https://github.com/HKUDS/Vibe-Trading/issues/55)）—— 预设 YAML 现已打包进 `src.swarm` 包内，配套 6 个回归测试。同时 AKShare 加载器正确路由 ETF（`510300.SH`）和外汇（`USDCNH`）到对应端点，并加固注册表回退链。汇总自 v0.1.5 以来全部更新：基准对比面板、`/upload` 流式上传 + 大小限制、富途数据源（港股/A 股）、vnpy 导出技能、安全加固、前端懒加载（688KB → 262KB）。
-- **2026-04-27** 📊 **基准对比面板 + 上传安全**：回测输出新增基准对比面板（标的 / 基准收益 / 超额收益 / 信息比率），通过 yfinance 解析 SPY、沪深 300 等基准（[#48](https://github.com/HKUDS/Vibe-Trading/issues/48)）。同时 `/upload` 端点改为 1MB 分块流式落盘，超过 `MAX_UPLOAD_SIZE` 立即中断并清理半截文件，让 50MB 上限在恶意/超大请求下真正生效（[#53](https://github.com/HKUDS/Vibe-Trading/pull/53)）—— 配套 4 个回归测试。
 
 <details>
 <summary>更早的新闻</summary>
 
+- **2026-04-27** 📊 **基准对比面板 + 上传安全**：回测输出新增基准对比面板（标的 / 基准收益 / 超额收益 / 信息比率），通过 yfinance 解析 SPY、沪深 300 等基准（[#48](https://github.com/HKUDS/Vibe-Trading/issues/48)）。同时 `/upload` 端点改为 1MB 分块流式落盘，超过 `MAX_UPLOAD_SIZE` 立即中断并清理半截文件，让 50MB 上限在恶意/超大请求下真正生效（[#53](https://github.com/HKUDS/Vibe-Trading/pull/53)）—— 配套 4 个回归测试。
 - **2026-04-22** 🛡️ **加固 + 新接入**：`safe_path` 强制路径包含校验 + 交割单/影子账户工具沙箱化，新增 `MANIFEST.in` 让 sdist 打包 `.env.example` / 测试 / Docker 文件，前端按路由懒加载把首屏包从 688KB 压到 262KB。同时新增富途港股/A 股数据加载器（[#47](https://github.com/HKUDS/Vibe-Trading/pull/47)）和 vnpy CtaTemplate 导出技能（[#46](https://github.com/HKUDS/Vibe-Trading/pull/46)）。
 - **2026-04-21** 🛡️ **工作区与文档**：相对路径 `run_dir` 归一化到当前 run 目录（[#43](https://github.com/HKUDS/Vibe-Trading/pull/43)）。README 加入使用示例（[#45](https://github.com/HKUDS/Vibe-Trading/pull/45)）。
 - **2026-04-20** 🔌 **推理模型与 Swarm 修复**：`reasoning_content` 在所有 `ChatOpenAI` 序列化路径上保留 —— Kimi / DeepSeek / Qwen thinking 端到端可用（[#39](https://github.com/HKUDS/Vibe-Trading/issues/39)）。Swarm 切流式调用 + 干净的 Ctrl+C 退出（[#42](https://github.com/HKUDS/Vibe-Trading/issues/42)）。

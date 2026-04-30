@@ -51,13 +51,14 @@
 
 ## 📰 뉴스
 
+- **2026-05-01** 🔥 **상관관계 히트맵 + OpenAI Codex OAuth + A주 pre-ST 필터**: 새 상관관계 대시보드/API가 롤링 수익률 상관관계를 계산하고, 포트폴리오 및 종목 분석용 ECharts 히트맵으로 렌더링합니다([#64](https://github.com/HKUDS/Vibe-Trading/pull/64)). OpenAI Codex provider는 이제 `vibe-trading provider login openai-codex`로 ChatGPT OAuth를 사용할 수 있으며, Settings 메타데이터와 어댑터 회귀 테스트도 추가되었습니다([#65](https://github.com/HKUDS/Vibe-Trading/pull/65)). A주 ST/*ST 리스크 스크리닝을 위한 `ashare-pre-st-filter` 스킬을 추가하고 강화했으며, Sina 제재 공시 관련성 필터링으로 증권 계좌 목록 언급이 E2 횟수를 부풀리지 않도록 했습니다([#63](https://github.com/HKUDS/Vibe-Trading/pull/63)).
 - **2026-04-30** ⚙️ **Web UI 설정 + validation CLI 강화**: LLM provider/model, Base URL, reasoning effort, 데이터 소스 자격 증명을 로컬에서 설정할 수 있는 Settings 페이지를 추가했습니다. settings API는 local/auth로 보호되며 provider 메타데이터도 데이터 기반 설정으로 분리되었습니다([#57](https://github.com/HKUDS/Vibe-Trading/pull/57)). 또한 `python -m backtest.validation <run_dir>`가 인자 없음, 빈 경로, 잘못된 경로, 존재하지 않는 경로, 디렉터리가 아닌 경로를 검증 시작 전에 명확한 메시지로 실패하도록 강화했습니다([#60](https://github.com/HKUDS/Vibe-Trading/pull/60)).
 - **2026-04-28** 🚀 **v0.1.6 릴리스**（`pip install -U vibe-trading-ai`）: `pip install` / `uv tool install` 설치 후 `vibe-trading --swarm-presets`가 비어 있는 문제 수정([#55](https://github.com/HKUDS/Vibe-Trading/issues/55)) — 프리셋 YAML을 `src.swarm` 패키지 내부에 번들링, 6개 회귀 테스트로 고정. 또한 AKShare 로더가 ETF(`510300.SH`)와 외환(`USDCNH`)을 올바른 엔드포인트로 라우팅하고 레지스트리 폴백 강화. v0.1.5 이후 업데이트 종합: 벤치마크 비교 패널, `/upload` 스트리밍 + 크기 제한, Futu 로더(HK + A주), vnpy 내보내기 스킬, 보안 강화, 프론트엔드 지연 로딩(688KB → 262KB).
-- **2026-04-27** 📊 **벤치마크 비교 패널 + 업로드 안전성**: 백테스트 출력에 벤치마크 비교 패널(티커 / 벤치마크 수익률 / 초과 수익률 / 정보 비율) 추가, yfinance로 SPY · CSI 300 등 자동 해석([#48](https://github.com/HKUDS/Vibe-Trading/issues/48)). 또한 `/upload` 엔드포인트를 1MB 청크 스트리밍으로 전환, `MAX_UPLOAD_SIZE` 초과 시 즉시 중단 + 부분 파일 정리. 50MB 상한이 악성/초대형 요청에도 실효화([#53](https://github.com/HKUDS/Vibe-Trading/pull/53)) — 4개 회귀 테스트로 고정.
 
 <details>
 <summary>이전 뉴스</summary>
 
+- **2026-04-27** 📊 **벤치마크 비교 패널 + 업로드 안전성**: 백테스트 출력에 벤치마크 비교 패널(티커 / 벤치마크 수익률 / 초과 수익률 / 정보 비율) 추가, yfinance로 SPY · CSI 300 등 자동 해석([#48](https://github.com/HKUDS/Vibe-Trading/issues/48)). 또한 `/upload` 엔드포인트를 1MB 청크 스트리밍으로 전환, `MAX_UPLOAD_SIZE` 초과 시 즉시 중단 + 부분 파일 정리. 50MB 상한이 악성/초대형 요청에도 실효화([#53](https://github.com/HKUDS/Vibe-Trading/pull/53)) — 4개 회귀 테스트로 고정.
 - **2026-04-22** 🛡️ **하드닝 + 신규 연동**: `safe_path`에 경로 컨테인먼트 강제 + 거래 명세서/섀도우 계정 도구 샌드박스화, `MANIFEST.in` 추가로 sdist에 `.env.example` / 테스트 / Docker 파일 포함, 프론트엔드 라우트 단위 지연 로딩으로 초기 번들 688KB → 262KB. 또한 Futu 홍콩/A주 데이터 로더([#47](https://github.com/HKUDS/Vibe-Trading/pull/47))와 vnpy CtaTemplate 내보내기 스킬([#46](https://github.com/HKUDS/Vibe-Trading/pull/46)) 추가.
 - **2026-04-21** 🛡️ **워크스페이스 + 문서**: 상대 `run_dir`을 활성 run 디렉토리로 정규화([#43](https://github.com/HKUDS/Vibe-Trading/pull/43)). README 사용 예제 추가([#45](https://github.com/HKUDS/Vibe-Trading/pull/45)).
 - **2026-04-20** 🔌 **추론 모델 + Swarm 수정**: `reasoning_content`을 모든 `ChatOpenAI` 직렬화 경로에서 보존 — Kimi / DeepSeek / Qwen thinking 엔드투엔드 작동([#39](https://github.com/HKUDS/Vibe-Trading/issues/39)). Swarm 스트리밍 + 깔끔한 Ctrl+C 종료([#42](https://github.com/HKUDS/Vibe-Trading/issues/42)).
