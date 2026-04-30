@@ -72,7 +72,7 @@ SUBJECT_KEYWORDS = [
         "控股股东", "实际控制人", "实控人", "原实际控制人", "原实控人",
         "持股5%以上", "持股 5%以上", "5%以上股东", "5%以上的股东",
         "第一大股东", "二股东", "大股东", "股东减持",
-        "原股东", "前股东", "一致行动人",
+        "股东收到", "股东因", "原股东", "前股东", "一致行动人",
     ]),
     ("officer", [
         "董事长", "副董事长", "总经理", "副总经理", "总裁",
@@ -84,6 +84,17 @@ SUBJECT_KEYWORDS = [
 ]
 
 DATE_RE = re.compile(r"公告日期[:：]\s*(\d{4}-\d{1,2}-\d{1,2})")
+
+SECURITY_MENTION_ONLY_KEYWORDS = [
+    "证券从业",
+    "证券账户",
+    "控制使用",
+    "持有并交易",
+    "交易股票",
+    "买入",
+    "卖出",
+    "账户交易",
+]
 
 
 def _norm_text(text: str) -> str:
@@ -149,6 +160,85 @@ def _normalize_subject(text: str) -> str:
             if _norm_text(kw) in norm:
                 return label
     return "company"
+
+
+def _build_target_aliases(stock_name: str | None, aliases: list[str] | None = None) -> list[str]:
+    """Build normalized target-name aliases for relevance checks.
+
+    Args:
+        stock_name: Official short name from ``stock_basic.name``.
+        aliases: Extra caller-provided aliases.
+
+    Returns:
+        Deduplicated normalized aliases.
+    """
+    candidates = [stock_name or "", *(aliases or [])]
+    out: list[str] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        norm = _norm_text(candidate)
+        if not norm or norm in seen:
+            continue
+        seen.add(norm)
+        out.append(norm)
+    return out
+
+
+def _contains_any_alias(text: str, aliases: list[str]) -> bool:
+    norm = _norm_text(text)
+    return bool(norm and any(alias in norm for alias in aliases))
+
+
+def _classify_target_relevance(
+    record: dict[str, Any],
+    target_aliases: list[str],
+) -> tuple[str, bool, str]:
+    """Classify whether a Sina penalty record is countable for this stock.
+
+    Args:
+        record: Parsed penalty record.
+        target_aliases: Normalized stock-name aliases.
+
+    Returns:
+        ``(target_relevance, e2_countable, relevance_reason)``.
+    """
+    if not target_aliases:
+        return "unknown", True, "stock_name_not_provided"
+
+    title = str(record.get("title") or "")
+    reason = str(record.get("reason") or "")
+    content = str(record.get("content") or "")
+    combined = " ".join([title, reason, content])
+    if not _contains_any_alias(combined, target_aliases):
+        return "unknown", False, "target_alias_not_found"
+
+    title_hits_target = _contains_any_alias(title, target_aliases)
+    subject = str(record.get("subject_normalized") or "company")
+    looks_like_security_mention = any(
+        _norm_text(keyword) in _norm_text(combined)
+        for keyword in SECURITY_MENTION_ONLY_KEYWORDS
+    )
+
+    if not title_hits_target and looks_like_security_mention:
+        return "security_mention_only", False, "target_only_appears_in_security_trade_list"
+    if subject in {"shareholder", "officer"}:
+        return "related_party", True, f"target_named_with_{subject}"
+    return "issuer_company", True, "target_named_as_company_record"
+
+
+def _annotate_relevance(
+    records: list[dict[str, Any]],
+    target_aliases: list[str],
+) -> list[dict[str, Any]]:
+    """Add target relevance fields used by E2 frequency counting."""
+    for rec in records:
+        relevance, countable, reason = _classify_target_relevance(rec, target_aliases)
+        rec["target_relevance"] = relevance
+        rec["e2_countable"] = countable
+        rec["relevance_reason"] = reason
+        if relevance == "security_mention_only" and rec.get("subject_normalized") == "company":
+            rec["subject_normalized"] = "unknown"
+    return records
 
 
 def _http_get_gbk(url: str, *, timeout: int = DEFAULT_TIMEOUT) -> str:
@@ -420,6 +510,8 @@ def fetch_penalty_list(
     *,
     start_date: str | None = None,
     end_date: str | None = None,
+    stock_name: str | None = None,
+    aliases: list[str] | None = None,
     timeout: int = DEFAULT_TIMEOUT,
 ) -> dict[str, Any]:
     code6 = _validate_stockid(ts_code)
@@ -444,13 +536,15 @@ def fetch_penalty_list(
             "error": f"parse_failed: {exc}",
             "records": [],
         }
-    filtered = _apply_date_filter(records, start_date, end_date)
+    target_aliases = _build_target_aliases(stock_name, aliases)
+    filtered = _apply_date_filter(_annotate_relevance(records, target_aliases), start_date, end_date)
     for rec in filtered:
         rec["source_url"] = url
     return {
         "source": "sina",
         "ts_code": ts_code,
         "url": url,
+        "target_aliases": target_aliases,
         "start_date": start_date,
         "end_date": end_date,
         "total_in_page": len(records),
@@ -475,6 +569,13 @@ def _normalize_date_arg(s: str | None) -> str | None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ts-code", required=True, help="例如 600000.SH / 000001.SZ / 688001")
+    parser.add_argument("--stock-name", default=None, help="股票简称，例如 闻泰科技；用于过滤误召处罚记录")
+    parser.add_argument(
+        "--alias",
+        action="append",
+        default=[],
+        help="额外目标别名；可重复传入",
+    )
     parser.add_argument("--start-date", default=None, help="YYYY-MM-DD，含端点")
     parser.add_argument("--end-date", default=None, help="YYYY-MM-DD，含端点")
     parser.add_argument(
@@ -502,6 +603,8 @@ def main(argv: list[str] | None = None) -> int:
             args.ts_code,
             start_date=start_date,
             end_date=end_date,
+            stock_name=args.stock_name,
+            aliases=args.alias,
             timeout=args.timeout,
         )
     except ValueError as exc:

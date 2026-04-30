@@ -77,6 +77,7 @@ class TestNormalizeSubject:
             ("证券事务代表信息披露违规", "officer"),
             ("一致行动人未及时披露权益变动", "shareholder"),
             ("5%以上股东减持未预披露", "shareholder"),
+            ("关于股东收到行政处罚决定书的公告", "shareholder"),
             ("聘任的高级管理人员违规交易", "officer"),
             ("", "company"),
         ],
@@ -276,6 +277,82 @@ class TestFetchPenaltyListFallback:
         assert result["source"] == "unavailable"
         assert "http_failed" in result["error"]
         assert "disallowed host" in result["error"]
+
+
+# ---------------------------------------------------------------------------
+# target_relevance —— 防止“交易股票列表提到目标股”误计入 E2
+# ---------------------------------------------------------------------------
+
+class TestTargetRelevance:
+    def test_build_target_aliases_normalizes_and_dedupes(self, fsp):
+        aliases = fsp._build_target_aliases("闻 泰 科 技", ["闻泰科技", "WINGTECH"])
+        assert aliases == ["闻泰科技", "WINGTECH"]
+
+    def test_company_record_is_countable(self, fsp):
+        rec = {
+            "title": "关于对闻泰科技股份有限公司采取出具警示函措施的决定",
+            "reason": "信息披露违规",
+            "content": "责令改正",
+            "subject_normalized": "company",
+        }
+        relevance, countable, reason = fsp._classify_target_relevance(rec, ["闻泰科技"])
+        assert relevance == "issuer_company"
+        assert countable is True
+        assert reason == "target_named_as_company_record"
+
+    def test_related_party_record_is_countable(self, fsp):
+        rec = {
+            "title": "闻泰科技:关于股东收到《行政处罚决定书》的公告",
+            "reason": "控股股东未如实报告一致行动关系",
+            "content": "给予警告",
+            "subject_normalized": "shareholder",
+        }
+        relevance, countable, _ = fsp._classify_target_relevance(rec, ["闻泰科技"])
+        assert relevance == "related_party"
+        assert countable is True
+
+    def test_security_trade_list_mention_is_not_countable(self, fsp):
+        rec = {
+            "title": "中国证券监督管理委员会湖南监管局行政处罚决定书〔2024〕7号(郭雪)",
+            "reason": (
+                "郭雪作为证券从业人员控制使用他人证券账户，"
+                "持有并交易“紫光国微、闻泰科技、音飞储存”等股票。"
+            ),
+            "content": "对郭雪处以2万元罚款",
+            "subject_normalized": "company",
+        }
+        annotated = fsp._annotate_relevance([rec], ["闻泰科技"])[0]
+        assert annotated["target_relevance"] == "security_mention_only"
+        assert annotated["e2_countable"] is False
+        assert annotated["subject_normalized"] == "unknown"
+
+    def test_alias_missing_is_not_countable_when_stock_name_provided(self, fsp):
+        rec = {
+            "title": "关于对其他公司的警示函",
+            "reason": "未及时披露",
+            "content": "责令改正",
+            "subject_normalized": "company",
+        }
+        relevance, countable, reason = fsp._classify_target_relevance(rec, ["闻泰科技"])
+        assert relevance == "unknown"
+        assert countable is False
+        assert reason == "target_alias_not_found"
+
+    def test_fetch_annotates_relevance_with_stock_name(self, fsp, monkeypatch):
+        html = """
+        <table id="collectFund_1">
+          <thead><tr><th>处罚决定 公告日期: 2024-10-28</th></tr></thead>
+          <tr><td><strong>标题:</strong></td><td>中国证监会行政处罚决定书(郭雪)</td></tr>
+          <tr><td><strong>处罚原因:</strong></td><td>证券从业人员持有并交易“闻泰科技”等股票</td></tr>
+          <tr><td><strong>处罚内容:</strong></td><td>罚款</td></tr>
+          <tr><td><strong>处罚机关:</strong></td><td>湖南证监局</td></tr>
+        </table>
+        """
+        monkeypatch.setattr(fsp, "_http_get_gbk", lambda *a, **kw: html)
+        result = fsp.fetch_penalty_list("600745.SH", stock_name="闻泰科技")
+        assert result["target_aliases"] == ["闻泰科技"]
+        assert result["records"][0]["target_relevance"] == "security_mention_only"
+        assert result["records"][0]["e2_countable"] is False
 
 
 # ---------------------------------------------------------------------------
