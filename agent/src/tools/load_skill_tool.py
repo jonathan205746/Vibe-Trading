@@ -35,12 +35,20 @@ class LoadSkillTool(BaseTool):
         """Load skill documentation.
 
         Args:
-            **kwargs: Must include name.
+            **kwargs: Must include name, or a single positional arg as skill name.
 
         Returns:
             Full skill documentation or an error message.
         """
-        name = kwargs["name"]
+        name = kwargs.get("name")
+        if name is None:
+            # 兼容 LLM 可能传入的非标准格式（如直接传 skill 名）
+            for key in kwargs:
+                if isinstance(kwargs[key], str) and len(kwargs[key]) < 100:
+                    name = kwargs[key]
+                    break
+        if not name:
+            return json.dumps({"status": "error", "content": "Error: load_skill requires 'name' parameter"}, ensure_ascii=False)
         content = self._loader.get_content(name)
         return json.dumps({
             "status": "ok" if not content.startswith("Error:") else "error",

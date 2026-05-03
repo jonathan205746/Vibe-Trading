@@ -903,6 +903,7 @@ def cmd_swarm_run_live(preset: str, vars_json: Optional[str] = None) -> None:
     from src.swarm.runtime import SwarmRuntime
     from src.swarm.store import SwarmStore
     from src.swarm.models import RunStatus
+    from src.swarm.presets import load_preset
 
     user_vars: Dict[str, str] = {}
     if vars_json:
@@ -911,6 +912,36 @@ def cmd_swarm_run_live(preset: str, vars_json: Optional[str] = None) -> None:
         except json.JSONDecodeError as exc:
             console.print(f"[red]Invalid JSON: {exc}[/red]")
             return
+
+    # --- 修复变量映射：自动将常见变量名映射到预设期望的变量名 ---
+    preset_data = load_preset(preset)
+    preset_vars = preset_data.get("variables", [])
+    preset_var_names = {v["name"] for v in preset_vars}
+
+    # 如果用户传了 topic 但预设期望 target，自动映射
+    if "topic" in user_vars and "target" in preset_var_names and "target" not in user_vars:
+        user_vars["target"] = user_vars.pop("topic")
+    # 如果用户传了 goal 但预设期望 target，自动映射
+    if "goal" in user_vars and "target" in preset_var_names and "target" not in user_vars:
+        user_vars["target"] = user_vars.pop("goal")
+    # 自动检测 market（如果预设需要但用户没传）
+    if "market" in preset_var_names and "market" not in user_vars:
+        target_str = user_vars.get("target", user_vars.get("topic", user_vars.get("goal", "")))
+        # 检测 A 股特征
+        if re.search(r'\d{6}\.(SH|SZ|BJ)|\b(002|300|600|601|603|688|000|001)\d{3}\b|沪深|上证|深证', target_str, re.IGNORECASE):
+            user_vars["market"] = "A-shares"
+        # 检测港股
+        elif re.search(r'\.HK\b|港股|恒生', target_str, re.IGNORECASE):
+            user_vars["market"] = "Hong Kong"
+        # 检测美股
+        elif re.search(r'\.US\b|\.NASDAQ|\.NYSE|美股|纳斯达克', target_str, re.IGNORECASE):
+            user_vars["market"] = "US"
+        # 检测加密
+        elif re.search(r'BTC|ETH|加密|crypto', target_str, re.IGNORECASE):
+            user_vars["market"] = "crypto"
+        else:
+            user_vars["market"] = "A-shares"  # 默认 A 股
+    # ------------------------------------------------------------------
 
     store = SwarmStore(base_dir=SWARM_DIR)
     runtime = SwarmRuntime(store=store)
@@ -1197,6 +1228,38 @@ def cmd_swarm_presets() -> None:
 
 def cmd_swarm_run(preset: str, vars_json: Optional[str] = None) -> None:
     """Run swarm preset (legacy polling mode, use cmd_swarm_run_live for streaming)."""
+    from src.swarm.presets import load_preset
+
+    user_vars: Dict[str, str] = {}
+    if vars_json:
+        try:
+            user_vars = json.loads(vars_json)
+        except json.JSONDecodeError as exc:
+            console.print(f"[red]Invalid JSON: {exc}[/red]")
+            return
+
+    # --- 修复变量映射：自动将常见变量名映射到预设期望的变量名 ---
+    preset_data = load_preset(preset)
+    preset_vars = preset_data.get("variables", [])
+    preset_var_names = {v["name"] for v in preset_vars}
+
+    if "topic" in user_vars and "target" in preset_var_names and "target" not in user_vars:
+        user_vars["target"] = user_vars.pop("topic")
+    if "goal" in user_vars and "target" in preset_var_names and "target" not in user_vars:
+        user_vars["target"] = user_vars.pop("goal")
+    if "market" in preset_var_names and "market" not in user_vars:
+        target_str = user_vars.get("target", user_vars.get("topic", user_vars.get("goal", "")))
+        if re.search(r'\d{6}\.(SH|SZ|BJ)|\b(002|300|600|601|603|688|000|001)\d{3}\b|沪深|上证|深证', target_str, re.IGNORECASE):
+            user_vars["market"] = "A-shares"
+        elif re.search(r'\.HK\b|港股|恒生', target_str, re.IGNORECASE):
+            user_vars["market"] = "Hong Kong"
+        elif re.search(r'\.US\b|\.NASDAQ|\.NYSE|美股|纳斯达克', target_str, re.IGNORECASE):
+            user_vars["market"] = "US"
+        elif re.search(r'BTC|ETH|加密|crypto', target_str, re.IGNORECASE):
+            user_vars["market"] = "crypto"
+        else:
+            user_vars["market"] = "A-shares"
+    # ------------------------------------------------------------------
     cmd_swarm_run_live(preset, vars_json)
 
 

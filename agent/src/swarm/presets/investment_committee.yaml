@@ -45,7 +45,7 @@ agents:
 
       Use factor_analysis for quant support; use load_skill for frameworks.
     tools: [bash, read_file, write_file, load_skill, factor_analysis]
-    skills: [technical-basic, fundamental-filter, yfinance, earnings-revision, sentiment-analysis]
+    skills: [technical-basic, fundamental-filter, akshare, earnings-revision, sentiment-analysis]
     max_iterations: 50
     timeout_seconds: 600
     max_retries: 1
@@ -98,7 +98,7 @@ agents:
 
       Use factor_analysis for risk-factor views; use load_skill for risk frameworks.
     tools: [bash, read_file, write_file, load_skill, factor_analysis]
-    skills: [technical-basic, fundamental-filter, yfinance, risk-analysis, volatility]
+    skills: [technical-basic, fundamental-filter, akshare, risk-analysis, volatility]
     max_iterations: 50
     timeout_seconds: 600
     max_retries: 1
